@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import time
+import logging
+import getopt
+from multiprocessing import Process, Manager
+from util.dbopts import connectMongo, getGridsFromMongo
+
+class UnitGridDistribution(object):
+	
+	def __init__(self, PROP):
+		super(UnitGridDistribution, self).__init__()
+
+	def run(self):
+		logging.info('TASK- running...')
+
+		
+
+
+def processTask(x, city, directory, inum, onum):
+	task = augmentRawDatainMultiProcess({
+		INDEX: x, 
+		CITY: city, 
+		DIRECTORY: directory, 
+		INUM: inum, 
+		ONUM: onum
+	})
+	task.run()
+
+def usage():
+	print '''Usage Guidance
+help	-h	get usage guidance
+city	-c	city or region name, such as beijing
+directory	-d	the root directory of records and results, such as /China/beijing
+inum	-i	number of input files
+onum	-o	number of output files
+'''
+
+def main(argv):
+	try:
+		opts, args = getopt.getopt(argv, "hc:d:i:o:", ["help", "city=", 'directory=', 'inum=', 'onum='])
+	except getopt.GetoptError as err:
+		print str(err)
+		usage()
+		sys.exit(2)
+
+	city, directory, inum, onum, jnum = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records/beijing', 3999, 20, 20
+	for opt, arg in opts:
+		if opt == '-h':
+			usage()
+			sys.exit()
+		elif opt in ("-c", "--city"):
+			city = arg
+		elif opt in ("-d", "--directory"):
+			directory = arg
+		elif opt in ('-i', '--inum'):
+			inum = int(arg)
+		elif opt in ('-o', '--onum'):
+			onum = int(arg)
+
+	STARTTIME = time.time()
+	print "Start approach at %s" % STARTTIME
+
+	# 连接数据获取网格信息，包括总数，具有有效POI的网格
+	conn, db = connectMongo('tdnormal')
+	GRIDSNUM = db['newgrids_%s' % city].count()
+	gridsData, validIDs = getGridsFromMongo(city, db)
+	conn.close()
+
+	# @多进程运行程序 START
+	manager = Manager()
+	jobs = []
+
+	tasks = []
+	for x in xrange(0, jnum):
+		# jnum 为进程数
+		jobs.append( Process(target=processTask, args=(x, city, directory, inum, onum)) )
+		jobs[x].start()
+
+	for job in jobs:
+		job.join()
+
+	# 处理剩余数据进文件
+	for x in xrange(0, jnum):
+		# 合并操作
+	# @多进程运行程序 END
+
+if __name__ == '__main__':
+	logging.basicConfig(filename='logger-unitGridDistribution.log', level=logging.DEBUG)
+	main(sys.argv[1:])
