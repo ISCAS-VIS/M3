@@ -7,27 +7,50 @@ import time
 import logging
 import getopt
 from multiprocessing import Process, Manager
-from util.dbopts import connectMongo, getGridsFromMongo
+from util.dbopts import connectMongo
 
 class UnitGridDistribution(object):
 	
 	def __init__(self, PROP):
 		super(UnitGridDistribution, self).__init__()
 
+		self.INDEX = PROP['INDEX']
+		self.CITY = PROP['CITY'] 
+		self.DIRECTORY = PROP['DIRECTORY'] 
+		self.INUM = PROP['INUM']
+		self.ONUM = PROP['ONUM']
+		self.GRIDSNUM = PROP['GRIDSNUM']
+
 	def run(self):
 		logging.info('TASK- running...')
 
-		
+		oname = 't%02d-pred-res' % (self.INDEX)
+		idir = os.path.join(self.DIRECTORY, '', self.CITY )
+		entropyfile = os.path.join(self.DIRECTORY, 'result', self.CITY, oname)
 
 
-def processTask(x, city, directory, inum, onum):
-	task = augmentRawDatainMultiProcess({
-		INDEX: x, 
-		CITY: city, 
-		DIRECTORY: directory, 
-		INUM: inum, 
-		ONUM: onum
-	})
+		for x in xrange(0,10000):
+			number = self.INDEX + 20 * x
+			if number > self.INUM:
+				break
+
+			ifilename = 'res-%05d' % number
+			logging.info('TASK-%d operates file %s' % (self.INDEX, ifilename))
+			self.updateDis(os.path.join(idir, ifilename))
+	
+	def updateDis(ifile):
+		# 
+		with open(ifile, 'rb') as stream:
+			for line in stream:
+				resnumber += 1
+				linelist = line.strip('\n').split(',')
+				# index = int(linelist[0]) % self.resfilenum
+
+				# reslist[ index ] += linelist[0] + ',' + formatTime(linelist[1]) + ',' + formatAdmin(linelist[4]) + ',' + formatGridID(getCityLocs(CITY), [linelist[3], linelist[2]]) + '\n'
+		stream.close()
+
+def processTask(PROP):
+	task = augmentRawDatainMultiProcess(PROP)
 	task.run()
 
 def usage():
@@ -67,7 +90,6 @@ def main(argv):
 	# 连接数据获取网格信息，包括总数，具有有效POI的网格
 	conn, db = connectMongo('tdnormal')
 	GRIDSNUM = db['newgrids_%s' % city].count()
-	gridsData, validIDs = getGridsFromMongo(city, db)
 	conn.close()
 
 	# @多进程运行程序 START
@@ -77,7 +99,16 @@ def main(argv):
 	tasks = []
 	for x in xrange(0, jnum):
 		# jnum 为进程数
-		jobs.append( Process(target=processTask, args=(x, city, directory, inum, onum)) )
+		PROP = {
+			INDEX: x, 
+			CITY: city, 
+			DIRECTORY: directory, 
+			INUM: inum, 
+			ONUM: onum,
+			GRIDSNUM: GRIDSNUM
+		}
+
+		jobs.append( Process(target=processTask, args=(PROP)) )
 		jobs[x].start()
 
 	for job in jobs:

@@ -35,24 +35,3 @@ def connectMYSQL(dbname):
 	cur = db.cursor()
 
 	return db, cur
-
-def getGridsFromMongo(city, db):
-	"""从 MongoDB 获取 grid 数据，传回第一个参数为 dictionary, 存有不同 id 的 POI vector; 第二个参数存有有效网格 ID 列表
-	
-	Args:
-	    city (TYPE): Description
-	    db (TYPE): Description
-	
-	Returns:
-	    TYPE: Description
-	"""
-	res = list( db['newgrids_%s' % city].find({"properties.vecvalid": True }, {"properties.uid": 1, "properties.vec": 1}) )
-	gridsData, validIDs = {}, []
-	reslen = len(res)
-	for x in xrange(0, reslen):
-		id = str(res[x]['properties']['uid'])
-		vec = np.array(res[x]['properties']['vec'], dtype='f')
-		gridsData[ id ] = vec
-		validIDs.append(id)
-
-	return gridsData, validIDs

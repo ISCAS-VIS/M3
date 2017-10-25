@@ -84,3 +84,19 @@ def formatGridID(locs, point, SPLIT = 0.003):
 	latind = int( (float(point[1]) - locs['south']) / SPLIT )
 
 	return str(lngind + latind * LNGNUM)
+
+def calGridID(locs, id, SPLIT = 0.003):
+	# 根据城市网格编号还原经纬度信息
+	centerincrement = SPLIT/2.0
+	LNGNUM = int((locs['east'] - locs['west']) / SPLIT + 1)
+	latind = int(id / LNGNUM)
+	lngind = id - latind * LNGNUM
+	lat = (locs['south'] + latind * SPLIT)
+	lng = (locs['west'] + lngind * SPLIT)
+	lngcen = (lng + centerincrement)
+	latcen = (lat + centerincrement)
+
+	return {
+		'lat': latcen,
+		'lng': lngcen
+	}
