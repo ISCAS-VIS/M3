@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 def getAdminNumber(admin):
-	# 获取行政区划对应数字编号
+	"""
+	获取行政区划对应数字编号
+		:param admin: 
+	"""
+
 	districts = {
 		# beijing 
 		u'东城区': 1,u'西城区':2,u'朝阳区':3,u'丰台区':4,u'石景山区':5,u'海淀区':6,u'门头沟区':7,u'房山区':8,u'通州区':9,u'顺义区':10,u'昌平区':11,u'大兴区':12,u'怀柔区':13,u'平谷区':14,u'密云县':15,u'延庆县':16,
@@ -20,7 +25,10 @@ def getAdminNumber(admin):
 	return str( districts[admin] )
 	
 def getCityLocs(city):
-	# 城市边界信息列表
+	"""
+	城市边界信息列表
+		:param city: 
+	"""
 	newCitylocslist = {
 		'beijing': {
 			'north': 41.055,
@@ -86,7 +94,13 @@ def formatGridID(locs, point, SPLIT = 0.003):
 	return str(lngind + latind * LNGNUM)
 
 def calGridID(locs, id, SPLIT = 0.003):
-	# 根据城市网格编号还原经纬度信息
+	"""
+	根据城市网格编号还原经纬度信息
+		:param locs: 
+		:param id: 
+		:param SPLIT=0.003: 
+	"""
+	
 	centerincrement = SPLIT/2.0
 	LNGNUM = int((locs['east'] - locs['west']) / SPLIT + 1)
 	latind = int(id / LNGNUM)

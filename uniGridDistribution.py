@@ -11,6 +11,7 @@ from multiprocessing import Process, Manager
 from util.dbopts import connectMongo
 from util.preprocess import getCityLocs, formatGridID, getAdminNumber
 
+
 class UnitGridDistribution(object):
 	
 	def __init__(self, PROP):
@@ -24,14 +25,12 @@ class UnitGridDistribution(object):
 		self.GRIDSNUM = PROP['GRIDSNUM']
 		self.MATRIX = np.array([np.array([x, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) for x in xrange(0, PROP['GRIDSNUM'])])
 
-
 	def run(self):
 		logging.info('TASK- running...')
 
 		oname = 't%02d-pred-res' % (self.INDEX)
 		idir = os.path.join(self.DIRECTORY, '', self.CITY )
 		entropyfile = os.path.join(self.DIRECTORY, 'result', self.CITY, oname)
-
 
 		for x in xrange(0,10000):
 			number = self.INDEX + 20 * x
@@ -59,9 +58,11 @@ class UnitGridDistribution(object):
 
 		stream.close()
 
+
 def processTask(PROP):
 	task = augmentRawDatainMultiProcess(PROP)
 	task.run()
+
 
 def usage():
 	print '''Usage Guidance
@@ -71,6 +72,7 @@ directory	-d	the root directory of records and results, such as /China/beijing
 inum	-i	number of input files
 onum	-o	number of output files
 '''
+
 
 def main(argv):
 	try:
@@ -103,22 +105,20 @@ def main(argv):
 	conn.close()
 
 	# @多进程运行程序 START
-	manager = Manager()
 	jobs = []
 
-	tasks = []
 	for x in xrange(0, jnum):
 		# jnum 为进程数
 		PROP = {
-			INDEX: x, 
-			CITY: city, 
-			DIRECTORY: directory, 
-			INUM: inum, 
-			ONUM: onum,
-			GRIDSNUM: GRIDSNUM
+			'INDEX': x, 
+			'CITY': city, 
+			'DIRECTORY': directory, 
+			'INUM': inum, 
+			'ONUM': onum,
+			'GRIDSNUM': GRIDSNUM
 		}
 
-		jobs.append( Process(target=processTask, args=(PROP)) )
+		jobs.append(Process(target=processTask, args=(PROP)))
 		jobs[x].start()
 
 	for job in jobs:
@@ -127,7 +127,9 @@ def main(argv):
 	# 处理剩余数据进文件
 	for x in xrange(0, jnum):
 		# 合并操作
+		print 0
 	# @多进程运行程序 END
+
 
 if __name__ == '__main__':
 	logging.basicConfig(filename='logger-unitGridDistribution.log', level=logging.DEBUG)
