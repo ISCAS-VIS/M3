@@ -6,8 +6,10 @@ import sys
 import time
 import logging
 import getopt
+import numpy as np
 from multiprocessing import Process, Manager
 from util.dbopts import connectMongo
+from util.preprocess import getCityLocs, formatGridID, getAdminNumber
 
 class UnitGridDistribution(object):
 	
@@ -20,6 +22,8 @@ class UnitGridDistribution(object):
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
 		self.GRIDSNUM = PROP['GRIDSNUM']
+		self.MATRIX = np.array([np.array([x, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) for x in xrange(0, PROP['GRIDSNUM'])])
+
 
 	def run(self):
 		logging.info('TASK- running...')
@@ -40,13 +44,19 @@ class UnitGridDistribution(object):
 	
 	def updateDis(ifile):
 		# 
+		resnum = 0
 		with open(ifile, 'rb') as stream:
 			for line in stream:
-				resnumber += 1
+				resnum += 1
 				linelist = line.strip('\n').split(',')
-				# index = int(linelist[0]) % self.resfilenum
+				index = int(linelist[0]) % self.GRIDSNUM
 
-				# reslist[ index ] += linelist[0] + ',' + formatTime(linelist[1]) + ',' + formatAdmin(linelist[4]) + ',' + formatGridID(getCityLocs(CITY), [linelist[3], linelist[2]]) + '\n'
+				# reslist[ index ] += linelist[0] + ',' + formatTime(linelist[1]) + ',' + formatAdmin(linelist[4]) + ',' + formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]]) + '\n'
+				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
+				admin = formatAdmin(linelist[4])
+
+				# 
+
 		stream.close()
 
 def processTask(PROP):
