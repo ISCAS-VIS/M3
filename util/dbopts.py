@@ -22,7 +22,7 @@ def connectMongo(dbname):
 
 	return conn, mdb
 
-def connectMYSQL(dbname):
+def connectMYSQL(dbname, passwd):
 	"""Connect MySQL
 	
 	Returns:
@@ -30,7 +30,7 @@ def connectMYSQL(dbname):
 	"""
 	db = MySQLdb.connect(host="192.168.1.42",    	# your host, usually localhost
 						user="root",         	# your username
-						passwd="vis_2014",  	# your password
+						passwd=passwd,  	# your password
 						db=dbname)		# name of the data base
 	cur = db.cursor()
 
