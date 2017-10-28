@@ -9,7 +9,7 @@ import getopt
 import numpy as np
 from multiprocessing import Process, Manager
 from util.dbopts import connectMongo
-from util.preprocess import getCityLocs, formatGridID, getAdminNumber
+from util.preprocess import getCityLocs, formatGridID, getAdminNumber, formatTime
 
 
 class UnitGridDistribution(object):
@@ -23,16 +23,17 @@ class UnitGridDistribution(object):
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
 		self.GRIDSNUM = PROP['GRIDSNUM']
+		self.WEEK = PROP['WEEK']
 		self.MATRIX = np.array([np.array([x, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) for x in xrange(0, PROP['GRIDSNUM'])])
 
 	def run(self):
 		logging.info('TASK- running...')
 
 		oname = 't%02d-pred-res' % (self.INDEX)
-		idir = os.path.join(self.DIRECTORY, '', self.CITY )
+		idir = os.path.join(self.DIRECTORY, '', self.CITY)
 		entropyfile = os.path.join(self.DIRECTORY, 'result', self.CITY, oname)
 
-		for x in xrange(0,10000):
+		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
 			if number > self.INUM:
 				break
@@ -41,7 +42,7 @@ class UnitGridDistribution(object):
 			logging.info('TASK-%d operates file %s' % (self.INDEX, ifilename))
 			self.updateDis(os.path.join(idir, ifilename))
 	
-	def updateDis(ifile):
+	def updateDis(self, ifile):
 		# 
 		resnum = 0
 		with open(ifile, 'rb') as stream:
@@ -52,14 +53,23 @@ class UnitGridDistribution(object):
 
 				# reslist[ index ] += linelist[0] + ',' + formatTime(linelist[1]) + ',' + formatAdmin(linelist[4]) + ',' + formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]]) + '\n'
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
+				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[7], linelist[6]])
+				toGid = formatGridID(getCityLocs(self.CITY), [linelist[9], linelist[8]])
 				admin = formatAdmin(linelist[4])
+				state = linelist[5]
+				ydayCurrent = formatTime(linelist[1])
+				ydayBase = self.WEEK * 7 + 185
 
-				# 
-
+				if ydayCurrent >= ydayBase and ydayCurrent < (ydayBase + 7):
+					self.dealPointState(state, admin, grid, fromGid, toGid)
 		stream.close()
+	
+	def dealPointState(self, linelist):
+		# 将当前记录更新到 distribution 以及存在的旅行记录更新到出行轨迹上
+		print 0
 
 
-def processTask(PROP):
+def processTask(PROP): 
 	task = augmentRawDatainMultiProcess(PROP)
 	task.run()
 
@@ -82,7 +92,7 @@ def main(argv):
 		usage()
 		sys.exit(2)
 
-	city, directory, inum, onum, jnum = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records/beijing', 3999, 20, 20
+	city, directory, inum, onum, jnum, weekSep = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records/beijing', 3999, 20, 20, 0
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -115,7 +125,8 @@ def main(argv):
 			'DIRECTORY': directory, 
 			'INUM': inum, 
 			'ONUM': onum,
-			'GRIDSNUM': GRIDSNUM
+			'GRIDSNUM': GRIDSNUM,
+			'WEEK': weekSep
 		}
 
 		jobs.append(Process(target=processTask, args=(PROP)))

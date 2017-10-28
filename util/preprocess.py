@@ -69,12 +69,7 @@ def formatTime(timestr):
 	"""
 	dateObj = time.localtime( int(timestr)/1000.0 )
 	
-	date = time.strftime("%m-%d", dateObj)
-	hourmin = time.strftime("%H:%M", dateObj)
-	day = time.strftime("%w", dateObj)
-	period = str( getTimePeriod( time.strftime("%H", dateObj) ) )
-
-	return date + ',' + hourmin + ',' + day + ',' + period
+	return dateObj[7]
 
 def formatGridID(locs, point, SPLIT = 0.003):
 	"""根据经纬度计算城市网格编号
@@ -86,12 +81,15 @@ def formatGridID(locs, point, SPLIT = 0.003):
 	Returns:
 		TYPE: Description
 	"""
-	# LATNUM = int((locs['north'] - locs['south']) / SPLIT + 1)
-	LNGNUM = int( (locs['east'] - locs['west']) / SPLIT + 1 )
-	lngind = int( (float(point[0]) - locs['west']) / SPLIT )
-	latind = int( (float(point[1]) - locs['south']) / SPLIT )
+	if point[0] == '0' and point[1] == '0':
+		return '0'
+	else:
+		# LATNUM = int((locs['north'] - locs['south']) / SPLIT + 1)
+		LNGNUM = int( (locs['east'] - locs['west']) / SPLIT + 1 )
+		lngind = int( (float(point[0]) - locs['west']) / SPLIT )
+		latind = int( (float(point[1]) - locs['south']) / SPLIT )
 
-	return str(lngind + latind * LNGNUM)
+		return str(lngind + latind * LNGNUM)
 
 def calGridID(locs, id, SPLIT = 0.003):
 	"""
