@@ -10,7 +10,7 @@ import numpy as np
 from multiprocessing import Process, Manager
 from util.dbopts import connectMongo
 from util.preprocess import getCityLocs, formatGridID, getAdminNumber, formatTime
-
+from util.preprocess import mergeMatrixs
 
 class UnitGridDistribution(object):
 	
@@ -24,14 +24,20 @@ class UnitGridDistribution(object):
 		self.ONUM = PROP['ONUM']
 		self.GRIDSNUM = PROP['GRIDSNUM']
 		self.WEEK = PROP['WEEK']
-		self.MATRIX = np.array([np.array([x, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) for x in xrange(0, PROP['GRIDSNUM'])])
+		self.MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, PROP['GRIDSNUM'])]) # index, people, number
+		self.RECS = ''
+		self.LASTREC = {
+			'id': -1,
+			'grid': [],
+			'travel': ''
+		}
 
 	def run(self):
-		logging.info('TASK- running...')
+		logging.info('TASK-%d running...' % (self.INDEX))
 
 		oname = 't%02d-pred-res' % (self.INDEX)
 		idir = os.path.join(self.DIRECTORY, '', self.CITY)
-		entropyfile = os.path.join(self.DIRECTORY, 'result', self.CITY, oname)
+		ofile = os.path.join(self.DIRECTORY, 'result', self.CITY, oname)
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
@@ -41,32 +47,70 @@ class UnitGridDistribution(object):
 			ifilename = 'res-%05d' % number
 			logging.info('TASK-%d operates file %s' % (self.INDEX, ifilename))
 			self.updateDis(os.path.join(idir, ifilename))
+		
+		# 结果写进文件
+		# MATRIX
+		# RECORDS
 	
 	def updateDis(self, ifile):
 		# 
 		resnum = 0
 		with open(ifile, 'rb') as stream:
 			for line in stream:
+				line = line.strip('\n')
 				resnum += 1
-				linelist = line.strip('\n').split(',')
-				index = int(linelist[0]) % self.GRIDSNUM
+				linelist = line.split(',')
 
-				# reslist[ index ] += linelist[0] + ',' + formatTime(linelist[1]) + ',' + formatAdmin(linelist[4]) + ',' + formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]]) + '\n'
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
 				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[7], linelist[6]])
-				toGid = formatGridID(getCityLocs(self.CITY), [linelist[9], linelist[8]])
-				admin = formatAdmin(linelist[4])
+				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[9], linelist[8]])
+				admin = getAdminNumber(linelist[4])
 				state = linelist[5]
 				ydayCurrent = formatTime(linelist[1])
 				ydayBase = self.WEEK * 7 + 185
 
 				if ydayCurrent >= ydayBase and ydayCurrent < (ydayBase + 7):
-					self.dealPointState(state, admin, grid, fromGid, toGid)
+					self.dealPointState({
+						'id': linelist[0],
+						'state': state, 
+						'day': ydayCurrent,
+						'admin': admin, 
+						'grid': grid, 
+						'fromGrid': fromGid, 
+						'toGrid': toGrid,
+						'string': line
+					})
 		stream.close()
 	
-	def dealPointState(self, linelist):
-		# 将当前记录更新到 distribution 以及存在的旅行记录更新到出行轨迹上
-		print 0
+	def dealPointState(self, data):
+		"""
+		将当前记录更新到 distribution 以及存在的旅行记录更新到出行轨迹上
+			:param self: 
+			:param data: 
+		"""
+		grid = data['grid']
+		id = data['id']
+		if data['state'] == 'S':
+			# stay 状态更新
+			if id == self.LASTREC['id']:
+				if grid not in self.LASTREC['grid']:
+					self.LASTREC['grid'].append(grid)
+					self.MATRIX[grid][1] += 1
+			else:
+				self.LASTREC['id'] = id
+				self.LASTREC['grid'] = [grid]
+				self.MATRIX[grid][1] += 1
+
+			self.MATRIX[grid][2] += 1
+		elif data['state'] == 'T':
+			day = data['day']
+			fromGrid = data['fromGrid']
+			toGrid = data['toGrid']
+			identifier = '%s-%s-$s' % (day, fromGrid, toGrid)
+			if identifier != self.LASTREC['travel']:
+				self.LASTREC['travel'] = identifier
+				self.RECS += '%s,%d,%s,%s,%s,%s\n' % (id, data['day'], grid, data['admin'], fromGrid, toGrid)
+			
 
 
 def processTask(PROP): 
@@ -110,9 +154,10 @@ def main(argv):
 	print "Start approach at %s" % STARTTIME
 
 	# 连接数据获取网格信息，包括总数，具有有效POI的网格
-	conn, db = connectMongo('tdnormal')
-	GRIDSNUM = db['newgrids_%s' % city].count()
-	conn.close()
+	# conn, db = connectMongo('tdnormal')
+	# 固定到北京大小
+	GRIDSNUM = 33650
+	# conn.close()
 
 	# @多进程运行程序 START
 	jobs = []
@@ -136,9 +181,10 @@ def main(argv):
 		job.join()
 
 	# 处理剩余数据进文件
-	for x in xrange(0, jnum):
-		# 合并操作
-		print 0
+	# 合并操作
+	mergeMatrixs()
+	
+
 	# @多进程运行程序 END
 
 

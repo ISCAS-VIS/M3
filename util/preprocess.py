@@ -31,10 +31,10 @@ def getCityLocs(city):
 	"""
 	newCitylocslist = {
 		'beijing': {
-			'north': 41.055,
-			'south': 39.445,
-			'west': 115.422,
-			'east': 117.515
+			'north': 41.05, # 41.055,
+			'south': 39.44, # 39.445,
+			'west': 115.42, # 115.422,
+			'east': 117.51, # 117.515
 		},
 		'tianjin': {
 			'north': 40.254,
@@ -91,7 +91,7 @@ def formatGridID(locs, point, SPLIT = 0.003):
 
 		return str(lngind + latind * LNGNUM)
 
-def calGridID(locs, id, SPLIT = 0.003):
+def calGridID(locs, id, SPLIT = 0.01):
 	"""
 	根据城市网格编号还原经纬度信息
 		:param locs: 
@@ -112,3 +112,55 @@ def calGridID(locs, id, SPLIT = 0.003):
 		'lat': latcen,
 		'lng': lngcen
 	}
+
+def mergeMatrixs(city, GRIDSNUM, directory):
+	"""
+	合并 CityGrids 信息,分别读取文件,最后需将叠加的信息处理存入一个合并的文件
+	
+	Args:
+	    city (TYPE): Description
+	    GRIDSNUM (TYPE): Description
+	
+	Returns:
+	    TYPE: Description
+	"""
+	
+	ematrix = np.array([np.array([x, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) for x in xrange(0, GRIDSNUM)])
+	baseurl = os.path.join(directory, 'entropy/matrix', city)
+
+	for x in xrange(0,20):
+		with open(os.path.join(baseurl, 'respeo-%03d' % x), 'rb') as stream:
+			for each in stream:
+				line = np.array(each.split(','), dtype='f')
+				id = int(line[0])
+				line[0] = 0
+				ematrix[ id ] = np.add(line, ematrix[id])
+		stream.close()
+
+	resString = ''
+	for x in xrange(0,GRIDSNUM):
+		if ematrix[x][1] == 0:
+			ematrix[x][4] = -1
+			ematrix[x][5] = -1
+			ematrix[x][7] = -1
+			ematrix[x][8] = -1
+		else:
+			ematrix[x][7] = ematrix[x][4] / ematrix[x][1]
+			ematrix[x][8] = ematrix[x][5] / ematrix[x][1]
+
+		# 处理 POI 熵
+		if ematrix[x][2] == 0.0:
+			ematrix[x][3] = -1
+			ematrix[x][6] = -1
+		else:
+			ematrix[x][6] = ematrix[x][3] / ematrix[x][2]
+
+		linestr = ','.join([str(int(ematrix[x][e])) for e in xrange(0,3)]) + ',' + ','.join([str(ematrix[x][e]) for e in xrange(3,9)]) + '\n'
+		resString += linestr
+
+
+	with open(os.path.join(baseurl, 'respeo-xxx'), 'ab') as res:
+		res.write(resString)
+	res.close()
+
+	print "%d lines into matrix res-xxx file" % GRIDSNUM
