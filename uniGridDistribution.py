@@ -10,7 +10,7 @@ import numpy as np
 from multiprocessing import Process, Manager
 from util.dbopts import connectMongo
 from util.preprocess import getCityLocs, formatGridID, getAdminNumber, formatTime
-from util.preprocess import mergeMatrixs
+from util.preprocess import mergeMatrixs, writeMatrixtoFile, writeArraytoFile
 
 class UnitGridDistribution(object):
 	
@@ -20,12 +20,13 @@ class UnitGridDistribution(object):
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
 		self.DIRECTORY = PROP['DIRECTORY'] 
+		self.SUBPATH = PROP['SUBPATH']
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
 		self.GRIDSNUM = PROP['GRIDSNUM']
 		self.WEEK = PROP['WEEK']
-		self.MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, PROP['GRIDSNUM'])]) # index, people, number
-		self.RECS = ''
+		self.MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, PROP['GRIDSNUM'])])  # index, people, number
+		self.RECS = []
 		self.LASTREC = {
 			'id': -1,
 			'grid': [],
@@ -35,9 +36,10 @@ class UnitGridDistribution(object):
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
 
-		oname = 't%02d-pred-res' % (self.INDEX)
-		idir = os.path.join(self.DIRECTORY, '', self.CITY)
-		ofile = os.path.join(self.DIRECTORY, 'result', self.CITY, oname)
+		oname = 't%02d-w%d-res' % (self.INDEX. self.WEEK)
+		orecsaname = 't%02d-recs%d-res' % (self.INDEX. self.WEEK)
+		idir = os.path.join(self.DIRECTORY, self.CITY)
+		ofile = os.path.join(self.DIRECTORY, self.CITY, self.SUBPATH, oname)
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
@@ -51,7 +53,9 @@ class UnitGridDistribution(object):
 		# 结果写进文件
 		# MATRIX
 		# RECORDS
-	
+		writeMatrixtoFile(self.MATRIX, ofile)
+		writeArraytoFile(self.RECS, orecsaname)
+
 	def updateDis(self, ifile):
 		# 
 		resnum = 0
@@ -112,7 +116,7 @@ class UnitGridDistribution(object):
 			if identifier != self.LASTREC['travel']:
 				self.LASTREC['travel'] = identifier
 				# self.RECS += '%s,%d,%s,%s,%s,%s\n' % (id, data['day'], grid, data['admin'], fromGrid, toGrid)
-				self.RECS += '%s,%s,%s\n' % (id, fromGrid, toGrid)
+				self.RECS.append('%s,%s,%s' % (id, fromGrid, toGrid))
 			
 
 
@@ -139,7 +143,7 @@ def main(argv):
 		usage()
 		sys.exit(2)
 
-	city, directory, inum, onum, jnum, weekSep = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records/beijing', 3999, 20, 20, 0
+	city, directory, inum, onum, jnum, weekSep, subpath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20, 0, 'newvis'
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -174,7 +178,8 @@ def main(argv):
 			'INUM': inum, 
 			'ONUM': onum,
 			'GRIDSNUM': GRIDSNUM,
-			'WEEK': weekSep
+			'WEEK': weekSep,
+			'SUBPATH': subpath
 		}
 
 		jobs.append(Process(target=processTask, args=(PROP)))
@@ -185,8 +190,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeMatrixs(city, GRIDSNUM, directory)
-	
+	mergeMatrixs(city, GRIDSNUM, directory, subpath, weekSep)
 
 	# @多进程运行程序 END
 

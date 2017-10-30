@@ -113,7 +113,7 @@ def calGridID(locs, id, SPLIT = 0.01):
 		'lng': lngcen
 	}
 
-def mergeMatrixs(city, GRIDSNUM, directory):
+def mergeMatrixs(city, GRIDSNUM, directory, subpath, week):
 	"""
 	合并 CityGrids 信息,分别读取文件,最后需将叠加的信息处理存入一个合并的文件
 	
@@ -126,10 +126,10 @@ def mergeMatrixs(city, GRIDSNUM, directory):
 	"""
 	
 	matrix = np.array([np.array([x, 0, 0]) for x in xrange(0, GRIDSNUM)])
-	baseurl = os.path.join(directory, 'entropy/matrix', city)
+	baseurl = os.path.join(directory, subpath)
 
 	for x in xrange(0, 20):
-		with open(os.path.join(baseurl, 'respeo-%03d' % x), 'rb') as stream:
+		with open(os.path.join(baseurl, city, 't%02d-w%d-res' % (x, week)), 'rb') as stream:
 			for each in stream:
 				line = np.array(each.split(','), dtype='f')
 				id = int(line[0])
@@ -147,3 +147,23 @@ def mergeMatrixs(city, GRIDSNUM, directory):
 	res.close()
 
 	print "%d lines into matrix res-xxx file" % GRIDSNUM
+
+def writeMatrixtoFile(data, filename):
+	"""
+	将矩阵转换成逗号分隔的字符串并写入文件
+		:param data: 
+		:param filename: 
+	"""
+	length = len(data)
+	resString = []
+	for x in xrange(0, length):
+		resString.append(','.join(data[x]))
+
+	with open(filename, 'ab') as res:
+		res.write('\n'.join(resString))
+	res.close()
+
+def writeArraytoFile(data, filename):
+	with open(filename, 'ab') as res:
+		res.write('\n'.join(data))
+	res.close()
