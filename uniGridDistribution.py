@@ -62,23 +62,25 @@ class UnitGridDistribution(object):
 				linelist = line.split(',')
 
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
-				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[7], linelist[6]])
-				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[9], linelist[8]])
-				admin = getAdminNumber(linelist[4])
-				state = linelist[5]
+				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
+				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
+				# admin = getAdminNumber(linelist[4])
+				state = linelist[4]
 				ydayCurrent = formatTime(linelist[1])
 				ydayBase = self.WEEK * 7 + 185
+
+				if line[6] == '0' or line[5] == '0' or line[8] == '0' or line[7] == '0':
+					continue
 
 				if ydayCurrent >= ydayBase and ydayCurrent < (ydayBase + 7):
 					self.dealPointState({
 						'id': linelist[0],
 						'state': state, 
 						'day': ydayCurrent,
-						'admin': admin, 
+						# 'admin': admin, 
 						'grid': grid, 
 						'fromGrid': fromGid, 
-						'toGrid': toGrid,
-						'string': line
+						'toGrid': toGrid
 					})
 		stream.close()
 	
@@ -109,7 +111,8 @@ class UnitGridDistribution(object):
 			identifier = '%s-%s-$s' % (day, fromGrid, toGrid)
 			if identifier != self.LASTREC['travel']:
 				self.LASTREC['travel'] = identifier
-				self.RECS += '%s,%d,%s,%s,%s,%s\n' % (id, data['day'], grid, data['admin'], fromGrid, toGrid)
+				# self.RECS += '%s,%d,%s,%s,%s,%s\n' % (id, data['day'], grid, data['admin'], fromGrid, toGrid)
+				self.RECS += '%s,%s,%s\n' % (id, fromGrid, toGrid)
 			
 
 
@@ -182,7 +185,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeMatrixs()
+	mergeMatrixs(city, GRIDSNUM, directory)
 	
 
 	# @多进程运行程序 END
