@@ -38,8 +38,8 @@ class UnitGridDistribution(object):
 		print 'TASK-%d running...' % (self.INDEX)
 		logging.info('TASK-%d running...' % (self.INDEX))
 
-		oname = 't%02d-w%d-res' % (self.INDEX. self.WEEK)
-		orecsaname = 't%02d-recs%d-res' % (self.INDEX. self.WEEK)
+		oname = 't%02d-w%d-res' % (self.INDEX, self.WEEK)
+		orecsaname = 't%02d-recs%d-res' % (self.INDEX, self.WEEK)
 		idir = os.path.join(self.DIRECTORY, 'result')
 		ofile = os.path.join(self.DIRECTORY, self.SUBPATH, oname)
 
@@ -150,7 +150,7 @@ onum	-o	number of output files
 
 def main(argv):
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:o:w:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'week='])
+		opts, args = getopt.getopt(argv, "hc:d:i:o:w:j:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'week=', 'jnum='])
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
@@ -171,6 +171,8 @@ def main(argv):
 			onum = int(arg)
 		elif opt in ('-w', '--week'):
 			weekSep = int(arg)
+		elif opt in ('-j', '--jnum'):
+    		jnum = int(arg)
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
