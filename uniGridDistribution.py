@@ -7,10 +7,11 @@ import time
 import logging
 import getopt
 import numpy as np
-from multiprocessing import Process, Manager
-from util.dbopts import connectMongo
-from util.preprocess import getCityLocs, formatGridID, getAdminNumber, formatTime
+from multiprocessing import Process  # , Manager
+# from util.dbopts import connectMongo
+from util.preprocess import getCityLocs, formatGridID, formatTime
 from util.preprocess import mergeMatrixs, writeMatrixtoFile, writeArraytoFile
+
 
 class UnitGridDistribution(object):
 	
