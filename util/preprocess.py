@@ -145,7 +145,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, week):
 		resString += ','.join([str(int(matrix[x][e])) for e in xrange(0,3)]) + '\n'
 
 
-	with open(os.path.join(baseurl, 'respeo-xxx'), 'ab') as res:
+	with open(os.path.join(baseurl, 'tall-w%d-res' % (week)), 'ab') as res:
 		res.write(resString)
 	res.close()
 
