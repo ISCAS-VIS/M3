@@ -123,7 +123,17 @@ class UnitGridDistribution(object):
 			
 
 
-def processTask(PROP): 
+def processTask(x, city, directory, inum, onum, GRIDSNUM, weekSep, subpath): 
+	PROP = {
+		'INDEX': x, 
+		'CITY': city, 
+		'DIRECTORY': directory, 
+		'INUM': inum, 
+		'ONUM': onum,
+		'GRIDSNUM': GRIDSNUM,
+		'WEEK': weekSep,
+		'SUBPATH': subpath
+	}
 	task = UnitGridDistribution(PROP)
 	task.run()
 
@@ -187,7 +197,7 @@ def main(argv):
 			'SUBPATH': subpath
 		}
 
-		jobs.append(Process(target=processTask, args=(PROP)))
+		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, GRIDSNUM, weekSep, subpath)))
 		jobs[x].start()
 
 	for job in jobs:
