@@ -137,7 +137,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, week):
 				line = np.array(each.split(','), dtype='f')
 				id = int(line[0])
 				line[0] = 0
-				matrix[ id ] = np.add(line, ematrix[id])
+				matrix[ id ] = np.add(line, matrix[id])
 		stream.close()
 
 	resString = ''
