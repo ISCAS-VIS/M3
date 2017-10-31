@@ -160,7 +160,7 @@ def writeMatrixtoFile(data, filename):
 	length = len(data)
 	resString = []
 	for x in xrange(0, length):
-		resString.append(','.join(data[x]))
+		resString.append(','.join([str(each) for each in data[x]]))
 
 	with open(filename, 'ab') as res:
 		res.write('\n'.join(resString))
@@ -168,5 +168,5 @@ def writeMatrixtoFile(data, filename):
 
 def writeArraytoFile(data, filename):
 	with open(filename, 'ab') as res:
-		res.write('\n'.join(data))
+		res.write('\n'.join([str(each) for each in data]))
 	res.close()
