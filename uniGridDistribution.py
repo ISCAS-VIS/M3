@@ -35,6 +35,7 @@ class UnitGridDistribution(object):
 		}
 
 	def run(self):
+		print 'TASK-%d running...' % (self.INDEX)
 		logging.info('TASK-%d running...' % (self.INDEX))
 
 		oname = 't%02d-w%d-res' % (self.INDEX. self.WEEK)
@@ -123,7 +124,7 @@ class UnitGridDistribution(object):
 
 
 def processTask(PROP): 
-	task = augmentRawDatainMultiProcess(PROP)
+	task = UnitGridDistribution(PROP)
 	task.run()
 
 
