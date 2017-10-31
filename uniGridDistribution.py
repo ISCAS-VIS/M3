@@ -172,7 +172,7 @@ def main(argv):
 		elif opt in ('-w', '--week'):
 			weekSep = int(arg)
 		elif opt in ('-j', '--jnum'):
-    		jnum = int(arg)
+			jnum = int(arg)
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
