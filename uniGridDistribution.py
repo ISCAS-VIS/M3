@@ -49,6 +49,7 @@ class UnitGridDistribution(object):
 
 			ifilename = 'part-%05d' % number
 			logging.info('TASK-%d operates file %s' % (self.INDEX, ifilename))
+			print '%d file input...' % (x)
 			self.updateDis(os.path.join(idir, ifilename))
 		
 		# 结果写进文件
