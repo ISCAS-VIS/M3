@@ -39,15 +39,15 @@ class UnitGridDistribution(object):
 
 		oname = 't%02d-w%d-res' % (self.INDEX. self.WEEK)
 		orecsaname = 't%02d-recs%d-res' % (self.INDEX. self.WEEK)
-		idir = os.path.join(self.DIRECTORY, self.CITY)
-		ofile = os.path.join(self.DIRECTORY, self.CITY, self.SUBPATH, oname)
+		idir = os.path.join(self.DIRECTORY, 'result')
+		ofile = os.path.join(self.DIRECTORY, self.SUBPATH, oname)
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
 			if number > self.INUM:
 				break
 
-			ifilename = 'res-%05d' % number
+			ifilename = 'part-%05d' % number
 			logging.info('TASK-%d operates file %s' % (self.INDEX, ifilename))
 			self.updateDis(os.path.join(idir, ifilename))
 		
@@ -55,7 +55,7 @@ class UnitGridDistribution(object):
 		# MATRIX
 		# RECORDS
 		writeMatrixtoFile(self.MATRIX, ofile)
-		writeArraytoFile(self.RECS, orecsaname)
+		writeArraytoFile(self.RECS, os.path.join(self.DIRECTORY, self.SUBPATH, orecsaname))
 
 	def updateDis(self, ifile):
 		# 

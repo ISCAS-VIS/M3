@@ -129,7 +129,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, week):
 	baseurl = os.path.join(directory, subpath)
 
 	for x in xrange(0, 20):
-		with open(os.path.join(baseurl, city, 't%02d-w%d-res' % (x, week)), 'rb') as stream:
+		with open(os.path.join(baseurl, 't%02d-w%d-res' % (x, week)), 'rb') as stream:
 			for each in stream:
 				line = np.array(each.split(','), dtype='f')
 				id = int(line[0])
