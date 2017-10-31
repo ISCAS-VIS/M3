@@ -1,0 +1,1 @@
+python ./uniGridDistribution.py -i 1000 -o 20 -d /home/tao.jiang/datasets/JingJinJi/records -w 0

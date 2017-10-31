@@ -138,13 +138,13 @@ onum	-o	number of output files
 
 def main(argv):
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:o:", ["help", "city=", 'directory=', 'inum=', 'onum='])
+		opts, args = getopt.getopt(argv, "hc:d:i:o:w:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'week='])
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
-	city, directory, inum, onum, jnum, weekSep, subpath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20, 0, 'newvis'
+	city, directory, inum, onum, jnum, weekSep, subpath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20, 0, 'bj-newvis'
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -157,6 +157,8 @@ def main(argv):
 			inum = int(arg)
 		elif opt in ('-o', '--onum'):
 			onum = int(arg)
+		elif opt in ('-w', '--week'):
+			weekSep = int(arg)
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
