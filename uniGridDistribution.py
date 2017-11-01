@@ -83,7 +83,7 @@ class UnitGridDistribution(object):
 
 				# ydayBase = self.WEEK * 7 + 185
 
-				if ydayCurrent == self.DAY and hourCurrent == self.HOUR:
+				if ydayCurrent == self.DAY:
 					self.dealPointState({
 						'id': linelist[0],
 						'state': state, 
