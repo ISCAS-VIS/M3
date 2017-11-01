@@ -24,10 +24,11 @@ class UnitGridDistribution(object):
 		self.SUBPATH = PROP['SUBPATH']
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
+		self.DAY = PROP['DAY']
+		self.HOUR = PROP['HOUR']
 		self.GRIDSNUM = PROP['GRIDSNUM']
-		self.WEEK = PROP['WEEK']
 		self.MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, PROP['GRIDSNUM'])])  # index, people, number
-		self.RECS = []
+		self.RECS = {}  # fromgid, togid, people, number
 		self.LASTREC = {
 			'id': -1,
 			'grid': [],
@@ -35,7 +36,6 @@ class UnitGridDistribution(object):
 		}
 
 	def run(self):
-		print 'TASK-%d running...' % (self.INDEX)
 		logging.info('TASK-%d running...' % (self.INDEX))
 
 		oname = 't%02d-w%d-res' % (self.INDEX, self.WEEK)
@@ -50,14 +50,13 @@ class UnitGridDistribution(object):
 
 			ifilename = 'part-%05d' % number
 			logging.info('TASK-%d operates file %s' % (self.INDEX, ifilename))
-			print '%d file input...' % (x)
 			self.updateDis(os.path.join(idir, ifilename))
 		
 		# 结果写进文件
 		# MATRIX
+		writeMatrixtoFile(self.MATRIX, ofile, True)
 		# RECORDS
-		writeMatrixtoFile(self.MATRIX, ofile)
-		writeArraytoFile(self.RECS, os.path.join(self.DIRECTORY, self.SUBPATH, orecsaname))
+		# writeArraytoFile(self.RECS, os.path.join(self.DIRECTORY, self.SUBPATH, orecsaname))
 
 	def updateDis(self, ifile):
 		# 
@@ -71,15 +70,19 @@ class UnitGridDistribution(object):
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
 				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
 				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
-				# admin = getAdminNumber(linelist[4])
 				state = linelist[4]
-				ydayCurrent = formatTime(linelist[1])
-				ydayBase = self.WEEK * 7 + 185
 
-				if line[6] == '0' or line[5] == '0' or line[8] == '0' or line[7] == '0':
+				# 无效 Travel 状态信息
+				if state == 'T' and (line[6] == '0' or line[5] == '0' or line[8] == '0' or line[7] == '0'):
 					continue
+	
+				tmp = formatTime(linelist[1])
+				ydayCurrent = tmp['day']
+				hourCurrent = tmp['hour']
 
-				if ydayCurrent >= ydayBase and ydayCurrent < (ydayBase + 7):
+				# ydayBase = self.WEEK * 7 + 185
+
+				if ydayCurrent == self.DAY and hourCurrent == self.HOUR:
 					self.dealPointState({
 						'id': linelist[0],
 						'state': state, 
@@ -115,23 +118,32 @@ class UnitGridDistribution(object):
 			day = data['day']
 			fromGrid = data['fromGrid']
 			toGrid = data['toGrid']
-			identifier = '%s-%s-$s' % (day, fromGrid, toGrid)
-			if identifier != self.LASTREC['travel']:
-				self.LASTREC['travel'] = identifier
-				# self.RECS += '%s,%d,%s,%s,%s,%s\n' % (id, data['day'], grid, data['admin'], fromGrid, toGrid)
-				self.RECS.append('%s,%s,%s' % (id, fromGrid, toGrid))
+			lastidentifier = '%s-%d-%d-%d' % (id, day, fromGrid, toGrid)
+			existidentifier = '%d,%d' % (fromGrid, toGrid)
+
+			if existidentifier in self.RECS:
+				if lastidentifier != self.LASTREC['travel']:
+					self.LASTREC['travel'] = lastidentifier
+					self.RECS[existidentifier][2] += 1
+				self.RECS[existidentifier][3] += 1
+			else:
+    			self.LASTREC['travel'] = lastidentifier
+				self.RECS[existidentifier] = [fromGrid, toGrid, 1, 1]
+
+			
 			
 
 
-def processTask(x, city, directory, inum, onum, GRIDSNUM, weekSep, subpath): 
+def processTask(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, weekSep, subpath): 
 	PROP = {
 		'INDEX': x, 
 		'CITY': city, 
 		'DIRECTORY': directory, 
 		'INUM': inum, 
 		'ONUM': onum,
+		'DAY': judDay,
+		'HOUR': judHour,
 		'GRIDSNUM': GRIDSNUM,
-		'WEEK': weekSep,
 		'SUBPATH': subpath
 	}
 	task = UnitGridDistribution(PROP)
@@ -139,6 +151,9 @@ def processTask(x, city, directory, inum, onum, GRIDSNUM, weekSep, subpath):
 
 
 def usage():
+	"""
+	使用说明函数
+	"""
 	print '''Usage Guidance
 help	-h	get usage guidance
 city	-c	city or region name, such as beijing
@@ -149,14 +164,19 @@ onum	-o	number of output files
 
 
 def main(argv):
+	"""
+	主入口函数
+		:param argv: city 表示城市， directory 表示路径， inum 表示输入文件总数， onum 表示输出文件总数， jnum 表示处理进程数，通常和 onum 一致， subpath 为结果存储的子目录名字
+	"""
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:o:w:j:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'week=', 'jnum='])
+		opts, args = getopt.getopt(argv, "hc:d:i:o:j:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum='])
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
-	city, directory, inum, onum, jnum, weekSep, subpath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20, 0, 'bj-newvis'
+	city, directory, inum, onum, jnum, subpath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20, 'bj-newvis'
+	judDay = 186, judHour = 11
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -169,8 +189,6 @@ def main(argv):
 			inum = int(arg)
 		elif opt in ('-o', '--onum'):
 			onum = int(arg)
-		elif opt in ('-w', '--week'):
-			weekSep = int(arg)
 		elif opt in ('-j', '--jnum'):
 			jnum = int(arg)
 
@@ -195,11 +213,10 @@ def main(argv):
 			'INUM': inum, 
 			'ONUM': onum,
 			'GRIDSNUM': GRIDSNUM,
-			'WEEK': weekSep,
 			'SUBPATH': subpath
 		}
 
-		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, GRIDSNUM, weekSep, subpath)))
+		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, subpath)))
 		jobs[x].start()
 
 	for job in jobs:
@@ -207,7 +224,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeMatrixs(city, GRIDSNUM, directory, subpath, weekSep)
+	mergeMatrixs(city, GRIDSNUM, directory, subpath)
 
 	# @多进程运行程序 END
 

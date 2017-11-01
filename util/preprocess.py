@@ -72,7 +72,10 @@ def formatTime(timestr):
 	"""
 	dateObj = time.localtime( int(timestr)/1000.0 )
 	
-	return dateObj[7]
+	return {
+		'hour': dateObj[3],
+		'day': dateObj[7]
+	}
 
 def formatGridID(locs, point, SPLIT = 0.003):
 	"""根据经纬度计算城市网格编号
@@ -116,7 +119,7 @@ def calGridID(locs, id, SPLIT = 0.01):
 		'lng': lngcen
 	}
 
-def mergeMatrixs(city, GRIDSNUM, directory, subpath, week):
+def mergeMatrixs(city, GRIDSNUM, directory, subpath):
 	"""
 	合并 CityGrids 信息,分别读取文件,最后需将叠加的信息处理存入一个合并的文件
 	
@@ -151,22 +154,32 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, week):
 
 	print "%d lines into matrix res-xxx file" % GRIDSNUM
 
-def writeMatrixtoFile(data, filename):
+def writeMatrixtoFile(data, filename, zero):
 	"""
-	将矩阵转换成逗号分隔的字符串并写入文件
+	将矩阵转换成逗号分隔的字符串并写入文件, zero 表示是否需要过滤 0， 取值 true表示需要
 		:param data: 
 		:param filename: 
 	"""
 	length = len(data)
 	resString = []
 	for x in xrange(0, length):
-		resString.append(','.join([str(each) for each in data[x]]))
+		if (zero and data[x][1] != 0) or not zero:
+			resString.append(','.join([str(each) for each in data[x]]))
 
 	with open(filename, 'ab') as res:
 		res.write('\n'.join(resString))
 	res.close()
 
-def writeArraytoFile(data, filename):
+def writeObjecttoFile(data, filename):
+	"""
+	将对象转成逗号分隔字符串写入文件，对象不同 key 对应的 value 均为 Array 格式
+		:param data: 
+		:param filename: 
+	"""
+	resString = []
+	for key in data.iterkeys():
+		resString.append('\n'.join([str(each) for each in data[key]]))
+	
 	with open(filename, 'ab') as res:
-		res.write('\n'.join([str(each) for each in data]))
+		res.write('\n'.join(resString))
 	res.close()
