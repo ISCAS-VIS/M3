@@ -227,7 +227,9 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeMatrixs(city, GRIDSNUM, directory, subpath, (judDay - 185) * 24 + judHour)
+	oTime = (judDay - 185) * 24 + judHour
+	mergeMatrixs(city, GRIDSNUM, directory, subpath, oTime)
+	mergeRecords(city, directory, subpath, oTime)
 
 	# @多进程运行程序 END
 
