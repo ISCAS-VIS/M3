@@ -159,6 +159,20 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 
 	print "%d lines into matrix file" % len(resString)
 
+def mergeRecords(city, directory, subpath, time):
+	resString = []
+
+	baseurl = os.path.join(directory, subpath)
+	for x in xrange(0, 20):
+		with open(os.path.join(baseurl, 'rres-t%02d-ti%d' % (x, time)), 'rb') as stream:
+			for each in stream:
+				resString.append(each.strip('\n'))
+		stream.close()
+	
+	with open(os.path.join(baseurl, 'rares-ti%d' % (time)), 'ab') as res:
+		res.write('\n'.join(resString))
+	stream.close()
+
 def writeMatrixtoFile(city, data, filename, zero):
 	"""
 	将矩阵转换成逗号分隔的字符串并写入文件, zero 表示是否需要过滤 0， 取值 true表示需要
@@ -183,7 +197,7 @@ def writeObjecttoFile(data, filename):
 	"""
 	resString = []
 	for key in data.iterkeys():
-		resString.append('\n'.join([str(each) for each in data[key]]))
+		resString.append(','.join([str(each) for each in data[key]]))
 	
 	with open(filename, 'ab') as res:
 		res.write('\n'.join(resString))
