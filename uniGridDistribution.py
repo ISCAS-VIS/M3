@@ -201,7 +201,7 @@ def main(argv):
 	# 连接数据获取网格信息，包括总数，具有有效POI的网格
 	# conn, db = connectMongo('tdnormal')
 	# 固定到北京大小
-	GRIDSNUM = 33650
+	GRIDSNUM = 2000
 	# conn.close()
 
 	# @多进程运行程序 START
