@@ -10,7 +10,7 @@ import numpy as np
 from multiprocessing import Process  # , Manager
 # from util.dbopts import connectMongo
 from util.preprocess import getCityLocs, formatGridID, formatTime
-from util.preprocess import mergeMatrixs, writeMatrixtoFile, writeArraytoFile
+from util.preprocess import mergeMatrixs, writeMatrixtoFile, writeObjecttoFile
 
 
 class UnitGridDistribution(object):
