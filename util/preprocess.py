@@ -88,14 +88,14 @@ def formatGridID(locs, point, SPLIT = 0.05):
 		TYPE: Description
 	"""
 	if point[0] == '0' and point[1] == '0':
-		return '0'
+		return 0
 	else:
 		# LATNUM = int((locs['north'] - locs['south']) / SPLIT + 1)
 		LNGNUM = int( (locs['east'] - locs['west']) / SPLIT + 1 )
 		lngind = int( (float(point[0]) - locs['west']) / SPLIT )
 		latind = int( (float(point[1]) - locs['south']) / SPLIT )
 
-		return str(lngind + latind * LNGNUM)
+		return lngind + latind * LNGNUM
 
 def calGridID(locs, id, SPLIT = 0.05):
 	"""
