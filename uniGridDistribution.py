@@ -26,6 +26,7 @@ class UnitGridDistribution(object):
 		self.ONUM = PROP['ONUM']
 		self.DAY = PROP['DAY']
 		self.HOUR = PROP['HOUR']
+		self.TimeIndex = (self.DAY - 185) * 24 + self.HOUR
 		self.GRIDSNUM = PROP['GRIDSNUM']
 		self.MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, PROP['GRIDSNUM'])])  # index, people, number
 		self.RECS = {}  # fromgid, togid, people, number
@@ -38,8 +39,8 @@ class UnitGridDistribution(object):
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
 
-		oname = 't%02d-w%d-res' % (self.INDEX, self.WEEK)
-		orecsaname = 't%02d-recs%d-res' % (self.INDEX, self.WEEK)
+		oname = 'mres-t%02d-ti%d' % (self.INDEX, self.TimeIndex)
+		orecsaname = 'rres-t%02d-ti%d' % (self.INDEX, self.TimeIndex)
 		idir = os.path.join(self.DIRECTORY, 'result')
 		ofile = os.path.join(self.DIRECTORY, self.SUBPATH, oname)
 
@@ -54,9 +55,9 @@ class UnitGridDistribution(object):
 		
 		# 结果写进文件
 		# MATRIX
-		writeMatrixtoFile(self.MATRIX, ofile, True)
+		writeMatrixtoFile(self.CITY, self.MATRIX, ofile, True)
 		# RECORDS
-		# writeArraytoFile(self.RECS, os.path.join(self.DIRECTORY, self.SUBPATH, orecsaname))
+		writeObjecttoFile(self.RECS, os.path.join(self.DIRECTORY, self.SUBPATH, orecsaname))
 
 	def updateDis(self, ifile):
 		# 
@@ -127,13 +128,10 @@ class UnitGridDistribution(object):
 					self.RECS[existidentifier][2] += 1
 				self.RECS[existidentifier][3] += 1
 			else:
-    			self.LASTREC['travel'] = lastidentifier
+				self.LASTREC['travel'] = lastidentifier
 				self.RECS[existidentifier] = [fromGrid, toGrid, 1, 1]
 
 			
-			
-
-
 def processTask(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, weekSep, subpath): 
 	PROP = {
 		'INDEX': x, 
@@ -169,14 +167,14 @@ def main(argv):
 		:param argv: city 表示城市， directory 表示路径， inum 表示输入文件总数， onum 表示输出文件总数， jnum 表示处理进程数，通常和 onum 一致， subpath 为结果存储的子目录名字
 	"""
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:o:j:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum='])
+		opts, args = getopt.getopt(argv, "hc:d:i:o:j:x:y:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum='])
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
 	city, directory, inum, onum, jnum, subpath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20, 'bj-newvis'
-	judDay = 186, judHour = 11
+	dayBase, judDay, judHour = 185, 1, 11
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -191,7 +189,12 @@ def main(argv):
 			onum = int(arg)
 		elif opt in ('-j', '--jnum'):
 			jnum = int(arg)
+		elif opt in ('-x'):
+			judDay = int(arg)
+		elif opt in ('-y'):
+			judHour = int(arg)
 
+	judDay += dayBase
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
@@ -224,7 +227,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeMatrixs(city, GRIDSNUM, directory, subpath)
+	mergeMatrixs(city, GRIDSNUM, directory, subpath, (judDay - 185) * 24 + judHour)
 
 	# @多进程运行程序 END
 

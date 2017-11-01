@@ -34,10 +34,10 @@ def getCityLocs(city):
 	"""
 	newCitylocslist = {
 		'beijing': {
-			'north': 41.05, # 41.055,
-			'south': 39.45, # 39.445,
-			'west': 115.42, # 115.422,
-			'east': 117.52, # 117.515
+			'north': 41.0, # 41.055,
+			'south': 39.5, # 39.445,
+			'west': 115.4, # 115.422,
+			'east': 117.6, # 117.515
 		},
 		'tianjin': {
 			'north': 40.254,
@@ -77,7 +77,7 @@ def formatTime(timestr):
 		'day': dateObj[7]
 	}
 
-def formatGridID(locs, point, SPLIT = 0.003):
+def formatGridID(locs, point, SPLIT = 0.05):
 	"""根据经纬度计算城市网格编号
 	
 	Args:
@@ -97,12 +97,12 @@ def formatGridID(locs, point, SPLIT = 0.003):
 
 		return str(lngind + latind * LNGNUM)
 
-def calGridID(locs, id, SPLIT = 0.01):
+def calGridID(locs, id, SPLIT = 0.05):
 	"""
 	根据城市网格编号还原经纬度信息
 		:param locs: 
 		:param id: 
-		:param SPLIT=0.003: 
+		:param SPLIT=0.05: 
 	"""
 	
 	centerincrement = SPLIT/2.0
@@ -114,12 +114,13 @@ def calGridID(locs, id, SPLIT = 0.01):
 	lngcen = (lng + centerincrement)
 	latcen = (lat + centerincrement)
 
-	return {
-		'lat': latcen,
-		'lng': lngcen
-	}
+	return str(latcen) + ',' + str(lngcen)
+	# {
+	# 	'lat': latcen,
+	# 	'lng': lngcen
+	# }
 
-def mergeMatrixs(city, GRIDSNUM, directory, subpath):
+def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	"""
 	合并 CityGrids 信息,分别读取文件,最后需将叠加的信息处理存入一个合并的文件
 	
@@ -135,7 +136,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath):
 	baseurl = os.path.join(directory, subpath)
 
 	for x in xrange(0, 20):
-		with open(os.path.join(baseurl, 't%02d-w%d-res' % (x, week)), 'rb') as stream:
+		with open(os.path.join(baseurl, 'mres-t%02d-ti%d' % (x, time)), 'rb') as stream:
 			for each in stream:
 				line = np.array(each.split(','), dtype='f')
 				id = int(line[0])
@@ -148,13 +149,13 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath):
 		resString += ','.join([str(int(matrix[x][e])) for e in xrange(0,3)]) + '\n'
 
 
-	with open(os.path.join(baseurl, 'tall-w%d-res' % (week)), 'ab') as res:
+	with open(os.path.join(baseurl, 'mares-ti%d' % (time)), 'ab') as res:
 		res.write(resString)
 	res.close()
 
 	print "%d lines into matrix res-xxx file" % GRIDSNUM
 
-def writeMatrixtoFile(data, filename, zero):
+def writeMatrixtoFile(city, data, filename, zero):
 	"""
 	将矩阵转换成逗号分隔的字符串并写入文件, zero 表示是否需要过滤 0， 取值 true表示需要
 		:param data: 
@@ -164,7 +165,7 @@ def writeMatrixtoFile(data, filename, zero):
 	resString = []
 	for x in xrange(0, length):
 		if (zero and data[x][1] != 0) or not zero:
-			resString.append(','.join([str(each) for each in data[x]]))
+			resString.append(str(data[x][0]) + ',' + calGridID(getCityLocs(city), data[x][0], 0.05) + ',' + str(data[x][1]) + ',' + str(data[x][2]))
 
 	with open(filename, 'ab') as res:
 		res.write('\n'.join(resString))
