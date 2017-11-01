@@ -152,12 +152,12 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 		if matrix[x][3] != 0:
 			resString.append(str(int(matrix[x][0])) + ',' + str(float(matrix[x][1])) + ',' + str(float(matrix[x][2])) + ',' + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])))
 
+	if len(resString) != 0:	
+		with open(os.path.join(baseurl, 'mares-ti%d' % (time)), 'ab') as res:
+			res.write('\n'.join(resString))
+		res.close()
 
-	with open(os.path.join(baseurl, 'mares-ti%d' % (time)), 'ab') as res:
-		res.write('\n'.join(resString))
-	res.close()
-
-	print "%d lines into matrix res-xxx file" % GRIDSNUM
+	print "%d lines into matrix file" % len(resString)
 
 def writeMatrixtoFile(city, data, filename, zero):
 	"""
