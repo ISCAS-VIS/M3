@@ -93,6 +93,7 @@ class UnitGridDistribution(object):
 						'fromGrid': fromGid, 
 						'toGrid': toGrid
 					})
+					print self.HOUR
 		stream.close()
 	
 	def dealPointState(self, data):
@@ -101,6 +102,7 @@ class UnitGridDistribution(object):
 			:param self: 
 			:param data: 
 		"""
+		print "Deal one point with state: " + str(data['state'])
 		grid = data['grid']
 		id = data['id']
 		if data['state'] == 'S':

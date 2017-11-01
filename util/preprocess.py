@@ -132,7 +132,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	    TYPE: Description
 	"""
 	
-	matrix = np.array([np.array([x, 0, 0]) for x in xrange(0, GRIDSNUM)])
+	matrix = np.array([np.array([x, 0.0, 0.0, 0, 0]) for x in xrange(0, GRIDSNUM)])
 	baseurl = os.path.join(directory, subpath)
 
 	for x in xrange(0, 20):
@@ -141,16 +141,20 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 				line = np.array(each.split(','), dtype='f')
 				id = int(line[0])
 				line[0] = 0
+				if x != 0:
+					line[1] = 0
+					line[2] = 0
 				matrix[ id ] = np.add(line, matrix[id])
 		stream.close()
 
-	resString = ''
+	resString = []
 	for x in xrange(0,GRIDSNUM):
-		resString += ','.join([str(int(matrix[x][e])) for e in xrange(0,3)]) + '\n'
+		if matrix[x][3] != 0:
+			resString.append(str(int(matrix[x][0])) + ',' + str(float(matrix[x][1])) + ',' + str(float(matrix[x][2])) + ',' + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])))
 
 
 	with open(os.path.join(baseurl, 'mares-ti%d' % (time)), 'ab') as res:
-		res.write(resString)
+		res.write('\n'.join(resString))
 	res.close()
 
 	print "%d lines into matrix res-xxx file" % GRIDSNUM
