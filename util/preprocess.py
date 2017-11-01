@@ -70,7 +70,7 @@ def formatTime(timestr):
 	Returns:
 		TYPE: Description
 	"""
-	dateObj = time.localtime( int(timestr)/1000.0 )
+	dateObj = time.localtime( int(timestr) )
 	
 	return {
 		'hour': dateObj[3],

@@ -83,7 +83,7 @@ class UnitGridDistribution(object):
 
 				# ydayBase = self.WEEK * 7 + 185
 
-				if ydayCurrent == self.DAY:
+				if ydayCurrent == self.DAY and hourCurrent == self.HOUR:
 					self.dealPointState({
 						'id': linelist[0],
 						'state': state, 
@@ -93,7 +93,6 @@ class UnitGridDistribution(object):
 						'fromGrid': fromGid, 
 						'toGrid': toGrid
 					})
-					print self.HOUR
 		stream.close()
 	
 	def dealPointState(self, data):
@@ -102,7 +101,6 @@ class UnitGridDistribution(object):
 			:param self: 
 			:param data: 
 		"""
-		print "Deal one point with state: " + str(data['state'])
 		grid = data['grid']
 		id = data['id']
 		if data['state'] == 'S':
