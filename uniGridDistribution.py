@@ -132,7 +132,7 @@ class UnitGridDistribution(object):
 				self.RECS[existidentifier] = [fromGrid, toGrid, 1, 1]
 
 			
-def processTask(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, weekSep, subpath): 
+def processTask(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, subpath): 
 	PROP = {
 		'INDEX': x, 
 		'CITY': city, 
