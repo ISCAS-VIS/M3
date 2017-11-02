@@ -114,7 +114,7 @@ def calGridID(locs, id, SPLIT = 0.05):
 	lngcen = (lng + centerincrement)
 	latcen = (lat + centerincrement)
 
-	return str(latcen) + ',' + str(lngcen)
+	return "%.3f,%.3f" % (latcen, lngcen)
 	# {
 	# 	'lat': latcen,
 	# 	'lng': lngcen
@@ -132,7 +132,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	    TYPE: Description
 	"""
 	
-	matrix = np.array([np.array([x, 0.0, 0.0, 0, 0]) for x in xrange(0, GRIDSNUM)])
+	matrix = np.array([np.array([x, 0.0, 0.0, 0, 0, time]) for x in xrange(0, GRIDSNUM)])
 	baseurl = os.path.join(directory, subpath)
 
 	for x in xrange(0, 20):
@@ -141,6 +141,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 				line = np.array(each.split(','), dtype='f')
 				id = int(line[0])
 				line[0] = 0
+				line[5] = 0
 				if x != 0:
 					line[1] = 0
 					line[2] = 0
@@ -150,11 +151,11 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	resString = []
 	for x in xrange(0,GRIDSNUM):
 		if matrix[x][3] != 0:
-			resString.append(str(int(matrix[x][0])) + ',' + str(float(matrix[x][1])) + ',' + str(float(matrix[x][2])) + ',' + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])))
+			resString.append(str(int(matrix[x][0])) + ',' + str(float(matrix[x][1])) + ',' + str(float(matrix[x][2])) + ',' + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])) + ',' + str(int(matrix[x][5])))
 
 	if len(resString) != 0:	
-		with open(os.path.join(baseurl, 'mares-ti%d' % (time)), 'ab') as res:
-			res.write('\n'.join(resString))
+		with open(os.path.join(baseurl, 'mares-at'), 'ab') as res:
+			res.write('\n'.join(resString) + '\n')
 		res.close()
 
 	print "%d lines into matrix file" % len(resString)
@@ -169,9 +170,9 @@ def mergeRecords(city, directory, subpath, time):
 				resString.append(each.strip('\n'))
 		stream.close()
 	
-	with open(os.path.join(baseurl, 'rares-ti%d' % (time)), 'ab') as res:
-		res.write('\n'.join(resString))
-	stream.close()
+	with open(os.path.join(baseurl, 'rares-at'), 'ab') as res:
+		res.write('\n'.join(resString) + '\n')
+	res.close()
 
 def writeMatrixtoFile(city, data, filename, zero):
 	"""
@@ -182,7 +183,7 @@ def writeMatrixtoFile(city, data, filename, zero):
 	length = len(data)
 	resString = []
 	for x in xrange(0, length):
-		resString.append(str(data[x][0]) + ',' + calGridID(getCityLocs(city), data[x][0], 0.05) + ',' + str(data[x][1]) + ',' + str(data[x][2]))
+		resString.append(str(data[x][0]) + ',' + calGridID(getCityLocs(city), data[x][0], 0.05) + ',' + str(data[x][1]) + ',' + str(data[x][2])) + ',0'
 
 	with open(filename, 'ab') as res:
 		res.write('\n'.join(resString))

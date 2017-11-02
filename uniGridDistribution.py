@@ -51,7 +51,7 @@ class UnitGridDistribution(object):
 				break
 
 			ifilename = 'part-%05d' % number
-			logging.info('TASK-%d operates file %s' % (self.INDEX, ifilename))
+			logging.info('Job-%d Task-%d File-%s Operating...' % (self.INDEX, self.TimeIndex, ifilename))
 			self.updateDis(os.path.join(idir, ifilename))
 		
 		# 结果写进文件
@@ -130,7 +130,7 @@ class UnitGridDistribution(object):
 				self.RECS[existidentifier][3] += 1
 			else:
 				self.LASTREC['travel'] = lastidentifier
-				self.RECS[existidentifier] = [fromGrid, toGrid, 1, 1]
+				self.RECS[existidentifier] = [fromGrid, toGrid, 1, 1, self.TimeIndex]
 
 			
 def processTask(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, subpath): 
@@ -200,39 +200,31 @@ def main(argv):
 	print "Start approach at %s" % STARTTIME
 
 	# 连接数据获取网格信息，包括总数，具有有效POI的网格
-	# conn, db = connectMongo('tdnormal')
 	# 固定到北京大小
 	GRIDSNUM = 2000
-	# conn.close()
 
-	# @多进程运行程序 START
-	jobs = []
+	for dayCount in xrange(4, 5):
+		for hourCount in xrange(0, 24):
+			judDay = dayCount + dayBase
+			judHour = hourCount
 
-	for x in xrange(0, jnum):
-		# jnum 为进程数
-		PROP = {
-			'INDEX': x, 
-			'CITY': city, 
-			'DIRECTORY': directory, 
-			'INUM': inum, 
-			'ONUM': onum,
-			'GRIDSNUM': GRIDSNUM,
-			'SUBPATH': subpath
-		}
+			# @多进程运行程序 START
+			jobs = []
 
-		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, subpath)))
-		jobs[x].start()
+			for x in xrange(0, jnum):
+				jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, judDay, judHour, GRIDSNUM, subpath)))
+				jobs[x].start()
 
-	for job in jobs:
-		job.join()
+			for job in jobs:
+				job.join()
 
-	# 处理剩余数据进文件
-	# 合并操作
-	oTime = (judDay - 185) * 24 + judHour
-	mergeMatrixs(city, GRIDSNUM, directory, subpath, oTime)
-	mergeRecords(city, directory, subpath, oTime)
+			# 处理剩余数据进文件
+			# 合并操作
+			oTime = (judDay - 185) * 24 + judHour
+			mergeMatrixs(city, GRIDSNUM, directory, subpath, oTime)
+			mergeRecords(city, directory, subpath, oTime)
 
-	# @多进程运行程序 END
+			# @多进程运行程序 END
 
 
 if __name__ == '__main__':
