@@ -151,7 +151,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	resString = []
 	for x in xrange(0,GRIDSNUM):
 		if matrix[x][3] != 0:
-			resString.append(str(int(matrix[x][0])) + ',' + str(float(matrix[x][1])) + ',' + str(float(matrix[x][2])) + ',' + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])) + ',' + str(int(matrix[x][5])))
+			resString.append(str(int(matrix[x][0])) + ',%.3f' % (matrix[x][1]) + ',%.3f,' % (matrix[x][2]) + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])) + ',' + str(int(matrix[x][5])))
 
 	if len(resString) != 0:	
 		with open(os.path.join(baseurl, 'mares-at'), 'ab') as res:
