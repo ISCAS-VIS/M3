@@ -11,6 +11,7 @@ from multiprocessing import Process  # , Manager
 # from util.dbopts import connectMongo
 from util.preprocess import getCityLocs, formatGridID, formatTime
 from util.preprocess import mergeMatrixs, writeMatrixtoFile, writeObjecttoFile
+from util.preprocess import mergeRecords
 
 
 class UnitGridDistribution(object):

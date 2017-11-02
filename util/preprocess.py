@@ -182,8 +182,7 @@ def writeMatrixtoFile(city, data, filename, zero):
 	length = len(data)
 	resString = []
 	for x in xrange(0, length):
-		if (zero and data[x][1] != 0) or not zero:
-			resString.append(str(data[x][0]) + ',' + calGridID(getCityLocs(city), data[x][0], 0.05) + ',' + str(data[x][1]) + ',' + str(data[x][2]))
+		resString.append(str(data[x][0]) + ',' + calGridID(getCityLocs(city), data[x][0], 0.05) + ',' + str(data[x][1]) + ',' + str(data[x][2]))
 
 	with open(filename, 'ab') as res:
 		res.write('\n'.join(resString))
