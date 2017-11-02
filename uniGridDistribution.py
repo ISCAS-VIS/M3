@@ -27,7 +27,7 @@ class UnitGridDistribution(object):
 		self.ONUM = PROP['ONUM']
 		self.DAY = PROP['DAY']
 		self.HOUR = PROP['HOUR']
-		self.TimeIndex = (self.DAY - 185) * 24 + self.HOUR
+		self.TimeIndex = (self.DAY - 187) * 24 + self.HOUR
 		self.GRIDSNUM = PROP['GRIDSNUM']
 		self.MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, PROP['GRIDSNUM'])])  # index, people, number
 		self.RECS = {}  # fromgid, togid, people, number
@@ -82,7 +82,7 @@ class UnitGridDistribution(object):
 				ydayCurrent = tmp['day']
 				hourCurrent = tmp['hour']
 
-				# ydayBase = self.WEEK * 7 + 185
+				# ydayBase = self.WEEK * 7 + 187
 
 				if ydayCurrent == self.DAY and hourCurrent == self.HOUR:
 					self.dealPointState({
@@ -168,14 +168,14 @@ def main(argv):
 		:param argv: city 表示城市， directory 表示路径， inum 表示输入文件总数， onum 表示输出文件总数， jnum 表示处理进程数，通常和 onum 一致， subpath 为结果存储的子目录名字
 	"""
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:o:j:x:y:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum='])
+		opts, args = getopt.getopt(argv, "hc:d:i:o:j:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum='])
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
 	city, directory, inum, onum, jnum, subpath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20, 'bj-newvis'
-	dayBase, judDay, judHour = 185, 1, 11
+	dayBase, judDay, judHour = 187, 0, 0
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -190,12 +190,7 @@ def main(argv):
 			onum = int(arg)
 		elif opt in ('-j', '--jnum'):
 			jnum = int(arg)
-		elif opt in ('-x'):
-			judDay = int(arg)
-		elif opt in ('-y'):
-			judHour = int(arg)
 
-	judDay += dayBase
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
@@ -203,7 +198,7 @@ def main(argv):
 	# 固定到北京大小
 	GRIDSNUM = 2000
 
-	for dayCount in xrange(4, 5):
+	for dayCount in xrange(0, 87):
 		for hourCount in xrange(0, 24):
 			judDay = dayCount + dayBase
 			judHour = hourCount
@@ -220,12 +215,13 @@ def main(argv):
 
 			# 处理剩余数据进文件
 			# 合并操作
-			oTime = (judDay - 185) * 24 + judHour
+			oTime = (judDay - 187) * 24 + judHour
 			mergeMatrixs(city, GRIDSNUM, directory, subpath, oTime)
 			mergeRecords(city, directory, subpath, oTime)
 
 			# @多进程运行程序 END
 
+	print "END TIME: %s" % time.time()
 
 if __name__ == '__main__':
 	logging.basicConfig(filename='logger-unitGridDistribution.log', level=logging.DEBUG)
