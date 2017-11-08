@@ -200,11 +200,11 @@ def main(argv):
 
 	for dayCount in xrange(0, 87):
 		for hourCount in xrange(0, 24):
-			if ((judDay - 187) * 24 + judHour) < 118:
-				continue
-
 			judDay = dayCount + dayBase
 			judHour = hourCount
+
+			if ((judDay - 187) * 24 + judHour) < 118:
+				continue
 
 			# @多进程运行程序 START
 			jobs = []
