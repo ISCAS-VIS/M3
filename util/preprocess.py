@@ -34,10 +34,10 @@ def getCityLocs(city):
 	"""
 	newCitylocslist = {
 		'beijing': {
-			'north': 41.05, # 41.055,
-			'south': 39.45, # 39.445,
+			'north': 41.05, # 41.050,
+			'south': 39.45, # 39.457,
 			'west': 115.42, # 115.422,
-			'east': 117.52, # 117.515
+			'east': 117.50, # 117.500
 		},
 		'tianjin': {
 			'north': 40.254,
