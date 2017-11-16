@@ -189,7 +189,7 @@ def mergeMultiProcessMatFiles(directory, subpath, jnum):
 	
 	with open(os.path.join(baseurl, 'hares-at'), 'ab') as output:
 		for jobId in xrange(0, 20):
-			with open(os.path.join(baseurl, 'mares-%d' % (jobId)), 'rb') as input:
+			with open(os.path.join(baseurl, 'hares-j%d' % (jobId)), 'rb') as input:
 				output.write(input.read())
 			input.close()
 	output.close()
@@ -224,7 +224,7 @@ def writeObjecttoFile(data, filename):
 	res.close()
 
 def writeDayMatrixtoFile(index, city, data, opath, day):
-	with open(os.path.join(opath, 'mares-j%d' % (index)), 'ab') as res:
+	with open(os.path.join(opath, 'hares-j%d' % (index)), 'ab') as res:
 		# 24 时间段
 		for x in xrange(0, 24):
 			resString = []
