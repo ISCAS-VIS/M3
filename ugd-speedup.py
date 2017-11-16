@@ -76,14 +76,14 @@ def main(argv):
 	GRIDSNUM = 374826
 
 	# @多进程运行程序 START
-	jobs = []
+	# jobs = []
 
-	for x in xrange(0, jnum):
-		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, GRIDSNUM, subopath)))
-		jobs[x].start()
+	# for x in xrange(0, jnum):
+	# 	jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, GRIDSNUM, subopath)))
+	# 	jobs[x].start()
 
-	for job in jobs:
-		job.join()
+	# for job in jobs:
+	# 	job.join()
 
 	# 处理剩余数据进文件
 	# 合并操作

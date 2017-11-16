@@ -189,7 +189,7 @@ def mergeMultiProcessMatFiles(directory, subpath, jnum):
 	
 	with open(os.path.join(baseurl, 'hares-at'), 'ab') as output:
 		for jobId in xrange(0, 20):
-			with open(os.path.join(baseurl, 'hres-%d-%d' % (jobId, x)), 'rb') as input:
+			with open(os.path.join(baseurl, 'mares-%d' % (jobId)), 'rb') as input:
 				output.write(input.read())
 			input.close()
 	output.close()
