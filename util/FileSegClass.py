@@ -20,6 +20,7 @@ class FileSegByHour(object):
 		self.DIRECTORY = PROP['DIRECTORY']
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
+		self.MAXDAY = PROP['MAXDAY']
 		self.MATRIX = [[] for x in xrange(0, PROP['MAXDAY'])]
 		self.COUNT = [0 for x in xrange(0, PROP['MAXDAY'])]
 		self.SAFECOUNT = PROP['SAFECOUNT']
@@ -39,6 +40,16 @@ class FileSegByHour(object):
 			logging.info('Job-%d File-%s Operating...' % (self.INDEX, ifilename))
 			self.iterateFile(os.path.join(idir, ifilename), odir)
 
+		# 捡完所有漏掉的记录，遍历输入文件
+		for x in xrange(0, self.MAXDAY):
+			if self.COUNT[x] == 0:
+				continue
+
+			ofile = os.path.join(odir, "hres-%d-%d" % (self.INDEX, x))
+			with open(ofile, 'ab') as stream:
+				stream.write('\n'.join(self.MATRIX[x]) + '\n')
+			stream.close()
+
 		logging.info('End Job-%d' % (self.INDEX))
 
 	def iterateFile(self, ifile, opath):
@@ -51,15 +62,17 @@ class FileSegByHour(object):
 				# 无效 Travel 状态信息
 				if state == 'T' and (line[6] == '0' or line[5] == '0' or line[8] == '0' or line[7] == '0'):
 					continue
-				
-				# 处理字段
-				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
-				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
-				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
 
 				# 分析日期
 				tmp = formatTime(linelist[1])
 				ydayCurrent = tmp['day'] - 187
+				if ydayCurrent < 0 or ydayCurrent >= self.MAXDAY:
+					continue
+
+				# 处理字段
+				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
+				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
+				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
 
 				# 计数存储，看情况写入文件
 				if self.COUNT[ydayCurrent] == self.SAFECOUNT:
