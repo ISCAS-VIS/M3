@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
+# Output Format:
+# [hares-x]
+# id, seg, gid, state, from_nid(default to 0), to_nid(default to 0)
 
 import logging
 import os
@@ -66,6 +69,7 @@ class FileSegByHour(object):
 				# 分析日期
 				tmp = formatTime(linelist[1])
 				ydayCurrent = tmp['day'] - 187
+				seg = ydayCurrent * 24 + tmp['hour']
 				if ydayCurrent < 0 or ydayCurrent >= self.MAXDAY:
 					continue
 
@@ -74,6 +78,10 @@ class FileSegByHour(object):
 				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
 				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
 
+				newline = "%s,%d,%d,S,0,0" % (line[0], seg, grid)
+				if state == 'T':
+					newline = "%s,%d,%d,T,%d,%d" % (line[0], seg, grid, fromGid, toGrid)
+
 				# 计数存储，看情况写入文件
 				if self.COUNT[ydayCurrent] == self.SAFECOUNT:
 					ofile = os.path.join(opath, "hres-%d-%d" % (self.INDEX, ydayCurrent))
@@ -81,12 +89,8 @@ class FileSegByHour(object):
 						stream.write('\n'.join(self.MATRIX[ydayCurrent]) + '\n')
 					stream.close()
 
-					self.COUNT[ydayCurrent] = 0
-					self.MATRIX[ydayCurrent] = []
+					self.COUNT[ydayCurrent] = 1
+					self.MATRIX[ydayCurrent] = [newline]
 				else:
 					self.COUNT[ydayCurrent] += 1
-					newline = "%s,%d,%d,S,0,0" % (line[0], ydayCurrent, grid)
-					if state == 'T':
-						newline = "%s,%d,%d,T,%d,%d" % (line[0], ydayCurrent, grid, fromGid, toGrid)
-
 					self.MATRIX[ydayCurrent].append(newline)

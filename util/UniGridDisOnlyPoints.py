@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#  
+# 
+# Output Format:
+# [mopres-at]
+# from_nid, to_nid, dev_num, rec_num, seg
 
 import os
 import logging
