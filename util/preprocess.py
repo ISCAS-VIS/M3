@@ -177,12 +177,22 @@ def mergeSmallRecords(city, directory, subpath, time):
 def mergeLargeRecords(city, directory, subpath, count):
 	baseurl = os.path.join(directory, subpath)
 	for x in xrange(0, count):
-		with open(os.path.join(baseurl, 'hares-%d' % (x)), 'wb') as output:
+		with open(os.path.join(baseurl, 'hares-%d' % (x)), 'ab') as output:
 			for jobId in xrange(0, 20):
 				with open(os.path.join(baseurl, 'hres-%d-%d' % (jobId, x)), 'rb') as input:
 					output.write(input.read())
 				input.close()
 		output.close()
+
+def mergeMultiProcessMatFiles(directory, subpath, jnum):
+	baseurl = os.path.join(directory, subpath)
+	
+	with open(os.path.join(baseurl, 'hares-at'), 'ab') as output:
+		for jobId in xrange(0, 20):
+			with open(os.path.join(baseurl, 'hres-%d-%d' % (jobId, x)), 'rb') as input:
+				output.write(input.read())
+			input.close()
+	output.close()
 
 def writeMatrixtoFile(city, data, filename, zero):
 	"""
@@ -211,4 +221,24 @@ def writeObjecttoFile(data, filename):
 	
 	with open(filename, 'ab') as res:
 		res.write('\n'.join(resString))
+	res.close()
+
+def writeDayMatrixtoFile(index, city, data, opath, day):
+	with open(os.path.join(opath, 'mares-j%d' % (index)), 'ab') as res:
+		# 24 时间段
+		for x in xrange(0, 24):
+			resString = []
+			rawLen = len(data[x])
+			seg = day * 24 + x
+
+			# 网格数遍历
+			for i in xrange(0, rawLen):
+				oneRec = data[x][i]
+
+				# 只记录有人定位的有效网格
+				if oneRec[1] != 0:
+					singleRes = "%d,%s,%d,%d,%d" % (oneRec[0], calGridID(getCityLocs(city), oneRec[0], 0.003), oneRec[1], oneRec[2], seg)
+					resString.append(singleRes)
+
+			res.write('\n'.join(resString) + '\n')
 	res.close()

@@ -2,60 +2,95 @@
 # -*- coding: utf-8 -*-
 # 
 # Output Format:
-# [mopres-at]
-# from_nid, to_nid, dev_num, rec_num, seg
+# [mares-x]
+# nid, lat, lng, dev_num, rec_num, seg
 
 import os
+import gc
 import logging
-import numpy as np
-from util.preprocess import getCityLocs, formatGridID, formatTime
-from util.preprocess import writeMatrixtoFile, writeObjecttoFile
+from util.preprocess import writeDayMatrixtoFile
 
 
-class UniGridDisOnlyPonts(object):
+class UniGridDisOnlyPoints(object):
 	"""
-	多进程计算类：通过给定小时过滤数据，将分属网格、以及两节点间连线的定位记录数/人数计算并存入文件，多个小时数据需要分别遍历所有数据多遍进行处理
+	多进程计算类：输入分天的处理后数据，将网格内的定位记录数/人数计算并存入文件，一个进程执行一次负责一天24小时时间段的数据处理，结果增量输入至文件，最后多进程执行情况下需要做合并操作
 		:param object: 
 	"""
 	def __init__(self, PROP):
-		super(UniGridDisOnlyPonts, self).__init__()
+		super(UniGridDisOnlyPoints, self).__init__()
 
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
 		self.DIRECTORY = PROP['DIRECTORY'] 
-		self.SUBPATH = PROP['SUBPATH']
+		self.SUBOPATH = PROP['SUBOPATH']
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
-		self.DAY = PROP['DAY']
-		self.HOUR = PROP['HOUR']
-		self.TimeIndex = (self.DAY - 187) * 24 + self.HOUR
+		self.DAY = -1
 		self.GRIDSNUM = PROP['GRIDSNUM']
-		self.MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, PROP['GRIDSNUM'])])  # index, people, number
-		self.LASTREC = {
-			'id': -1,
-			'grid': [],
-			'travel': ''
-		}
 
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
 
-		oname = 'mres-t%02d-ti%d' % (self.INDEX, self.TimeIndex)
-		orecsaname = 'rres-t%02d-ti%d' % (self.INDEX, self.TimeIndex)
-		idir = os.path.join(self.DIRECTORY, 'result')
-		ofile = os.path.join(self.DIRECTORY, self.SUBPATH, oname)
+		idir = os.path.join(self.DIRECTORY, 'bj-byday')
+		odir = os.path.join(self.DIRECTORY, self.SUBOPATH)
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
 			if number > self.INUM:
 				break
 
-			ifilename = 'part-%05d' % number
-			logging.info('Job-%d Task-%d File-%s Operating...' % (self.INDEX, self.TimeIndex, ifilename))
+			# 结果处理完成重新初始化
+			self.DAY = number
+			self.MATRIX = [[[x, 0, 0] for x in xrange(0, self.GRIDSNUM)] for e in xrange(0, 24)]  # index, people, number
+			self.LASTREC = [{
+				'id': -1,
+				'grid': []
+			} for x in xrange(0, 24)]
+
+			ifilename = 'hares-%d' % number
+			logging.info('Job-%d File-%d Operating...' % (self.INDEX, number))
 			self.updateDis(os.path.join(idir, ifilename))
 		
-		# 结果写进文件
-		# MATRIX
-		writeMatrixtoFile(self.CITY, self.MATRIX, ofile, True)
-		# RECORDS
-		writeObjecttoFile(self.RECS, os.path.join(self.DIRECTORY, self.SUBPATH, orecsaname))
+			# 结果写进文件
+			# # MATRIX
+			writeDayMatrixtoFile(self.INDEX, self.CITY, self.MATRIX, odir, self.DAY)
+			self.MATRIX = []
+			self.LASTREC = []
+			gc.collect()
+
+	def updateDis(self, ifile):
+		resnum = 0
+
+		with open(ifile, 'rb') as stream:
+			for line in stream:
+				line = line.strip('\n')
+				resnum += 1
+				linelist = line.split(',')
+
+				state = linelist[3]
+				if state == 'T':
+					continue
+
+				self.dealPointState({
+					'id': linelist[0],
+					'hour': int(linelist[1]) % 23,
+					'grid': int(linelist[2]),
+				})
+		stream.close()
+
+	def dealPointState(self, data):
+		grid = data['grid']
+		id = data['id']
+		hour = data['hour']
+
+		# stay 状态更新
+		if id == self.LASTREC[hour]['id']:
+			if grid not in self.LASTREC[hour]['grid']:
+				self.LASTREC[hour]['grid'].append(grid)
+				self.MATRIX[hour][grid][1] += 1
+		else:
+			self.LASTREC[hour]['id'] = id
+			self.LASTREC[hour]['grid'] = [grid]
+			self.MATRIX[hour][grid][1] += 1
+
+		self.MATRIX[hour][grid][2] += 1
