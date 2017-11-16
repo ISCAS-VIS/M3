@@ -17,13 +17,26 @@ def processTask():
 
 
 if __name__ == '__main__':
-	MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, 800000)])
+	# MATRIX = np.array([np.array([x, 0, 0]) for x in xrange(0, 800000)])
 
-	jobs = []
+	# jobs = []
 
-	for x in xrange(0, 20):
-		jobs.append(Process(target=processTask))
-		jobs[x].start()
+	# for x in xrange(0, 20):
+	# 	jobs.append(Process(target=processTask))
+	# 	jobs[x].start()
 
-	for job in jobs:
-		job.join()
+	# for job in jobs:
+	# 	job.join()
+
+	with open('b', 'wb') as t:
+		t.write('sadadasd\nasdasd\n123\n')
+	t.close()
+
+	with open('a', 'wb') as output:
+		for jobId in xrange(0, 20):
+			with open('b', 'rb') as input:
+				output.write(input.read())
+				for each in input:
+					print each
+			input.close()
+	output.close()
