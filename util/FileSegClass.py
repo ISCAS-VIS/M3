@@ -2,15 +2,14 @@
 # -*- coding: utf-8 -*-
 # 
 
-import numpy as np
 import logging
 import os
 from util.preprocess import getCityLocs, formatGridID, formatTime
 
 
 class FileSegByHour(object):
-    	"""
-	多进程计算类：通过给定小时过滤数据，将分属网格、以及两节点间连线的定位记录数/人数计算并存入文件，多个小时数据需要分别遍历所有数据多遍进行处理
+	"""
+	多进程计算类：按照日期对文件进行分类重写存储，相关字段预先处理
 		:param object: 
 	"""
 	def __init__(self, PROP):
@@ -18,21 +17,18 @@ class FileSegByHour(object):
 
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
-		self.DIRECTORY = PROP['DIRECTORY'] 
-		self.SUBPATH = PROP['SUBPATH']
+		self.DIRECTORY = PROP['DIRECTORY']
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
-		self.DAY = PROP['DAY']
-		self.HOUR = PROP['HOUR']
-		self.TimeIndex = (self.DAY - 187) * 24 + self.HOUR
+		self.MATRIX = [[] for x in xrange(0, PROP['MAXDAY'])]
+		self.COUNT = [0 for x in xrange(0, PROP['MAXDAY'])]
+		self.SAFECOUNT = PROP['SAFECOUNT']
 	
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
 
-		oname = 'mres-t%02d-ti%d' % (self.INDEX, self.TimeIndex)
-		orecsaname = 'rres-t%02d-ti%d' % (self.INDEX, self.TimeIndex)
 		idir = os.path.join(self.DIRECTORY, 'result')
-		ofile = os.path.join(self.DIRECTORY, self.SUBPATH, oname)
+		odir = os.path.join(self.DIRECTORY, 'bj-byday')
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
@@ -40,5 +36,44 @@ class FileSegByHour(object):
 				break
 
 			ifilename = 'part-%05d' % number
-			logging.info('Job-%d Task-%d File-%s Operating...' % (self.INDEX, self.TimeIndex, ifilename))
-			self.updateDis(os.path.join(idir, ifilename))
+			logging.info('Job-%d File-%s Operating...' % (self.INDEX, ifilename))
+			self.iterateFile(os.path.join(idir, ifilename), odir)
+
+		logging.info('End Job-%d' % (self.INDEX))
+
+	def iterateFile(self, ifile, opath):
+		with open(ifile, 'rb') as stream:
+			for line in stream:
+				line = line.strip('\n')
+				linelist = line.split(',')
+
+				state = linelist[4]
+				# 无效 Travel 状态信息
+				if state == 'T' and (line[6] == '0' or line[5] == '0' or line[8] == '0' or line[7] == '0'):
+					continue
+				
+				# 处理字段
+				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
+				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
+				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
+
+				# 分析日期
+				tmp = formatTime(linelist[1])
+				ydayCurrent = tmp['day'] - 187
+
+				# 计数存储，看情况写入文件
+				if self.COUNT[ydayCurrent] == self.SAFECOUNT:
+					ofile = os.path.join(opath, "hres-%d-%d" % (self.INDEX, ydayCurrent))
+					with open(ofile, 'ab') as stream:
+						stream.write('\n'.join(self.MATRIX[ydayCurrent]) + '\n')
+					stream.close()
+
+					self.COUNT[ydayCurrent] = 0
+					self.MATRIX[ydayCurrent] = []
+				else:
+					self.COUNT[ydayCurrent] += 1
+					newline = "%s,%d,%d,S,0,0" % (line[0], ydayCurrent, grid)
+					if state == 'T':
+						newline = "%s,%d,%d,T,%d,%d" % (line[0], ydayCurrent, grid, fromGid, toGrid)
+
+					self.MATRIX[ydayCurrent].append(newline)

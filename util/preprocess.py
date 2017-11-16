@@ -77,7 +77,7 @@ def formatTime(timestr):
 		'day': dateObj[7]
 	}
 
-def formatGridID(locs, point, SPLIT = 0.05):
+def formatGridID(locs, point, SPLIT = 0.003):
 	"""根据经纬度计算城市网格编号
 	
 	Args:
@@ -97,7 +97,7 @@ def formatGridID(locs, point, SPLIT = 0.05):
 
 		return lngind + latind * LNGNUM
 
-def calGridID(locs, id, SPLIT = 0.05):
+def calGridID(locs, id, SPLIT = 0.003):
 	"""
 	根据城市网格编号还原经纬度信息
 		:param locs: 
@@ -160,7 +160,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 
 	print "%d lines into matrix file" % len(resString)
 
-def mergeRecords(city, directory, subpath, time):
+def mergeSmallRecords(city, directory, subpath, time):
 	resString = []
 
 	baseurl = os.path.join(directory, subpath)
@@ -173,6 +173,16 @@ def mergeRecords(city, directory, subpath, time):
 	with open(os.path.join(baseurl, 'rares-at'), 'ab') as res:
 		res.write('\n'.join(resString) + '\n')
 	res.close()
+
+def mergeLargeRecords(city, directory, subpath, count):
+	baseurl = os.path.join(directory, subpath)
+	for x in xrange(0, count):
+		with open(os.path.join(baseurl, 'hares-%d' % (x)), 'wb') as output:
+			for jobId in xrange(0, 20):
+				with open(os.path.join(baseurl, 'hres-%d-%d' % (jobId, x)), 'rb') as input:
+					output.write(input.read())
+				input.close()
+		output.close()
 
 def writeMatrixtoFile(city, data, filename, zero):
 	"""

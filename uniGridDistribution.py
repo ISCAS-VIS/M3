@@ -8,7 +8,7 @@ import logging
 import getopt
 from multiprocessing import Process
 from util.preprocess import mergeMatrixs
-from util.preprocess import mergeRecords
+from util.preprocess import mergeSmallRecords
 from util.UniGridDisBasic import UniGridDisBasic
 
 			
@@ -100,11 +100,12 @@ def main(argv):
 			# 合并操作
 			oTime = (judDay - 187) * 24 + judHour
 			mergeMatrixs(city, GRIDSNUM, directory, subpath, oTime)
-			mergeRecords(city, directory, subpath, oTime)
+			mergeSmallRecords(city, directory, subpath, oTime)
 
 			# @多进程运行程序 END
 
 	print "END TIME: %s" % time.time()
+
 
 if __name__ == '__main__':
 	logging.basicConfig(filename='logger-unitGridDistribution.log', level=logging.DEBUG)
