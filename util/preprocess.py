@@ -161,6 +161,13 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	print "%d lines into matrix file" % len(resString)
 
 def mergeSmallRecords(city, directory, subpath, time):
+	"""
+	通过逐行读取的方式合并记录数
+		:param city: 
+		:param directory: 
+		:param subpath: 
+		:param time: 
+	"""
 	resString = []
 
 	baseurl = os.path.join(directory, subpath)
@@ -175,6 +182,13 @@ def mergeSmallRecords(city, directory, subpath, time):
 	res.close()
 
 def mergeLargeRecords(city, directory, subpath, count):
+	"""
+	通过整个文件读取的方式合并记录数
+		:param city: 
+		:param directory: 
+		:param subpath: 
+		:param count: 
+	"""
 	baseurl = os.path.join(directory, subpath)
 	for x in xrange(0, count):
 		with open(os.path.join(baseurl, 'hares-%d' % (x)), 'ab') as output:
@@ -185,6 +199,12 @@ def mergeLargeRecords(city, directory, subpath, count):
 		output.close()
 
 def mergeMultiProcessMatFiles(directory, subpath, jnum):
+	"""
+	通过整个文件读取的方式合并记录数，与 mergeLargeRecords 方法的不同点在于该方法不存在分时段的文件遍历，只需要遍历每个进程的唯一结果
+		:param directory: 
+		:param subpath: 
+		:param jnum: 
+	"""
 	baseurl = os.path.join(directory, subpath)
 	
 	with open(os.path.join(baseurl, 'hares-at'), 'ab') as output:
@@ -224,6 +244,14 @@ def writeObjecttoFile(data, filename):
 	res.close()
 
 def writeDayMatrixtoFile(index, city, data, opath, day):
+	"""
+	将进程中单天所有时间单位的网格分布数据转化为字符串存储进文件
+		:param index: 
+		:param city: 
+		:param data: 
+		:param opath: 
+		:param day: 
+	"""
 	with open(os.path.join(opath, 'hares-j%d' % (index)), 'ab') as res:
 		# 24 时间段
 		for x in xrange(0, 24):

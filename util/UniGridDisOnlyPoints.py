@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # Output Format:
-# [mares-x]
+# [hares-j[x]]
 # nid, lat, lng, dev_num, rec_num, seg
 
 import os

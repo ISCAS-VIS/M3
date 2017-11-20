@@ -7,7 +7,6 @@ import time
 import logging
 import getopt
 from multiprocessing import Process
-from util.preprocess import mergeMatrixs
 from util.preprocess import mergeLargeRecords
 from util.FileSegClass import FileSegByHour
 

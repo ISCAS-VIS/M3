@@ -7,7 +7,6 @@ import time
 import logging
 import getopt
 from multiprocessing import Process
-from util.preprocess import mergeMatrixs
 from util.preprocess import mergeMultiProcessMatFiles
 from util.UniGridDisOnlyPoints import UniGridDisOnlyPoints
 
@@ -71,8 +70,7 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	# 连接数据获取网格信息，包括总数，具有有效POI的网格
-	# 固定到北京大小
+	# 固定网格总数
 	GRIDSNUM = 374826
 
 	# @多进程运行程序 START
