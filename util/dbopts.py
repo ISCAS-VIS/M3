@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-import os, pymongo, math, sys, logging, MySQLdb
+import os
+import pymongo
+import math
+import sys
+import logging
+import json
+import MySQLdb
 import numpy as np
 from scipy import stats
-from geopy.distance import great_circle  # https://pypi.python.org/pypi/geopy/1.11.0
 
 def connectMongo(dbname):
 	"""Connect MongoDB
@@ -28,10 +32,24 @@ def connectMYSQL(dbname, passwd):
 	Returns:
 		TYPE: db, cursor
 	"""
-	db = MySQLdb.connect(host="192.168.1.42",    	# your host, usually localhost
-						user="root",         	# your username
-						passwd=passwd,  	# your password
-						db=dbname)		# name of the data base
+	db = MySQLdb.connect(
+		host="192.168.1.42",    	# your host, usually localhost
+		user="root",         	# your username
+		passwd=passwd,  	# your password
+		db=dbname)		# name of the data base
 	cur = db.cursor()
 
 	return db, cur
+
+def getBoundaryList(basePath, x, city='beijing'):
+	subfixs = ['cbd', 'community', 'villa', 'shoppingCenter']
+	res = {
+		'prop': subfixs[x],
+		'pois': []
+	}
+	with open(os.path.join(basePath, '%s.json' % subfixs[x]), 'r') as f:
+		data = json.load(f)
+		res.pois = data['poi']
+	f.close()
+
+	return res

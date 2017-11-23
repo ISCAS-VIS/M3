@@ -20,3 +20,8 @@ ALTER TABLE `edges` ADD INDEX( `seg`);
 -- load data into table
 LOAD DATA LOCAL INFILE "/enigma/tao.jiang/datasets/JingJinJi/records/bj-newvis/rares-at" INTO TABLE edges COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5) set from_nid=@col1,to_nid=@col2,dev_num=@col3,rec_num=@col4,seg=DATE_ADD("2016-07-05", INTERVAL @col5 HOUR);
 
+-- new matrix table
+CREATE TABLE `stvis`.`matrixs` ( `id` INT NOT NULL AUTO_INCREMENT , `nid` INT NOT NULL , `rec_num` INT NOT NULL , `dev_num` INT NOT NULL , `seg` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+ALTER TABLE `matrixs` ADD INDEX( `nid`, `seg`);
+ALTER TABLE `matrixs` ADD INDEX( `rec_num`, `dev_num`);

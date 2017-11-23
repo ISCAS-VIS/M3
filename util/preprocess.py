@@ -34,10 +34,10 @@ def getCityLocs(city):
 	"""
 	newCitylocslist = {
 		'beijing': {
-			'north': 41.05, # 41.050,
-			'south': 39.45, # 39.457,
-			'west': 115.42, # 115.422,
-			'east': 117.50, # 117.500
+			'north': 41.0500, # 41.050,
+			'south': 39.4570, # 39.457,
+			'west': 115.4220, # 115.422,
+			'east': 117.5000, # 117.500
 		},
 		'tianjin': {
 			'north': 40.254,
@@ -77,8 +77,9 @@ def formatTime(timestr):
 		'day': dateObj[7]
 	}
 
-def formatGridID(locs, point, SPLIT = 0.003):
-	"""根据经纬度计算城市网格编号
+def formatGridID(locs, point, SPLIT = 0.0005):
+	"""
+	根据经纬度计算城市网格编号
 	
 	Args:
 		locs (TYPE): Description
@@ -97,7 +98,7 @@ def formatGridID(locs, point, SPLIT = 0.003):
 
 		return lngind + latind * LNGNUM
 
-def calGridID(locs, id, SPLIT = 0.003):
+def calGridID(locs, id, SPLIT = 0.0005):
 	"""
 	根据城市网格编号还原经纬度信息
 		:param locs: 
@@ -119,6 +120,67 @@ def calGridID(locs, id, SPLIT = 0.003):
 	# 	'lat': latcen,
 	# 	'lng': lngcen
 	# }
+
+def getFormatGID(locs, point, SPLIT = 0.0005):
+	"""
+	[NEW] 根据经纬度计算城市网格编号
+	
+	Args:
+		locs (TYPE): Description
+		point (TYPE): [lng, lat]
+	
+	Returns:
+		TYPE: Description
+	"""
+	if point[0] == '0' and point[1] == '0':
+		return 0
+	else:
+		# LATNUM = int((locs['north'] - locs['south']) / SPLIT + 1)
+		LNGNUM = int( (locs['east'] - locs['west']) / SPLIT + 1 )
+		lngind = int( (float(point[0]) - locs['west']) / SPLIT )
+		latind = int( (float(point[1]) - locs['south']) / SPLIT )
+
+		return {
+			'gid': lngind + latind * LNGNUM,
+			'lngind': lngind,
+			'latind': latind
+		}
+
+def parseFormatGID(locs, id, SPLIT = 0.0005):
+	"""
+	[NEW] 根据城市网格编号还原经纬度信息
+		:param locs: 
+		:param id: 
+		:param SPLIT=0.05: 
+	"""
+
+	centerincrement = SPLIT/2.0
+	LNGNUM = int((locs['east'] - locs['west']) / SPLIT + 1)
+	latind = 0
+	lngind = 0
+	nid = 0
+
+	if isinstance(id, int):
+		latind = int(id / LNGNUM)
+		lngind = id - latind * LNGNUM
+		nid = id
+	else:
+		latind = id.y
+		lngind = id.x
+		nid = lngind + latind * LNGNUM
+	
+	lat = (locs['south'] + latind * SPLIT)
+	lng = (locs['west'] + lngind * SPLIT)
+	lngcen = (lng + centerincrement)
+	latcen = (lat + centerincrement)
+
+	return {
+		'lat': latcen,
+		'lng': lngcen,
+		'nid': nid,
+		'latLngStr': "%.4f,%.4f" % (latcen, lngcen),
+		'latLngId': "%d,%d" % (latind, lngind)
+	}
 
 def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	"""
@@ -151,7 +213,7 @@ def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
 	resString = []
 	for x in xrange(0,GRIDSNUM):
 		if matrix[x][3] != 0:
-			resString.append(str(int(matrix[x][0])) + ',%.3f' % (matrix[x][1]) + ',%.3f,' % (matrix[x][2]) + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])) + ',' + str(int(matrix[x][5])))
+			resString.append(str(int(matrix[x][0])) + ',%.4f' % (matrix[x][1]) + ',%.4f,' % (matrix[x][2]) + str(int(matrix[x][3])) + ',' + str(int(matrix[x][4])) + ',' + str(int(matrix[x][5])))
 
 	if len(resString) != 0:	
 		with open(os.path.join(baseurl, 'mares-at'), 'ab') as res:
