@@ -84,8 +84,8 @@ def main(argv):
 
 	conn, db = connectMongo('stvis')
 	plist = list(db['pois'].find({}, {
-		'properties.pid': 1,
-		'properties.coordinates': 1
+		'pid': 1,
+		'coordinates': 1
 	}))
 	pois = list(chunks(plist, 20))
 	conn.close()
