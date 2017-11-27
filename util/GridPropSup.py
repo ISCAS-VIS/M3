@@ -58,7 +58,7 @@ class GridPropSup(object):
 		pid = props['pid']
 		polygon = shape({
 			'type': 'Polygon',
-			"coordinates": props['boundary']
+			"coordinates": [props['boundary']]
 		})
 
 		# 遍历小格判断

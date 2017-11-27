@@ -165,8 +165,8 @@ def parseFormatGID(locs, id, SPLIT = 0.0005):
 		lngind = id - latind * LNGNUM
 		nid = id
 	else:
-		latind = id.y
-		lngind = id.x
+		latind = id['y']
+		lngind = id['x']
 		nid = lngind + latind * LNGNUM
 	
 	lat = (locs['south'] + latind * SPLIT)
