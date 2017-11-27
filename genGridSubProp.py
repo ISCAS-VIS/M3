@@ -1,17 +1,50 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-
+# Output Format:
+# [grid-at]
+# JSON
 
 import os
 import logging
 import getopt
 import sys
 import time
+import json
 from multiprocessing import Process
 from util.dbopts import connectMongo
 from util.GridPropSup import GridPropSup
-from util.preprocess import chunks
+from util.preprocess import chunks, getCityLocs
+from util.preprocess import parseFormatGID
+
+
+def mergeGrids(basepath, jobsNum):
+	# 加载所有网格
+	locs = getCityLocs('beijing')
+	SPLIT = 0.0005
+	LATNUM = int((locs['north'] - locs['south']) / SPLIT + 1)
+	LNGNUM = int((locs['east'] - locs['west']) / SPLIT + 1)
+
+	totalLen = LATNUM * LNGNUM
+	result = [parseFormatGID(locs, i) for i in xrange(0, totalLen)]
+
+	# 根据每个文件对网格进行更新
+	for i in xrange(0, jobsNum):
+		with open(os.path.join(basepath, "BJ-MID-SQL", "grid-j%d" % j)) as f:
+			for each in f:
+				each = each.strip().split(',')
+				nid = int(each[0])
+				pid = int(each[1])
+
+				if result[nid]['pid'] != -1:
+					result[nid]['pid'] = pid
+		f.close()
+
+	# 结果写入文件
+	result = [i for i in result if i['pid'] != -1]
+	with open(os.path.join(basepath, 'BJ-MID-SQL', 'grid-at'), 'ab') as res:
+		res.write(json.dumps(result).encode('utf-8'))
+	res.close()
 
 
 def processTask(INDEX, city, basepath, pidList):
@@ -25,7 +58,7 @@ def processTask(INDEX, city, basepath, pidList):
 
 
 def usage():
-    	pass
+	pass
 
 
 def main(argv):
@@ -70,7 +103,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeLargeRecords(city, directory, 'bj-byday', 87)
+	mergeGrids(directory, 20)
 
 	# @多进程运行程序 END
 

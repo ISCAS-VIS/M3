@@ -72,7 +72,8 @@ class GridPropSup(object):
 
 				if polygon.contains(Point(point.lng, point.lat)) and pid not in self.gridList:
 					self.gridList.append(pid)
-					newGridRec = "%d,%d,%f,%f,%d,%d" % (point.nid, pid, point.lng, point.lat, x, y)
+					newGridRec = "%d,%d" % (point.nid, pid)
+					# newGridRec = "%d,%d,%f,%f,%d,%d" % (point.nid, pid, point.lng, point.lat, x, y)
 					self.MATRIX.append(newGridRec)
 
 	def getPoiEdgePoints(self, boundary):

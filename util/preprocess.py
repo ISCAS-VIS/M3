@@ -148,7 +148,7 @@ def getFormatGID(locs, point, SPLIT = 0.0005):
 
 def parseFormatGID(locs, id, SPLIT = 0.0005):
 	"""
-	[NEW] 根据城市网格编号还原经纬度信息
+	[NEW] 根据城市网格编号还原经纬度信息，注意：经纬度为中心点信息并非西南角信息
 		:param locs: 
 		:param id: 
 		:param SPLIT=0.05: 
@@ -178,8 +178,9 @@ def parseFormatGID(locs, id, SPLIT = 0.0005):
 		'lat': latcen,
 		'lng': lngcen,
 		'nid': nid,
-		'latLngStr': "%.4f,%.4f" % (latcen, lngcen),
-		'latLngId': "%d,%d" % (latind, lngind)
+		'pid': -1,
+		'y': latind,
+		'x': lngind
 	}
 
 def mergeMatrixs(city, GRIDSNUM, directory, subpath, time):
