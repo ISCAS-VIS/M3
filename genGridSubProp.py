@@ -87,7 +87,7 @@ def main(argv):
 		'pid': 1,
 		'coordinates': 1
 	}))
-	pois = list(chunks(plist, 20))
+	pois = list(chunks(plist, 347))
 	conn.close()
 
 	# @多进程运行程序 START
