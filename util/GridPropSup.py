@@ -9,6 +9,7 @@ import os
 from util.preprocess import getCityLocs, getFormatGID, parseFormatGID
 from shapely.geometry import Point
 from shapely.geometry import shape
+import logging
 
 
 class GridPropSup(object):
@@ -28,6 +29,8 @@ class GridPropSup(object):
 
 	def run(self):
 		# begin
+		pidLen = len(self.pidList)
+		count = 1
 
 		# 遍历每个实例充实带小区属性的网格数据
 		for each in self.pidList:
@@ -35,6 +38,8 @@ class GridPropSup(object):
 				'pid': each['pid'],
 				'boundary': each['coordinates']
 			})
+			logging.info("Finish %d - poi %d, %f percent in total." % (self.INDEX, count, count * 100.0 / pidLen))
+			count += 1
 
 		# 网格数据归一化存入文件，处理结果
 		ofile = os.path.join(self.basepath, "BJ-MID-SQL", "grid-j%d" % self.INDEX)
