@@ -30,7 +30,7 @@ def mergeGrids(basepath, jobsNum):
 
 	# 根据每个文件对网格进行更新
 	for i in xrange(0, jobsNum):
-		with open(os.path.join(basepath, "BJ-MID-SQL", "grid-j%d" % j)) as f:
+		with open(os.path.join(basepath, "BJ-MID-SQL", "grid-j%d" % i), 'rb') as f:
 			for each in f:
 				each = each.strip().split(',')
 				nid = int(each[0])

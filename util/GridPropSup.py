@@ -63,16 +63,16 @@ class GridPropSup(object):
 
 		# 遍历小格判断
 		cityLocs = getCityLocs('beijing')
-		swIndex = getFormatGID(cityLocs, edgePoints.sw)
-		neIndex = getFormatGID(cityLocs, edgePoints.ne)
+		swIndex = getFormatGID(cityLocs, edgePoints['sw'])
+		neIndex = getFormatGID(cityLocs, edgePoints['ne'])
 
-		for x in xrange(swIndex.lngind, neIndex.lngind+1):
-			for y in xrange(swIndex.latind, neIndex.latind+1):
+		for x in xrange(swIndex['lngind'], neIndex['lngind']+1):
+			for y in xrange(swIndex['latind'], neIndex['latind']+1):
 				point = parseFormatGID(cityLocs, {'x': x, 'y': y})
 
-				if polygon.contains(Point(point.lng, point.lat)) and pid not in self.gridList:
+				if polygon.contains(Point(point['lng'], point['lat'])) and pid not in self.gridList:
 					self.gridList.append(pid)
-					newGridRec = "%d,%d" % (point.nid, pid)
+					newGridRec = "%d,%d" % (point['nid'], pid)
 					# newGridRec = "%d,%d,%f,%f,%d,%d" % (point.nid, pid, point.lng, point.lat, x, y)
 					self.MATRIX.append(newGridRec)
 
@@ -91,19 +91,19 @@ class GridPropSup(object):
 		}
 
 		for each in boundary:
-			if each[0] > res.e:
-				res.e = each[0]
-			elif each[0] < res.w:
-				res.w = each[0]
+			if each[0] > res['e']:
+				res['e'] = each[0]
+			elif each[0] < res['w']:
+				res['w'] = each[0]
 			
-			if each[1] > res.n:
-				res.n = each[1]
-			elif each[1] < res.s:
-				res.s = each[1]
+			if each[1] > res['n']:
+				res['n'] = each[1]
+			elif each[1] < res['s']:
+				res['s'] = each[1]
 		
 		return {
-			'sw': [res.s, res.w],
-			'ne': [res.n, res.e]
+			'sw': [res['s'], res['w']],
+			'ne': [res['n'], res['e']]
 		}
 	
 	def writeToFile(self, file):
