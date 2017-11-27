@@ -21,8 +21,8 @@ class GridPropSup(object):
 
 		self.basepath = PROP['basepath']
 		self.pidList = PROP['pidList']
-		self.poiDict = PROP['poiDict']
 		self.INDEX = PROP['INDEX']
+		self.city = PROP['city']
 		self.MATRIX = []
 		self.gridList = []
 
@@ -32,15 +32,22 @@ class GridPropSup(object):
 		# 遍历每个实例充实带小区属性的网格数据
 		for each in self.pidList:
 			self.updGrids({
-				'pid': each,
-				'boundary': self.poiDict[each]
+				'pid': each['pid'],
+				'boundary': each['coordinates']
 			})
 
-		# 网格数据归一化存入文件
+		# 网格数据归一化存入文件，处理结果
+		ofile = os.path.join(self.basepath, "BJ-MID-SQL", "grid-j%d" % self.INDEX)
+		self.writeToFile(ofile)
 
 		# end
 	
 	def updGrids(self, props):
+		"""
+		根据给定 POI 进行网格更新
+			:param self: 
+			:param props: 
+		"""
 		# 获取围栏边界
 		edgePoints = self.getPoiEdgePoints(props['boundary'])
 		pid = props['pid']
@@ -62,10 +69,6 @@ class GridPropSup(object):
 					self.gridList.append(pid)
 					newGridRec = "%d,%d,%f,%f,%d,%d" % (point.nid, pid, point.lng, point.lat, x, y)
 					self.MATRIX.append(newGridRec)
-
-		# 处理结果
-		ofile = os.path.join(self.basepath, "BJ-MID-SQL", "grid-j%d" % self.INDEX)
-		self.writeToFile(ofile)
 
 	def getPoiEdgePoints(self, boundary):
 		"""
@@ -98,6 +101,11 @@ class GridPropSup(object):
 		}
 	
 	def writeToFile(self, file):
+		"""
+		将结果写入文件
+			:param self: 
+			:param file: 
+		"""
 		with open(file, 'ab') as f:
 			f.write('\n'.join(self.MATRIX))
 		f.close()
