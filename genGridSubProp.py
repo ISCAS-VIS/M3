@@ -34,7 +34,7 @@ def mergeGrids(basepath, jobsNum):
 			for each in f:
 				each = each.strip().split(',')
 				nid = int(each[0])
-				pid = int(each[1])
+				pid = each[1]
 
 				if result[nid]['pid'] != -1:
 					result[nid]['pid'] = pid

@@ -78,7 +78,7 @@ class GridPropSup(object):
 				if polygon.contains(Point(point['lng'], point['lat'])):
 					# print 'yes'
 					self.gridList.append(pid)
-					newGridRec = "%d,%d" % (point['nid'], int(pid))
+					newGridRec = "%d,%s" % (point['nid'], pid)
 					# newGridRec = "%d,%d,%f,%f,%d,%d" % (point.nid, pid, point.lng, point.lat, x, y)
 					self.MATRIX.append(newGridRec)
 
