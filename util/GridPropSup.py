@@ -7,7 +7,7 @@
 
 import os
 from util.preprocess import getCityLocs, getFormatGID, parseFormatGID
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 from shapely.geometry import shape
 import logging
 
@@ -38,6 +38,7 @@ class GridPropSup(object):
 				'pid': each['pid'],
 				'boundary': each['coordinates']
 			})
+			# break
 			logging.info("Finish %d - poi %d, %f percent in total." % (self.INDEX, count, count * 100.0 / pidLen))
 			count += 1
 
@@ -56,10 +57,13 @@ class GridPropSup(object):
 		# 获取围栏边界
 		edgePoints = self.getPoiEdgePoints(props['boundary'])
 		pid = props['pid']
-		polygon = shape({
-			'type': 'Polygon',
-			"coordinates": [props['boundary']]
-		})
+		polygon = Polygon(props['boundary'])
+		
+		# shape({
+		# 	'type': 'Polygon',
+		# 	"coordinates": [props['boundary']]
+		# 	# "coordinates": [[[0,0],[0,1],[1,1],[1,0],[0,0]]]
+		# })
 
 		# 遍历小格判断
 		cityLocs = getCityLocs('beijing')
@@ -69,8 +73,10 @@ class GridPropSup(object):
 		for x in xrange(swIndex['lngind'], neIndex['lngind']+1):
 			for y in xrange(swIndex['latind'], neIndex['latind']+1):
 				point = parseFormatGID(cityLocs, {'x': x, 'y': y})
+				# print point['lng'], point['lat']
 
-				if polygon.contains(Point(point['lng'], point['lat'])) and pid not in self.gridList:
+				if polygon.contains(Point(point['lng'], point['lat'])):
+					# print 'yes'
 					self.gridList.append(pid)
 					newGridRec = "%d,%d" % (point['nid'], pid)
 					# newGridRec = "%d,%d,%f,%f,%d,%d" % (point.nid, pid, point.lng, point.lat, x, y)
@@ -102,8 +108,8 @@ class GridPropSup(object):
 				res['s'] = each[1]
 		
 		return {
-			'sw': [res['s'], res['w']],
-			'ne': [res['n'], res['e']]
+			'sw': [res['w'], res['s']],
+			'ne': [res['e'], res['n']]
 		}
 	
 	def writeToFile(self, file):
