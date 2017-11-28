@@ -82,24 +82,24 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	# conn, db = connectMongo('stvis')
-	# plist = list(db['pois'].find({}, {
-	# 	'pid': 1,
-	# 	'coordinates': 1
-	# }))
-	# pois = list(chunks(plist, 347))
-	# conn.close()
+	conn, db = connectMongo('stvis')
+	plist = list(db['pois'].find({}, {
+		'pid': 1,
+		'coordinates': 1
+	}))
+	pois = list(chunks(plist, 347))
+	conn.close()
 
-	# # @多进程运行程序 START
-	# jobs = []
+	# @多进程运行程序 START
+	jobs = []
 
-	# for x in xrange(0, 20):
-	# 	tProcess = Process(target=processTask, args=(x, city, directory, pois[x]))
-	# 	jobs.append(tProcess)
-	# 	jobs[x].start()
+	for x in xrange(0, 20):
+		tProcess = Process(target=processTask, args=(x, city, directory, pois[x]))
+		jobs.append(tProcess)
+		jobs[x].start()
 
-	# for job in jobs:
-	# 	job.join()
+	for job in jobs:
+		job.join()
 
 	# 处理剩余数据进文件
 	# 合并操作
