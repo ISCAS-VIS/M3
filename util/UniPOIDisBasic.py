@@ -63,7 +63,8 @@ class UniPOIDisBasic(object):
 	def genPOIMapObj(self):
 		res = {}
 		for key in self.poiMap:
-			res[key] = [key, 0, 0]
+			val = self.poiMap[key]
+			res[val] = [val, 0, 0]
 		return res
     		
 	def updateDis(self, ifile):
