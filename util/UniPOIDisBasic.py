@@ -10,7 +10,7 @@
 import os
 import gc
 import logging
-from util.preprocess import writeDayObjecttoFile
+from util.preprocess import writeDayObjecttoJSONFile
 
 
 class UniPOIDisBasic(object):
@@ -55,7 +55,7 @@ class UniPOIDisBasic(object):
 		
 			# 结果写进文件
 			# # MATRIX
-			writeDayObjecttoFile(self.INDEX, self.CITY, self.MAP, odir, self.DAY)
+			writeDayObjecttoJSONFile(self.INDEX, self.CITY, self.MAP, odir, self.DAY)
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
