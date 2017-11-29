@@ -4,6 +4,7 @@
 
 import numpy as np
 from multiprocessing import Process
+import json
 
 def processTask():
 	MATRIX = [['j, 3.33, 3.33, 3.33, 3.33, 3.33, 3.33' for j in xrange(1000)] for x in xrange(0, 2088)]
@@ -28,15 +29,24 @@ if __name__ == '__main__':
 	# for job in jobs:
 	# 	job.join()
 
-	with open('b', 'wb') as t:
-		t.write('sadadasd\nasdasd\n123\n')
+	# with open('b', 'ab') as t:
+	# 	json.dump([], t)
+	# t.close()
+
+	with open('b', 'ab') as output:
+		output.write('[')
+		for jobId in xrange(0, 20):
+			output.write(json.dumps({
+				"id": jobId,
+				'test': "test"
+			}))
+			if jobId != 19:
+				output.write(',')
+		output.write(']')
+	output.close()
+
+	with open('b', 'rb') as t:
+		temp = json.load(t)
+		print temp
 	t.close()
 
-	with open('a', 'wb') as output:
-		for jobId in xrange(0, 20):
-			with open('b', 'rb') as input:
-				output.write(input.read())
-				for each in input:
-					print each
-			input.close()
-	output.close()

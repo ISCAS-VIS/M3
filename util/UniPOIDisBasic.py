@@ -28,12 +28,12 @@ class UniPOIDisBasic(object):
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
 		self.DAY = -1
-		self.GRIDSNUM = PROP['GRIDSNUM']
+		self.poiMap = PROP['poiMap']
 
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
 
-		idir = os.path.join(self.DIRECTORY, 'bj-byday')
+		idir = os.path.join(self.DIRECTORY, 'bj-byday-sg')
 		odir = os.path.join(self.DIRECTORY, self.SUBOPATH)
 
 		for x in xrange(0, 10000):
@@ -43,10 +43,10 @@ class UniPOIDisBasic(object):
 
 			# 结果处理完成重新初始化
 			self.DAY = number
-			self.MATRIX = [[[x, 0, 0] for x in xrange(0, self.GRIDSNUM)] for e in xrange(0, 24)]  # index, people, number
+			self.MAP = [self.genPOIMapObj() for e in xrange(0, 24)]
 			self.LASTREC = [{
 				'id': -1,
-				'grid': []
+				'poi': []
 			} for x in xrange(0, 24)]
 
 			ifilename = 'hares-%d' % number
@@ -56,10 +56,16 @@ class UniPOIDisBasic(object):
 			# 结果写进文件
 			# # MATRIX
 			writeDayMatrixtoFile(self.INDEX, self.CITY, self.MATRIX, odir, self.DAY)
-			self.MATRIX = []
+			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
 
+	def genPOIMapObj(self):
+		res = {}
+		for key in self.poiMap:
+			res[key] = [key, 0, 0]
+		return res
+    		
 	def updateDis(self, ifile):
 		resnum = 0
 
@@ -72,27 +78,30 @@ class UniPOIDisBasic(object):
 				state = linelist[3]
 				if state == 'T':
 					continue
-
-				self.dealPointState({
-					'id': linelist[0],
-					'hour': int(linelist[1]) % 23,
-					'grid': int(linelist[2]),
-				})
+                
+                if linelist[2] in self.poiMap:
+                    self.dealPointState({
+                        'id': linelist[0],
+                        'hour': int(linelist[1]) % 23,
+                        'poi': self.poiMap[linelist[2]]
+    				})
 		stream.close()
 
 	def dealPointState(self, data):
-		grid = data['grid']
 		id = data['id']
 		hour = data['hour']
+		poi = data['poi']
 
 		# stay 状态更新
+		# 判断此记录是否与上次一致
 		if id == self.LASTREC[hour]['id']:
-			if grid not in self.LASTREC[hour]['grid']:
-				self.LASTREC[hour]['grid'].append(grid)
-				self.MATRIX[hour][grid][1] += 1
+			# 判断 poi ID 在指定时段中是否出现过
+			if poi not in self.LASTREC[hour]['poi']:
+				self.LASTREC[hour]['poi'].append(poi)
+				self.MAP[hour][poi][1] += 1  # index, people, number
 		else:
 			self.LASTREC[hour]['id'] = id
-			self.LASTREC[hour]['grid'] = [grid]
-			self.MATRIX[hour][grid][1] += 1
+			self.LASTREC[hour]['poi'] = [poi]
+			self.MAP[hour][poi][1] += 1
 
-		self.MATRIX[hour][grid][2] += 1
+		self.MAP[hour][poi][2] += 1
