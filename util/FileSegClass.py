@@ -43,7 +43,7 @@ class FileSegByHour(object):
 		conn.close()
 
 		for each in plist:
-    		self.poiMap[each['nid']] = each['pid']
+			self.poiMap[each['nid']] = each['pid']
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
@@ -87,7 +87,7 @@ class FileSegByHour(object):
 				# 处理字段
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
 				if grid in self.poiMap:
-    				print 'poi'
+					print 'poi'
 				# fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
 				# toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
 
