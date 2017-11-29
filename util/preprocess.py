@@ -357,7 +357,7 @@ def writeDayObjecttoFile(index, city, data, opath, day):
 
 				# 只记录有人定位的有效网格
 				if oneRec[1] != 0:
-					singleRes = "%d,%d,%d,%d" % (oneRec[0], oneRec[1], oneRec[2], seg)
+					singleRes = "%s,%d,%d,%d" % (oneRec[0], oneRec[1], oneRec[2], seg)
 					resString.append(singleRes)
 
 			res.write('\n'.join(resString) + '\n')
