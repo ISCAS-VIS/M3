@@ -52,7 +52,7 @@ def main(argv):
 		usage()
 		sys.exit(2)
 
-	city, directory, inum, onum, jnum, subopath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 87, 20, 20, 'bj-newvis-sg'
+	city, directory, inum, onum, jnum, subopath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 86, 20, 20, 'bj-newvis-sg'
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
