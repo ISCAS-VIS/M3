@@ -7,7 +7,7 @@ import time
 import logging
 import getopt
 from multiprocessing import Process
-from util.preprocess import mergeMultiProcessMatFiles
+# from util.preprocess import mergeMultiProcessMatFiles
 from util.UniPOIDisBasic import UniPOIDisBasic
 from util.dbopts import connectMongo
 

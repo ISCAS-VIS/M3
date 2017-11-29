@@ -8,7 +8,7 @@
 import logging
 import os
 from util.preprocess import getCityLocs, formatGridID, formatTime
-from util.dbopts import connectMongo
+
 
 class FileSegByHour(object):
 	"""
@@ -34,17 +34,6 @@ class FileSegByHour(object):
 		idir = os.path.join(self.DIRECTORY, 'result')
 		odir = os.path.join(self.DIRECTORY, 'bj-byday-sg')
 
-		self.poiMap = {}
-		conn, db = connectMongo('stvis')
-		plist = list(db['grids'].find({}, {
-			'pid': 1,
-			'nid': 1
-		}))
-		conn.close()
-
-		for each in plist:
-			self.poiMap[each['nid']] = each['pid']
-
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
 			if number > self.INUM:
@@ -55,16 +44,16 @@ class FileSegByHour(object):
 			self.iterateFile(os.path.join(idir, ifilename), odir)
 
 		# 捡完所有漏掉的记录，遍历输入文件
-		# for x in xrange(0, self.MAXDAY):
-		# 	if self.COUNT[x] == 0:
-		# 		continue
+		for x in xrange(0, self.MAXDAY):
+			if self.COUNT[x] == 0:
+				continue
 
-		# 	ofile = os.path.join(odir, "hres-%d-%d" % (self.INDEX, x))
-		# 	with open(ofile, 'ab') as stream:
-		# 		stream.write('\n'.join(self.MATRIX[x]) + '\n')
-		# 	stream.close()
+			ofile = os.path.join(odir, "hres-%d-%d" % (self.INDEX, x))
+			with open(ofile, 'ab') as stream:
+				stream.write('\n'.join(self.MATRIX[x]) + '\n')
+			stream.close()
 
-		# logging.info('End Job-%d' % (self.INDEX))
+		logging.info('End Job-%d' % (self.INDEX))
 
 	def iterateFile(self, ifile, opath):
 		with open(ifile, 'rb') as stream:
@@ -86,24 +75,22 @@ class FileSegByHour(object):
 
 				# 处理字段
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
-				if grid in self.poiMap:
-					print 'poi'
-				# fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
-				# toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
+				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
+				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
 
-				# newline = "%s,%d,%d,S,0,0" % (line[0], seg, grid)
-				# if state == 'T':
-				# 	newline = "%s,%d,%d,T,%d,%d" % (line[0], seg, grid, fromGid, toGrid)
+				newline = "%s,%d,%d,S,0,0" % (line[0], seg, grid)
+				if state == 'T':
+					newline = "%s,%d,%d,T,%d,%d" % (line[0], seg, grid, fromGid, toGrid)
 
-				# # 计数存储，看情况写入文件
-				# if self.COUNT[ydayCurrent] == self.SAFECOUNT:
-				# 	ofile = os.path.join(opath, "hres-%d-%d" % (self.INDEX, ydayCurrent))
-				# 	with open(ofile, 'ab') as stream:
-				# 		stream.write('\n'.join(self.MATRIX[ydayCurrent]) + '\n')
-				# 	stream.close()
+				# 计数存储，看情况写入文件
+				if self.COUNT[ydayCurrent] == self.SAFECOUNT:
+					ofile = os.path.join(opath, "hres-%d-%d" % (self.INDEX, ydayCurrent))
+					with open(ofile, 'ab') as stream:
+						stream.write('\n'.join(self.MATRIX[ydayCurrent]) + '\n')
+					stream.close()
 
-				# 	self.COUNT[ydayCurrent] = 1
-				# 	self.MATRIX[ydayCurrent] = [newline]
-				# else:
-				# 	self.COUNT[ydayCurrent] += 1
-				# 	self.MATRIX[ydayCurrent].append(newline)
+					self.COUNT[ydayCurrent] = 1
+					self.MATRIX[ydayCurrent] = [newline]
+				else:
+					self.COUNT[ydayCurrent] += 1
+					self.MATRIX[ydayCurrent].append(newline)

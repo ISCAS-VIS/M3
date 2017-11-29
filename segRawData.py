@@ -69,7 +69,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	# mergeLargeRecords(city, directory, 'bj-byday-sg', 87)
+	mergeLargeRecords(city, directory, 'bj-byday-sg', 87)
 
 	# @多进程运行程序 END
 
@@ -77,5 +77,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
-	logging.basicConfig(filename='logger-test.log', level=logging.DEBUG)
+	logging.basicConfig(filename='logger-segrawdata.log', level=logging.DEBUG)
 	main(sys.argv[1:])

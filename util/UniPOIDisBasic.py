@@ -79,6 +79,7 @@ class UniPOIDisBasic(object):
 				if state == 'T':
 					continue
                 
+				linelist[2] = str(linelist[2])
                 if linelist[2] in self.poiMap:
 					resnum += 1
 					self.dealPointState({
