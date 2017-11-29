@@ -82,8 +82,8 @@ def main(argv):
 	
 	print "POI List length: %d" % len(plist)
 	for each in plist:
-		poiMap[str(each['nid'])] = each['pid']
-	plist = None
+		poiMap[each['nid']] = each['pid']
+	# plist = None
 
 	# @多进程运行程序 START
 	jobs = []
