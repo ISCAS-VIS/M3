@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
+# 引用 FileSegByHour 类切分原始文件，并合并最终结果至按天分的子文件中
 
 import sys
 import time
@@ -68,7 +69,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeLargeRecords(city, directory, 'bj-byday', 87)
+	mergeLargeRecords(city, directory, 'bj-byday-sg', 87)
 
 	# @多进程运行程序 END
 

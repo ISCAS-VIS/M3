@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# 
+# 基础数据库类操作方法
 
 import os
 import pymongo

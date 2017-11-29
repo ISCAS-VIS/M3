@@ -6,6 +6,8 @@
 # from_nid, to_nid, dev_num, rec_num, seg
 # [mares-at]
 # nid, lat, lng, dev_num, rec_num, seg
+# 
+# 初始计算脚本，适用于空间精度 0.05 的划分结构
 
 import os
 import logging

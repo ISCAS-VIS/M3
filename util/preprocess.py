@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# 
+# 预处理方法类，包括文件存储、数据计算转换等等方法
 
 import numpy as np
 import os

@@ -4,6 +4,8 @@
 # Output Format:
 # [grid-at]
 # JSON
+# 
+# 生成 grid JSON 数据，适合存入 mongoDB
 
 import os
 import logging

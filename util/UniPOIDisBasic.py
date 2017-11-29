@@ -5,7 +5,7 @@
 # [hares-j[x]]
 # nid, lat, lng, dev_num, rec_num, seg
 # 
-# 改进后计算脚本，适用于 0.003 精度空间的数据计算
+# 改进后计算脚本，适用于 0.0005 精度空间映射 POI 的数据计算
 
 import os
 import gc
@@ -13,13 +13,13 @@ import logging
 from util.preprocess import writeDayMatrixtoFile
 
 
-class UniGridDisOnlyPoints(object):
+class UniPOIDisBasic(object):
 	"""
-	多进程计算类：输入分天的处理后数据，将网格内的定位记录数/人数计算并存入文件，一个进程执行一次负责一天24小时时间段的数据处理，结果增量输入至文件，最后多进程执行情况下需要做合并操作
+	多进程计算类：输入分天的处理后数据，将 POI 内的定位记录数/人数计算并存入文件，一个进程执行一次负责一天24小时时间段的数据处理，结果增量输入至文件，最后多进程执行情况下需要做合并操作
 		:param object: 
 	"""
 	def __init__(self, PROP):
-		super(UniGridDisOnlyPoints, self).__init__()
+		super(UniPOIDisBasic, self).__init__()
 
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 

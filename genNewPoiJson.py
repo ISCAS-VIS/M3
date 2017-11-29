@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
+# 生成 POI Json 文件，适合存入 mongoDB
 
 import sys
 import time

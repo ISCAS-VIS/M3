@@ -32,7 +32,7 @@ class FileSegByHour(object):
 		logging.info('TASK-%d running...' % (self.INDEX))
 
 		idir = os.path.join(self.DIRECTORY, 'result')
-		odir = os.path.join(self.DIRECTORY, 'bj-byday')
+		odir = os.path.join(self.DIRECTORY, 'bj-byday-sg')
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x

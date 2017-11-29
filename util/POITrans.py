@@ -11,6 +11,10 @@ import os
 
 
 class POIJson(object):
+	"""
+	将原始 JSON 文件转化成预定格式、适合导入 mongoDB 的 GeoJSON 格式
+		:param object: 
+	"""
 	def __init__(self, PROP):
 		super(POIJson, self).__init__()
 		self.POITypes = PROP['POITypes']
