@@ -10,7 +10,7 @@
 import os
 import gc
 import logging
-from util.preprocess import writeDayObjecttoJSONFile
+from util.preprocess import writeDayObjecttoFile
 
 
 class UniPOIDisBasic(object):
@@ -55,7 +55,7 @@ class UniPOIDisBasic(object):
 		
 			# 结果写进文件
 			# # MATRIX
-			writeDayObjecttoJSONFile(self.INDEX, self.CITY, self.MAP, odir, self.DAY)
+			writeDayObjecttoFile(self.INDEX, self.CITY, self.MAP, odir, self.DAY)
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
@@ -73,7 +73,6 @@ class UniPOIDisBasic(object):
 		with open(ifile, 'rb') as stream:
 			for line in stream:
 				line = line.strip('\n')
-				resnum += 1
 				linelist = line.split(',')
 
 				state = linelist[3]
@@ -81,12 +80,14 @@ class UniPOIDisBasic(object):
 					continue
                 
                 if linelist[2] in self.poiMap:
-                    self.dealPointState({
-                        'id': linelist[0],
-                        'hour': int(linelist[1]) % 23,
-                        'poi': self.poiMap[linelist[2]]
-    				})
+					resnum += 1
+					self.dealPointState({
+						'id': linelist[0],
+						'hour': int(linelist[1]) % 23,
+						'poi': self.poiMap[linelist[2]]
+					})
 		stream.close()
+		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
 
 	def dealPointState(self, data):
 		id = data['id']

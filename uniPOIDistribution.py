@@ -79,7 +79,8 @@ def main(argv):
 		'nid': 1
 	}))
 	conn.close()
-
+	
+	print "POI List length: %d" % len(plist)
 	for each in plist:
 		poiMap[str(each['nid'])] = each['pid']
 	plist = None
