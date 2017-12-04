@@ -8,13 +8,12 @@
 import os
 from util.preprocess import getCityLocs, getFormatGID, parseFormatGID
 from shapely.geometry import Point, Polygon
-from shapely.geometry import shape
 import logging
 
 
 class GridPropSup(object):
 	"""
-	遍历 POI 增加有属性的网格信息
+	遍历 POI, 将从属的有意义网格挑出，并添加与 POI 的绑定信息，构成有效网格映射关系表
 		:param object: 
 	"""
 	def __init__(self, PROP):

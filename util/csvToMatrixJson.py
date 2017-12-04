@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # 
 # Output Format:
-# [hares-x]
-# id, seg, gid, state, from_nid(default to 0), to_nid(default to 0)
+# [hares-jat]
+# JSON
 
 import logging
 import json
@@ -34,7 +34,7 @@ class csvToMatrixJson(object):
 					line = line.strip('\n')
 					if line == '':
 						continue
-					
+
 					linelist = line.split(',')
 					
 					# tmpObject, index = {}, 0

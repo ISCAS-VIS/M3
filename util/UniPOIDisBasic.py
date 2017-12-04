@@ -5,7 +5,7 @@
 # [hares-j[x]]
 # nid, lat, lng, dev_num, rec_num, seg
 # 
-# 改进后计算脚本，适用于 0.0005 精度空间映射 POI 的数据计算
+# 改进后计算脚本，适用于 0.0005 精度 Grid 映射 POI 的聚集数据计算方案
 
 import os
 import gc
