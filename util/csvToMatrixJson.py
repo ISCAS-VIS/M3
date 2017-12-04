@@ -32,6 +32,9 @@ class csvToMatrixJson(object):
 			with open(ifile, 'rb') as stream:
 				for line in stream:
 					line = line.strip('\n')
+					if line == '':
+						continue
+					
 					linelist = line.split(',')
 					
 					# tmpObject, index = {}, 0
@@ -40,9 +43,9 @@ class csvToMatrixJson(object):
 
 					resArr.append({
 						"pid": linelist[0],
-						"segid": int(linelist[1]),
-						"dev_num": int(linelist[2]),
-						"rec_num": int(linelist[3])
+						"dev_num": int(linelist[1]),
+						"rec_num": int(linelist[2]),
+						"segid": int(linelist[3])
 					})
 			stream.close()
 		
