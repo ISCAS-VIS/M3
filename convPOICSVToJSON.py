@@ -12,7 +12,7 @@ if __name__ == '__main__':
 	print "Start approach at %s" % STARTTIME
 
 	csvToMatrixJson({
-		'KEYS': [],
+		'keys': [],
 		'DIRECTORY': '/enigma/tao.jiang/datasets/JingJinJi/records/bj-newvis-sg',
 		'FilePrefix': 'hares-j',
 		'INUM': 20
