@@ -1,8 +1,9 @@
 # grid table
- mongoimport --db stvis --collection grids --file grid-at.json  --jsonArray --numInsertionWorkers 8
+# [nid] [x] [y] [lat] [lng] [pid]
+CREATE TABLE `stvis`.`grid` ( `nid` MEDIUMINT NOT NULL , `pid` CHAR(10) NOT NULL DEFAULT '0' , PRIMARY KEY (`nid`)) ENGINE = InnoDB;
 
 # poi table
 mongoimport --db stvis --collection pois --file mongo.json --jsonArray --numInsertionWorkers 8
 
 # matrix table
-mongoimport --db stvis --collection matrixs --file hares-jat.json  --jsonArray --numInsertionWorkers 8
+
