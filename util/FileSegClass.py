@@ -44,16 +44,16 @@ class FileSegByHour(object):
 			self.iterateFile(os.path.join(idir, ifilename), odir)
 
 		# 捡完所有漏掉的记录，遍历输入文件
-		for x in xrange(0, self.MAXDAY):
-			if self.COUNT[x] == 0:
-				continue
+		# for x in xrange(0, self.MAXDAY):
+		# 	if self.COUNT[x] == 0:
+		# 		continue
 
-			ofile = os.path.join(odir, "hres-%d-%d" % (self.INDEX, x))
-			with open(ofile, 'ab') as stream:
-				stream.write('\n'.join(self.MATRIX[x]) + '\n')
-			stream.close()
+		# 	ofile = os.path.join(odir, "hres-%d-%d" % (self.INDEX, x))
+		# 	with open(ofile, 'ab') as stream:
+		# 		stream.write('\n'.join(self.MATRIX[x]) + '\n')
+		# 	stream.close()
 
-		logging.info('End Job-%d' % (self.INDEX))
+		# logging.info('End Job-%d' % (self.INDEX))
 
 	def iterateFile(self, ifile, opath):
 		with open(ifile, 'rb') as stream:
@@ -64,7 +64,7 @@ class FileSegByHour(object):
 				state = linelist[4]
 				# 无效 Travel 状态信息
 				if state == 'T' and (line[6] == '0' or line[5] == '0' or line[8] == '0' or line[7] == '0'):
-					continue
+					continue   
 
 				# 分析日期
 				tmp = formatTime(linelist[1])
@@ -81,16 +81,18 @@ class FileSegByHour(object):
 				newline = "%s,%d,%d,S,0,0" % (line[0], seg, grid)
 				if state == 'T':
 					newline = "%s,%d,%d,T,%d,%d" % (line[0], seg, grid, fromGid, toGrid)
+					print "1"
 
 				# 计数存储，看情况写入文件
-				if self.COUNT[ydayCurrent] == self.SAFECOUNT:
-					ofile = os.path.join(opath, "hres-%d-%d" % (self.INDEX, ydayCurrent))
-					with open(ofile, 'ab') as stream:
-						stream.write('\n'.join(self.MATRIX[ydayCurrent]) + '\n')
-					stream.close()
+				# if self.COUNT[ydayCurrent] == self.SAFECOUNT:
+				# 	ofile = os.path.join(opath, "hres-%d-%d" % (self.INDEX, ydayCurrent))
+				# 	with open(ofile, 'ab') as stream:
+				# 		stream.write('\n'.join(self.MATRIX[ydayCurrent]) + '\n')
+				# 	stream.close()
 
-					self.COUNT[ydayCurrent] = 1
-					self.MATRIX[ydayCurrent] = [newline]
-				else:
-					self.COUNT[ydayCurrent] += 1
-					self.MATRIX[ydayCurrent].append(newline)
+				# 	self.COUNT[ydayCurrent] = 1
+				# 	self.MATRIX[ydayCurrent] = [newline]
+				# else:
+				# 	self.COUNT[ydayCurrent] += 1
+				# 	self.MATRIX[ydayCurrent].append(newline)
+		stream.close()
