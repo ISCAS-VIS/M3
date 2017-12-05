@@ -123,6 +123,9 @@ util/
 | 外部调用 | convPOICSVToJSON.py |
 | 使用进程 | 1 |
 
+* `GridPropMatchAdmin.py` - 废弃
+
+
 
 ## 约定数据格式
 
