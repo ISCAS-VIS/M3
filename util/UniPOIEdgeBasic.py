@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # Output Format:
-# [eres-[x]]
+# [ppedge-[x]]
 # from_pid, to_pid, dev_num, rec_num, seg
 
 import os
