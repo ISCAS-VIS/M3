@@ -85,7 +85,7 @@ class UniPOIDisBasic(object):
 					resnum += 1
 					self.dealPointState({
 						'id': linelist[0],
-						'hour': int(linelist[1]) % 23,
+						'hour': int(linelist[1]) % 24,
 						'poi': self.poiMap[linelist[2]]
 					})
 		stream.close()

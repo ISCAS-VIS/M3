@@ -337,7 +337,7 @@ def writeDayMatrixtoFile(index, city, data, opath, day):
 	res.close()
 
 def writeDayObjecttoFile(index, city, data, opath, day):
-    	"""
+	"""
 	将进程中单天所有时间单位的 POI 分布数据转化为字符串存储进文件
 		:param index: 
 		:param city: 
