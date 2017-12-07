@@ -8,7 +8,7 @@
 import logging
 import os
 from util.preprocess import getCityLocs, formatGridID, formatTime
-
+from util.preprocess import getAdminNumber
 
 class FileSegByHour(object):
 	"""
@@ -77,10 +77,11 @@ class FileSegByHour(object):
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
 				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
 				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
+				admin = getAdminNumber(linelist[9])
 
-				newline = "%s,%d,%d,S,0,0" % (line[0], seg, grid)
+				newline = "%s,%d,%d,S,0,0,%d" % (line[0], seg, grid, admin)
 				if state == 'T':
-					newline = "%s,%d,%d,T,%d,%d" % (line[0], seg, grid, fromGid, toGrid)
+					newline = "%s,%d,%d,T,%d,%d,%d" % (line[0], seg, grid, fromGid, toGrid, admin)
 
 				# 计数存储，看情况写入文件
 				if self.COUNT[ydayCurrent] == self.SAFECOUNT:

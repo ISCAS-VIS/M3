@@ -123,9 +123,20 @@ util/
 | 外部调用 | convPOICSVToJSON.py |
 | 使用进程 | 1 |
 
-* `GridPropMatchAdmin.py` - 废弃
+* `GridPropMatchAdmin.py` - 废弃，由原始数据提供商处理完加入到原始数据字段中
 * `UniAdmDisBasic.py` - 空
 
+* `UniPOIEdgeBasic.py` - POI 到 POI 的边权聚集脚本
+
+| 属性 | 说明 |
+|---| ---------- |
+| 前序步骤 | Uni- 类脚本已经将 POI 分时段分布数据跑完 |
+| 后续步骤 | 结果转化为 JSON 后存入 mongoDB.ppedge |
+| 依赖项 | 无 |
+| 输入 | bj-byday-sg 中按天分的预处理后的数据文件 |
+| 输出 | bj-newvis-sg 中按进程分的 ppedge- 结果文件 |
+| 外部调用 | 类 convPOICSVToJSON.py 脚本 |
+| 使用进程 | 20 |
 
 
 ## 约定数据格式

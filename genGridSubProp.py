@@ -16,8 +16,14 @@ import json
 from multiprocessing import Process
 from util.dbopts import connectMongo
 from util.GridPropSup import GridPropSup
-from util.preprocess import chunks, getCityLocs
+from util.preprocess import getCityLocs
 from util.preprocess import parseFormatGID
+
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in xrange(0, len(l), n):
+        yield l[i:i + n]
 
 
 def mergeGrids(basepath, jobsNum):
