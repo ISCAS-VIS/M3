@@ -107,7 +107,7 @@ util/
 | 后续步骤 | 无 |
 | 依赖项 | 无 |
 | 输入 | bj-byday-sg 中按天分的预处理后的数据文件 |
-| 输出 | bj-newvis-sg 中按进程分的 matrix 结果文件 |
+| 输出 | bj-newvis-sg 中按进程分的 matrix 结果文件 [hares-j] |
 | 外部调用 | uniPOIDistribution.py |
 | 使用进程 | 20 |
 
@@ -119,7 +119,7 @@ util/
 | 后续步骤 | 结果存入 mongoDB.matrix |
 | 依赖项 | 无 |
 | 输入 | bj-newvis-sg 中分进程的 Matrix 文件 |
-| 输出 | bj-newvis-sg 中统一的 JSON 文件 |
+| 输出 | bj-newvis-sg 中统一的 JSON 文件 [hares-jat] |
 | 外部调用 | convPOICSVToJSON.py |
 | 使用进程 | 1 |
 

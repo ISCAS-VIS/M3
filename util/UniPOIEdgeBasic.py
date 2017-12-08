@@ -75,11 +75,11 @@ class UniPOIEdgeBasic(object):
 					toPid = self.poiMap[toGrid]
 					resnum += 1
 					hour = int(linelist[1]) % 24
-					mapId = "%d,%d" % (fromPid, toPid)
+					mapId = "%s,%s" % (fromPid, toPid)
 					self.dealOneEdge({
 						'id': linelist[0],
 						'hour': hour,
-						'existidentifier': '%s-%d-%d-%d' % (id, hour, fromPid, toPid),
+						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromPid, toPid),
 						'fromPid': fromPid,
 						'toPid': toPid,
 						'mapId': mapId
@@ -128,7 +128,7 @@ class UniPOIEdgeBasic(object):
 			# 24 时间段
 			for hour in xrange(0, 24):
 				for key, value in self.MAP[hour].iteritems():
-					resArr.append(','.join(value))
+					resArr.append('%s,%s,%d,%d' % (value[0], value[1], value[2], value[3]))
 			
 			res.write('\n'.join(resArr) + '\n')
 		res.close()
