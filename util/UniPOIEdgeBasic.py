@@ -50,7 +50,7 @@ class UniPOIEdgeBasic(object):
 			logging.info('Job-%d File-%d Operating...' % (self.INDEX, number))
 			self.updateEdge(os.path.join(idir, ifilename))
 
-			self.writeData(os.path.join(odir, 'ppedge-%d' % (number)))
+			self.writeData(os.path.join(odir, 'ppedge-%d' % (self.INDEX)))
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
@@ -88,6 +88,11 @@ class UniPOIEdgeBasic(object):
 		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
 
 	def dealOneEdge(self, data):
+		"""
+		判断处理单条记录函数
+			:param self: 
+			:param data: 
+		"""
 		id = data['id']
 		mapId = data['mapId']
 		hour = data['hour']
