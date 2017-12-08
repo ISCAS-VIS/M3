@@ -92,7 +92,7 @@ class UniPOIEdgeBasic(object):
 		mapId = data['mapId']
 		hour = data['hour']
 		fromPid = data['fromPid']
-		toPid = data['toGrid']
+		toPid = data['toPid']
 		existidentifier = data['existidentifier']
 		
 		# 人未变
