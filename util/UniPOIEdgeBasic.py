@@ -63,15 +63,16 @@ class UniPOIEdgeBasic(object):
 				linelist = line.split(',')
 
 				state = linelist[3]
-				fromPid = linelist[4]
-				toPid = linelist[5]
-				invalidTState = state == 'T' and (fromPid == '0' or toPid == '0')
+				fromGrid = int(linelist[4])
+				toGrid = int(linelist[5])
+				invalidTState = state == 'T' and (fromGrid == 0 or toGrid == 0)
 				if state == 'S' or invalidTState:
 					continue
                 
-				# print linelist[2]
 				linelist[2] = int(linelist[2])
-				if fromPid in self.poiMap and toPid in self.poiMap:
+				if fromGrid in self.poiMap and toGrid in self.poiMap:
+					fromPid = self.poiMap[fromGrid]
+					toPid = self.poiMap[toGrid]
 					resnum += 1
 					hour = int(linelist[1]) % 24
 					mapId = "%d,%d" % (fromPid, toPid)
@@ -129,5 +130,5 @@ class UniPOIEdgeBasic(object):
 				for key, value in self.MAP[hour].iteritems():
 					resArr.append(','.join(value))
 			
-			res.write('\n'.join(resString) + '\n')
+			res.write('\n'.join(resArr) + '\n')
 		res.close()
