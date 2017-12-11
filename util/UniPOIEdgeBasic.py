@@ -95,7 +95,8 @@ class UniPOIEdgeBasic(object):
 		"""
 		id = data['id']
 		mapId = data['mapId']
-		hour = self.DAY * 24 + data['hour']
+		hour = data['hour']
+		fhour = self.DAY * 24 + data['hour']
 		fromPid = data['fromPid']
 		toPid = data['toPid']
 		existidentifier = data['existidentifier']
@@ -105,13 +106,13 @@ class UniPOIEdgeBasic(object):
 			# 同一个人新纪录，如果记录相同则不作处理
 			if existidentifier != self.LASTREC[hour]['travel']:
 				self.LASTREC[hour]['travel'] = existidentifier
-				self.updateMap(mapId, hour, [fromPid, toPid, hour, 1, 0])
+				self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
 		else:
 			self.LASTREC[hour] = {
 				'id': id,
 				'travel': existidentifier
 			}
-			self.updateMap(mapId, hour, [fromPid, toPid, hour, 1, 0])
+			self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
 		
 		self.MAP[hour][mapId][4] += 1
 
