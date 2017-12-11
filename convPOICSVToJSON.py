@@ -15,7 +15,8 @@ if __name__ == '__main__':
 		'keys': [],
 		'DIRECTORY': '/enigma/tao.jiang/datasets/JingJinJi/records/bj-newvis-sg',
 		'FilePrefix': 'hares-j',
-		'INUM': 20
+		'INUM': 20,
+		'type': 'node'
 	}).run()
 
 	print "END TIME: %s" % time.time()

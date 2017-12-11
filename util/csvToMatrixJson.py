@@ -4,11 +4,13 @@
 # Output Format:
 # [hares-jat]
 # JSON
+# 
+# CSV -> Mongo.node.sample.js[matrix]
+# CSV -> Mongo.edge.sample.js[ppedge]
 
-import logging
+
 import json
 import os
-from util.preprocess import getCityLocs, formatGridID, formatTime
 
 class csvToMatrixJson(object):
 	"""
@@ -22,10 +24,20 @@ class csvToMatrixJson(object):
 		self.INUM = PROP['INUM']
 		self.DIRECTORY = PROP['DIRECTORY']
 		self.FilePrefix = PROP['FilePrefix']
+		self.type = PROP['type']
 
 	def run(self):
-		resArr = []
 		ofile = os.path.join(self.DIRECTORY, "%sat" % self.FilePrefix)
+		
+		with open(ofile, 'ab') as res:
+			if self.type == 'node':
+				json.dump(self.convertNode(), res)
+			else:
+				json.dump(self.convertEdge(), res)
+		res.close()
+
+	def convertNode(self):
+		resArr = []
 		for x in xrange(0, self.INUM):
 			ifile = os.path.join(self.DIRECTORY, '%s%d' % (self.FilePrefix, x))
 
@@ -37,10 +49,6 @@ class csvToMatrixJson(object):
 
 					linelist = line.split(',')
 					
-					# tmpObject, index = {}, 0
-					# for each in self.keys:
-					# 	tmpObject[each] = linelist[index]
-
 					resArr.append({
 						"pid": linelist[0],
 						"dev_num": int(linelist[1]),
@@ -49,6 +57,28 @@ class csvToMatrixJson(object):
 					})
 			stream.close()
 		
-		with open(ofile, 'ab') as res:
-			json.dump(resArr, res)
-		res.close()
+		return resArr
+
+	def convertEdge(self):
+		resArr = []
+		for x in xrange(0, self.INUM):
+			ifile = os.path.join(self.DIRECTORY, '%s%d' % (self.FilePrefix, x))
+
+			with open(ifile, 'rb') as stream:
+				for line in stream:
+					line = line.strip('\n')
+					if line == '':
+						continue
+
+					linelist = line.split(',')
+					
+					resArr.append({
+						"from_nid": linelist[0],
+						"to_nid": linelist[1],
+						"dev_num": int(linelist[2]),
+						"rec_num": int(linelist[3]),
+						"segid": int(linelist[4])
+					})
+			stream.close()
+		
+		return resArr

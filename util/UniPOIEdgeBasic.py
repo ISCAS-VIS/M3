@@ -95,7 +95,7 @@ class UniPOIEdgeBasic(object):
 		"""
 		id = data['id']
 		mapId = data['mapId']
-		hour = data['hour']
+		hour = self.DAY * 24 + data['hour']
 		fromPid = data['fromPid']
 		toPid = data['toPid']
 		existidentifier = data['existidentifier']
@@ -105,13 +105,15 @@ class UniPOIEdgeBasic(object):
 			# 同一个人新纪录，如果记录相同则不作处理
 			if existidentifier != self.LASTREC[hour]['travel']:
 				self.LASTREC[hour]['travel'] = existidentifier
-				self.updateMap(mapId, hour, [fromPid, toPid, self.DAY * 24 + hour, 1, 0])
+				self.updateMap(mapId, hour, [fromPid, toPid, hour, 1, 0])
 		else:
 			self.LASTREC[hour] = {
 				'id': id,
 				'travel': existidentifier
 			}
-			self.updateMap(mapId, hour, [fromPid, toPid, self.DAY * 24 + hour, 1, 0])
+			self.updateMap(mapId, hour, [fromPid, toPid, hour, 1, 0])
+		
+		self.MAP[hour][mapId][4] += 1
 
 	def updateMap(self, key, hour, val):
 		"""
@@ -133,7 +135,7 @@ class UniPOIEdgeBasic(object):
 			# 24 时间段
 			for hour in xrange(0, 24):
 				for key, value in self.MAP[hour].iteritems():
-					resArr.append('%s,%s,%d,%d' % (value[0], value[1], value[2], value[3]))
+					resArr.append('%s,%s,%d,%d,%d' % (value[0], value[1], value[3], value[4], value[2]))
 			
 			res.write('\n'.join(resArr) + '\n')
 		res.close()
