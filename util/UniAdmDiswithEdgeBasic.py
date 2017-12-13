@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 # 
 # Output Format:
-# [hares-j[x]]
-# nid, lat, lng, dev_num, rec_num, seg
+# [apoint-[x]]
+# aid, dev_num, rec_num, seg, hour, weekday
+# [aaedge-[x]]
+# from_aid, to_aid, dev_num, rec_num, seg, hour, weekday
 # 
-# 改进后计算脚本，适用于 0.0005 精度 Grid 映射 Admin 的聚集数据计算方案
+# 改进后计算脚本，适用于 Admin 区划下的点边信息聚集计算方案
 
 import os
 import gc
 import logging
-from util.preprocess import writeDayObjecttoFile
 
 
 class UniAdmDiswithEdgeBasic(object):
 	"""
-	多进程计算类：输入分天的处理后数据，将 POI 内的定位记录数/人数计算并存入文件，一个进程执行一次负责一天24小时时间段的数据处理，结果增量输入至文件，最后多进程执行情况下需要做合并操作
+	多进程计算类：输入分天的处理后数据，将定位记录数/人数按照行政区划切分计算并存入文件，一个进程执行一次负责一天24小时时间段的数据处理，结果增量输入至文件，包含点信息以及边信息，最后多进程执行情况下需要做合并操作
 		:param object: 
 	"""
 	def __init__(self, PROP):
@@ -26,9 +27,7 @@ class UniAdmDiswithEdgeBasic(object):
 		self.DIRECTORY = PROP['DIRECTORY'] 
 		self.SUBOPATH = PROP['SUBOPATH']
 		self.INUM = PROP['INUM']
-		self.ONUM = PROP['ONUM']
 		self.DAY = -1
-		self.poiMap = PROP['poiMap']
 
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
@@ -43,28 +42,37 @@ class UniAdmDiswithEdgeBasic(object):
 
 			# 结果处理完成重新初始化
 			self.DAY = number
-			self.MAP = [self.genPOIMapObj() for e in xrange(0, 24)]
+			
+			# 处理星期几的存储
+			tmpWed = (number+2) % 7
+			self.WEEKDAY = 7 if tmpWed == 0 else tmpWed  # 1-7
+
+			# MAP 存储点信息，EMAP 存储边信息
+			self.MAP = [self.genAdmMapObj() for e in xrange(0, 24)]
+			self.EMAP = [{} for each in xrange(0, 24)]
 			self.LASTREC = [{
 				'id': -1,
-				'poi': []
+				'adm': [],
+				'travel': '-1'
 			} for x in xrange(0, 24)]
 
-			ifilename = 'hares-%d' % number
+			ifilename = 'hares-%d' % number  # 输入文件名称
 			logging.info('Job-%d File-%d Operating...' % (self.INDEX, number))
 			self.updateDis(os.path.join(idir, ifilename))
 		
 			# 结果写进文件
 			# # MATRIX
-			writeDayObjecttoFile(self.INDEX, self.CITY, self.MAP, odir, self.DAY)
+			opFile = os.path.join(odir, 'apoint-%d' % (self.INDEX))
+			oeFile = os.path.join(odir, 'aaedge-%d' % (self.INDEX))
+			self.writeData(opFile, oeFile)
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
 
-	def genPOIMapObj(self):
-		res = {}
-		for key in self.poiMap:
-			val = self.poiMap[key]
-			res[val] = [val, 0, 0]
+	def genAdmMapObj(self):
+		res = []
+		for key in xrange(0, 16):
+			res.append([key+1, 0, 0])
 		return res
     		
 	def updateDis(self, ifile):
@@ -76,36 +84,115 @@ class UniAdmDiswithEdgeBasic(object):
 				linelist = line.split(',')
 
 				state = linelist[3]
+				fromAid = int(linelist[4])
+				toAid = int(linelist[5])
 				if state == 'T':
-					continue
-                
-				# print linelist[2]
-				linelist[2] = int(linelist[2])
-				if linelist[2] in self.poiMap:
 					resnum += 1
-					self.dealPointState({
+					hour = int(linelist[1]) % 24
+					mapId = "%s,%s" % (fromAid, toAid)
+					self.dealOneEdge({
+						'id': linelist[0],
+						'hour': hour,
+						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromAid, toAid),
+						'fromAid': fromAid,
+						'toAid': toAid,
+						'mapId': mapId
+					})
+				else:
+					resnum += 1
+					self.dealOnePoint({
 						'id': linelist[0],
 						'hour': int(linelist[1]) % 24,
-						'poi': self.poiMap[linelist[2]]
+						'adm': int(linelist[6])-1  # 0-15
 					})
 		stream.close()
 		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
 
-	def dealPointState(self, data):
+	def dealOnePoint(self, data):
 		id = data['id']
 		hour = data['hour']
-		poi = data['poi']
+		adm = data['adm']
 
 		# stay 状态更新
 		# 判断此记录是否与上次一致
 		if id == self.LASTREC[hour]['id']:
 			# 判断 poi ID 在指定时段中是否出现过
-			if poi not in self.LASTREC[hour]['poi']:
-				self.LASTREC[hour]['poi'].append(poi)
-				self.MAP[hour][poi][1] += 1  # index, people, number
+			if adm not in self.LASTREC[hour]['adm']:
+				self.LASTREC[hour]['adm'].append(adm)
+				self.MAP[hour][adm][1] += 1  # index, people, number
 		else:
 			self.LASTREC[hour]['id'] = id
-			self.LASTREC[hour]['poi'] = [poi]
-			self.MAP[hour][poi][1] += 1
+			self.LASTREC[hour]['adm'] = [adm]
+			self.MAP[hour][adm][1] += 1
 
-		self.MAP[hour][poi][2] += 1
+		self.MAP[hour][adm][2] += 1
+
+	def dealOneEdge(self, data):
+		"""
+		
+			:param self: 
+			:param data: 
+		"""
+		id = data['id']
+		mapId = data['mapId']
+		hour = data['hour']
+		fhour = self.DAY * 24 + data['hour']
+		fromPid = data['fromPid']
+		toPid = data['toPid']
+		existidentifier = data['existidentifier']
+		
+		# 人未变
+		if id == self.LASTREC[hour]['id']:
+			# 同一个人新纪录，如果记录相同则不作处理
+			if existidentifier != self.LASTREC[hour]['travel']:
+				self.LASTREC[hour]['travel'] = existidentifier
+				self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
+		else:
+			self.LASTREC[hour] = {
+				'id': id,
+				'travel': existidentifier
+			}
+			self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
+		
+		self.EMAP[hour][mapId][4] += 1
+
+	def updateEMap(self, key, hour, val):
+		"""
+		
+			:param self: 
+			:param key: 
+			:param hour: 
+			:param val: 
+		"""
+		if key in self.EMAP[hour]:
+			self.EMAP[hour][key][3]  += 1
+		else:
+			self.EMAP[hour][key] = val
+
+	def writeData(self, pointFile, edgeFile):
+		resArr = []
+
+		with open(edgeFile, 'ab') as res:
+			# 24 时间段
+			for hour in xrange(0, 24):
+
+				for key, value in self.EMAP[hour].iteritems():
+					resArr.append('%s,%s,%d,%d,%d,%d,%d' % (value[0], value[1], value[3], value[4], value[2], hour, self.WEEKDAY))
+			
+			res.write('\n'.join(resArr) + '\n')
+		res.close()
+
+		resString = []
+		with open(pointFile, 'ab') as res:
+		# 24 时间段
+			for x in xrange(0, 24):
+				seg = self.DAY * 24 + x
+
+				for i in self.MAP[x]:
+					oneRec = self.MAP[x][i]
+
+					singleRes = "%s,%d,%d,%d,%d,%d" % (oneRec[0], oneRec[1], oneRec[2], seg, x, self.WEEKDAY)
+					resString.append(singleRes)
+
+			res.write('\n'.join(resString) + '\n')
+		res.close()

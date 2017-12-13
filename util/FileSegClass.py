@@ -10,9 +10,10 @@ import os
 from util.preprocess import getCityLocs, formatGridID, formatTime
 from util.preprocess import getAdminNumber
 
+
 class FileSegByHour(object):
 	"""
-	多进程计算类：按照日期对文件进行分类重写存储，相关字段预先处理
+	多进程计算类：按照日期对文件进行分类重写存储，相关字段预先处理，需同时指定基础输入目录和输出目录
 		:param object: 
 	"""
 	def __init__(self, PROP):
