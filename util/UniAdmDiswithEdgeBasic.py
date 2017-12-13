@@ -51,7 +51,8 @@ class UniAdmDiswithEdgeBasic(object):
 			self.MAP = [self.genAdmMapObj() for e in xrange(0, 24)]
 			self.EMAP = [{} for each in xrange(0, 24)]
 			self.LASTREC = [{
-				'id': -1,
+				'sid': -1,
+				'tid': -1,
 				'adm': [],
 				'travel': '-1'
 			} for x in xrange(0, 24)]
@@ -87,10 +88,12 @@ class UniAdmDiswithEdgeBasic(object):
 				fromAid = int(linelist[4])
 				toAid = int(linelist[5])
 				id = linelist[0]
+				hour = int(linelist[1]) % 24
+				adm = int(linelist[6])-1  # 0-15
 
 				if state == 'T':
 					resnum += 1
-					hour = int(linelist[1]) % 24
+					
 					mapId = "%s,%s" % (fromAid, toAid)
 					self.dealOneEdge({
 						'id': id,
@@ -98,14 +101,15 @@ class UniAdmDiswithEdgeBasic(object):
 						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromAid, toAid),
 						'fromAid': fromAid,
 						'toAid': toAid,
-						'mapId': mapId
+						'mapId': mapId,
+						'adm': adm
 					})
 				else:
 					resnum += 1
 					self.dealOnePoint({
 						'id': id,
-						'hour': int(linelist[1]) % 24,
-						'adm': int(linelist[6])-1  # 0-15
+						'hour': hour,
+						'adm': adm
 					})
 		stream.close()
 		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
@@ -117,15 +121,16 @@ class UniAdmDiswithEdgeBasic(object):
 
 		# stay 状态更新
 		# 判断此记录是否与上次一致
-		if id == self.LASTREC[hour]['id']:
+		if id == self.LASTREC[hour]['sid']:
 			# 判断 poi ID 在指定时段中是否出现过
 			# print adm, self.LASTREC[hour]
 			if adm not in self.LASTREC[hour]['adm']:
 				self.LASTREC[hour]['adm'].append(adm)
 				self.MAP[hour][adm][1] += 1  # index, people, number
 		else:
-			self.LASTREC[hour]['id'] = id
-			self.LASTREC[hour]['adm'] = [adm]
+			self.LASTREC[hour]['sid'] = id
+			self.LASTREC[hour]['travel'] = '-1'
+			# self.LASTREC[hour]['adm'] = [adm]
 			self.MAP[hour][adm][1] += 1
 
 		self.MAP[hour][adm][2] += 1
@@ -145,16 +150,15 @@ class UniAdmDiswithEdgeBasic(object):
 		existidentifier = data['existidentifier']
 		
 		# 人未变
-		if id == self.LASTREC[hour]['id']:
+		if id == self.LASTREC[hour]['tid']:
 			# 同一个人新纪录，如果记录相同则不作处理
 			if existidentifier != self.LASTREC[hour]['travel']:
 				self.LASTREC[hour]['travel'] = existidentifier
 				self.updateEMap(mapId, hour, [fromAid, toAid, fhour, 1, 0])
 		else:
-			self.LASTREC[hour] = {
-				'id': id,
-				'travel': existidentifier
-			}
+			self.LASTREC[hour]['tid'] = id
+			self.LASTREC[hour]['travel'] = existidentifier
+			
 			self.updateEMap(mapId, hour, [fromAid, toAid, fhour, 1, 0])
 		
 		self.EMAP[hour][mapId][4] += 1
