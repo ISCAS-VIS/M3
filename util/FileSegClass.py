@@ -21,6 +21,7 @@ class FileSegByHour(object):
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
 		self.DIRECTORY = PROP['DIRECTORY']
+		self.stdoutdir = PROP['stdoutdir']
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
 		self.MAXDAY = PROP['MAXDAY']
@@ -32,7 +33,7 @@ class FileSegByHour(object):
 		logging.info('TASK-%d running...' % (self.INDEX))
 
 		idir = os.path.join(self.DIRECTORY, 'result')
-		odir = os.path.join(self.DIRECTORY, 'bj-byday-sg')
+		odir = os.path.join(self.stdoutdir, 'bj-byday-sg')
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x

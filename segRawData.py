@@ -12,11 +12,12 @@ from util.preprocess import mergeLargeRecords
 from util.FileSegClass import FileSegByHour
 
 			
-def processTask(x, city, directory, inum, onum, MAXDAY, SAFECOUNT): 
+def processTask(x, city, directory, stdoutdir, inum, onum, MAXDAY, SAFECOUNT): 
 	PROP = {
 		'INDEX': x, 
 		'CITY': city, 
 		'DIRECTORY': directory, 
+		'stdoutdir': stdoutdir,
 		'INUM': inum, 
 		'ONUM': onum,
 		'MAXDAY': MAXDAY,
@@ -32,13 +33,14 @@ def usage():
 
 def main(argv):
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:o:j:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum='])
+		opts, args = getopt.getopt(argv, "hc:d:i:o:j:s:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum=', 'stdoutdir'])
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
 	city, directory, inum, onum, jnum = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 3999, 20, 20
+	stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -53,6 +55,8 @@ def main(argv):
 			onum = int(arg)
 		elif opt in ('-j', '--jnum'):
 			jnum = int(arg)
+		elif opt in ('-s', '--stdoutdir'):
+			stdoutdir = arg
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
@@ -61,7 +65,7 @@ def main(argv):
 	jobs = []
 
 	for x in xrange(0, jnum):
-		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, 87, 300000)))
+		jobs.append(Process(target=processTask, args=(x, city, directory, stdoutdir, inum, onum, 87, 300000)))
 		jobs[x].start()
 
 	for job in jobs:
