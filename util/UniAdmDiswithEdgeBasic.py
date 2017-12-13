@@ -137,8 +137,8 @@ class UniAdmDiswithEdgeBasic(object):
 		mapId = data['mapId']
 		hour = data['hour']
 		fhour = self.DAY * 24 + data['hour']
-		fromPid = data['fromPid']
-		toPid = data['toPid']
+		fromAid = data['fromAid']
+		toAid = data['toAid']
 		existidentifier = data['existidentifier']
 		
 		# 人未变
@@ -146,13 +146,13 @@ class UniAdmDiswithEdgeBasic(object):
 			# 同一个人新纪录，如果记录相同则不作处理
 			if existidentifier != self.LASTREC[hour]['travel']:
 				self.LASTREC[hour]['travel'] = existidentifier
-				self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
+				self.updateMap(mapId, hour, [fromAid, toAid, fhour, 1, 0])
 		else:
 			self.LASTREC[hour] = {
 				'id': id,
 				'travel': existidentifier
 			}
-			self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
+			self.updateMap(mapId, hour, [fromAid, toAid, fhour, 1, 0])
 		
 		self.EMAP[hour][mapId][4] += 1
 
