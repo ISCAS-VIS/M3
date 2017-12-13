@@ -33,20 +33,26 @@ if __name__ == '__main__':
 	# 	json.dump([], t)
 	# t.close()
 
-	with open('b', 'ab') as output:
-		output.write('[')
-		for jobId in xrange(0, 20):
-			output.write(json.dumps({
-				"id": jobId,
-				'test': "test"
-			}))
-			if jobId != 19:
-				output.write(',')
-		output.write(']')
-	output.close()
+	# with open('b', 'ab') as output:
+	# 	output.write('[')
+	# 	for jobId in xrange(0, 20):
+	# 		output.write(json.dumps({
+	# 			"id": jobId,
+	# 			'test': "test"
+	# 		}))
+	# 		if jobId != 19:
+	# 			output.write(',')
+	# 	output.write(']')
+	# output.close()
 
-	with open('b', 'rb') as t:
-		temp = json.load(t)
-		print temp
-	t.close()
+	# with open('b', 'rb') as t:
+	# 	temp = json.load(t)
+	# 	print temp
+	# t.close()
 
+	t = [[1,2,3] for e in xrange(0, 24)]
+	for i in t:
+		try:
+			print i
+		except Exception as e:
+			raise e

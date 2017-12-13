@@ -195,9 +195,7 @@ class UniAdmDiswithEdgeBasic(object):
 			for x in xrange(0, 24):
 				seg = self.DAY * 24 + x
 
-				for i in self.MAP[x]:
-					oneRec = self.MAP[x][i]
-
+				for oneRec in self.MAP[x]:
 					singleRes = "%s,%d,%d,%d,%d,%d" % (oneRec[0], oneRec[1], oneRec[2], seg, x, self.WEEKDAY)
 					resString.append(singleRes)
 
