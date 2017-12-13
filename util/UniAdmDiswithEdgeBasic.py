@@ -86,12 +86,14 @@ class UniAdmDiswithEdgeBasic(object):
 				state = linelist[3]
 				fromAid = int(linelist[4])
 				toAid = int(linelist[5])
+				id = linelist[0]
+
 				if state == 'T':
 					resnum += 1
 					hour = int(linelist[1]) % 24
 					mapId = "%s,%s" % (fromAid, toAid)
 					self.dealOneEdge({
-						'id': linelist[0],
+						'id': id,
 						'hour': hour,
 						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromAid, toAid),
 						'fromAid': fromAid,
@@ -101,7 +103,7 @@ class UniAdmDiswithEdgeBasic(object):
 				else:
 					resnum += 1
 					self.dealOnePoint({
-						'id': linelist[0],
+						'id': id,
 						'hour': int(linelist[1]) % 24,
 						'adm': int(linelist[6])-1  # 0-15
 					})
@@ -117,6 +119,7 @@ class UniAdmDiswithEdgeBasic(object):
 		# 判断此记录是否与上次一致
 		if id == self.LASTREC[hour]['id']:
 			# 判断 poi ID 在指定时段中是否出现过
+			# print adm, self.LASTREC[hour]
 			if adm not in self.LASTREC[hour]['adm']:
 				self.LASTREC[hour]['adm'].append(adm)
 				self.MAP[hour][adm][1] += 1  # index, people, number
