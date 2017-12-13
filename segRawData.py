@@ -73,7 +73,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	mergeLargeRecords(city, directory, 'bj-byday-sg', 87)
+	mergeLargeRecords(city, stdoutdir, 'bj-byday-sg', 87)
 
 	# @多进程运行程序 END
 

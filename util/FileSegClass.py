@@ -78,7 +78,7 @@ class FileSegByHour(object):
 				grid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
 				fromGid = formatGridID(getCityLocs(self.CITY), [linelist[6], linelist[5]])
 				toGrid = formatGridID(getCityLocs(self.CITY), [linelist[8], linelist[7]])
-				admin = getAdminNumber(unicode(linelist[9]))
+				admin = getAdminNumber(linelist[9])
 
 				newline = "%s,%d,%d,S,0,0,%d" % (line[0], seg, grid, admin)
 				if state == 'T':
