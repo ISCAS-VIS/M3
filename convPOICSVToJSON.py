@@ -29,4 +29,8 @@ if __name__ == '__main__':
 		'type': 'edge'
 	}).run()
 
+	# CSV -> [apoint]
+
+	# CSV -> [aaedge]
+
 	print "END TIME: %s" % time.time()
