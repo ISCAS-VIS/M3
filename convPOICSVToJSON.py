@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# 将 POI 类文件（例如 uniPOIDistribution.py）中生成的 CSV / [node 或者 edge] 结果转化成 JSON 格式并汇集到一个文件，准备存入 mongoDB
+# 将 POI 类/ Admin 类文件（例如 uniPOIDistribution.py）中生成的 CSV / [node 或者 edge] 结果转化成 JSON 格式并汇集到一个文件，准备存入 mongoDB
 
 import sys
 import time
