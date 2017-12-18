@@ -13,7 +13,7 @@ import os
 import gc
 import logging
 from shapely.geometry import Point, Polygon
-from util.preprocess import parseFormatGID
+from util.preprocess import parseFormatGID, getCityLocs
 
 class UniAdmDiswithEdgeBasic(object):
 	"""
@@ -124,7 +124,7 @@ class UniAdmDiswithEdgeBasic(object):
 
 	def getAidFromGid(self, gid):
 		for polygon in self.bjbounds:
-			point = parseFormatGID('beijing', gid)
+			point = parseFormatGID(getCityLocs('beijing'), gid)
 			if polygon['b'].contains(Point(point['lng'], point['lat'])):
 				return polygon['id']
 		
