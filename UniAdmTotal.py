@@ -83,19 +83,19 @@ def main(argv):
 	s.close()
 
 	# @多进程运行程序 START
-	# jobs = []
+	jobs = []
 
-	# for x in xrange(0, jnum):
-	# 	task = Process(target=processTask, args=(x, city, directory, inum, subopath, bounds))
-	# 	jobs.append(task)
-	# 	jobs[x].start()
+	for x in xrange(0, jnum):
+		task = Process(target=processTask, args=(x, city, directory, inum, subopath, bounds))
+		jobs.append(task)
+		jobs[x].start()
 
-	# for job in jobs:
-	# 	job.join()
+	for job in jobs:
+		job.join()
 
-	# # @多进程运行程序 END
+	# @多进程运行程序 END
 
-	# print "END TIME: %s" % time.time()
+	print "END TIME: %s" % time.time()
 
 
 if __name__ == '__main__':
