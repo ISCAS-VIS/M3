@@ -70,11 +70,11 @@ def main(argv):
 	print "Start approach at %s" % STARTTIME
 
 	bounds = []
-	with open('./datasets/fromAid.json', 'rb') as s:
-		tmp = json.load(s)
+	with open('/home/joe/Documents/git/statePrediction/datasets/beijingBoundary.json', 'rb') as s:
+		tmp = json.load(s, encoding='utf-8')
 		tmp = tmp['features']
 		for each in tmp:
-			id = getAdminNumber(each['properties']['name'])
+			id = getAdminNumber(each['properties']['name'].encode("utf-8"))
 			b = each['geometry']['coordinates']
 			bounds.append({
 				'id': id,

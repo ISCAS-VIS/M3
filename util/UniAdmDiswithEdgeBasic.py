@@ -12,7 +12,7 @@
 import os
 import gc
 import logging
-from shaplely.geometry import Point, Polygon
+from shapely.geometry import Point, Polygon
 from util.preprocess import parseFormatGID
 
 class UniAdmDiswithEdgeBasic(object):
