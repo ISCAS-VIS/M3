@@ -12,7 +12,8 @@
 import os
 import gc
 import logging
-
+from shaplely.geometry import Point, Polygon
+from util.preprocess import parseFormatGID
 
 class UniAdmDiswithEdgeBasic(object):
 	"""
@@ -28,6 +29,10 @@ class UniAdmDiswithEdgeBasic(object):
 		self.SUBOPATH = PROP['SUBOPATH']
 		self.INUM = PROP['INUM']
 		self.DAY = -1
+		self.bjbounds = [{
+			'b': Polygon(item['b']),
+			'id': item['id']
+		} for item in PROP['bounds']]
 
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
@@ -85,14 +90,20 @@ class UniAdmDiswithEdgeBasic(object):
 				linelist = line.split(',')
 
 				state = linelist[3]
-				fromAid = int(linelist[4])
-				toAid = int(linelist[5])
 				id = linelist[0]
 				hour = int(linelist[1]) % 24
 				adm = int(linelist[6])-1  # 0-15
 
 				if state == 'T':
 					resnum += 1
+
+					fromGid = int(linelist[4])
+					toGid = int(linelist[5])
+					fromAid = self.getAidFromGid(fromGid)
+					toAid = self.getAidFromGid(toGid)
+
+					if fromAid == -1 or toAid == -1:
+						continue
 					
 					mapId = "%s,%s" % (fromAid, toAid)
 					self.dealOneEdge({
@@ -113,6 +124,14 @@ class UniAdmDiswithEdgeBasic(object):
 					})
 		stream.close()
 		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
+
+	def getAidFromGid(self, gid):
+		for polygon in self.bjbounds:
+			point = parseFormatGID('beijing', gid)
+			if polygon['b'].contains(Point(point['lng'], point['lat'])):
+				return polygon['id']
+		
+		return -1
 
 	def dealOnePoint(self, data):
 		id = data['id']

@@ -4,19 +4,22 @@
 
 import sys
 import time
+# import os
+import json
 import logging
 import getopt
 from multiprocessing import Process
 from util.UniAdmDiswithEdgeBasic import UniAdmDiswithEdgeBasic
+from util.preprocess import getAdminNumber
 
-
-def processTask(x, city, directory, inum, subopath): 
+def processTask(x, city, directory, inum, subopath, bounds): 
 	PROP = {
 		'INDEX': x, 
 		'CITY': city, 
 		'DIRECTORY': directory, 
 		'INUM': inum,
-		'SUBOPATH': subopath
+		'SUBOPATH': subopath,
+		'bounds': bounds
 	}
 
 	task = UniAdmDiswithEdgeBasic(PROP)
@@ -66,11 +69,24 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
+	bounds = []
+	with open('./datasets/fromAid.json', 'rb') as s:
+		tmp = json.load(s)
+		tmp = tmp['features']
+		for each in tmp:
+			id = getAdminNumber(each['properties']['name'])
+			b = each['geometry']['coordinates']
+			bounds.append({
+				'id': id,
+				'b': b 
+			})
+	s.close()
+
 	# @多进程运行程序 START
 	jobs = []
 
 	for x in xrange(0, jnum):
-		task = Process(target=processTask, args=(x, city, directory, inum, subopath))
+		task = Process(target=processTask, args=(x, city, directory, inum, subopath, bounds))
 		jobs.append(task)
 		jobs[x].start()
 
