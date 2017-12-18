@@ -29,10 +29,7 @@ class UniAdmDiswithEdgeBasic(object):
 		self.SUBOPATH = PROP['SUBOPATH']
 		self.INUM = PROP['INUM']
 		self.DAY = -1
-		self.bjbounds = [{
-			'b': Polygon(item['b']),
-			'id': item['id']
-		} for item in PROP['bounds']]
+		self.bjbounds = PROP['bounds']
 
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))

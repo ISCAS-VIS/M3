@@ -11,6 +11,7 @@ import getopt
 from multiprocessing import Process
 from util.UniAdmDiswithEdgeBasic import UniAdmDiswithEdgeBasic
 from util.preprocess import getAdminNumber
+from shapely.geometry import shape
 
 def processTask(x, city, directory, inum, subopath, bounds): 
 	PROP = {
@@ -75,27 +76,26 @@ def main(argv):
 		tmp = tmp['features']
 		for each in tmp:
 			id = getAdminNumber(each['properties']['name'].encode("utf-8"))
-			b = each['geometry']['coordinates']
 			bounds.append({
 				'id': id,
-				'b': b 
+				'b': shape(each['geometry'])
 			})
 	s.close()
 
 	# @多进程运行程序 START
-	jobs = []
+	# jobs = []
 
-	for x in xrange(0, jnum):
-		task = Process(target=processTask, args=(x, city, directory, inum, subopath, bounds))
-		jobs.append(task)
-		jobs[x].start()
+	# for x in xrange(0, jnum):
+	# 	task = Process(target=processTask, args=(x, city, directory, inum, subopath, bounds))
+	# 	jobs.append(task)
+	# 	jobs[x].start()
 
-	for job in jobs:
-		job.join()
+	# for job in jobs:
+	# 	job.join()
 
-	# @多进程运行程序 END
+	# # @多进程运行程序 END
 
-	print "END TIME: %s" % time.time()
+	# print "END TIME: %s" % time.time()
 
 
 if __name__ == '__main__':
