@@ -48,15 +48,16 @@ def formatTime(timestr):
 	Returns:
 		TYPE: Description
 	"""
-	dateObj = time.localtime( int(timestr) )
+	dateObj = time.localtime(int(timestr))
 	
 	return {
 		'hour': dateObj[3],
-		'day': dateObj[7]
+		'yday': dateObj[7],
+		'wday': dateObj[6]
 	}
 
 
-def formatGridID(locs, point, SPLIT = 0.0005):
+def formatGridID(locs, point, SPLIT=0.0005):
 	"""
 	根据经纬度计算城市网格编号
 	
@@ -223,22 +224,6 @@ def mergeSmallRecords(city, directory, subpath, time):
 		res.write('\n'.join(resString) + '\n')
 	res.close()
 
-def mergeLargeRecords(city, directory, subpath, count):
-	"""
-	通过整个文件读取的方式合并记录数
-		:param city: 
-		:param directory: 
-		:param subpath: 
-		:param count: 
-	"""
-	baseurl = os.path.join(directory, subpath)
-	for x in xrange(0, count):
-		with open(os.path.join(baseurl, 'hares-%d' % (x)), 'ab') as output:
-			for jobId in xrange(0, 20):
-				with open(os.path.join(baseurl, 'hres-%d-%d' % (jobId, x)), 'rb') as input:
-					output.write(input.read())
-				input.close()
-		output.close()
 
 def mergeMultiProcessMatFiles(directory, subpath, jnum):
 	"""
