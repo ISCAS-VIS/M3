@@ -108,7 +108,7 @@ class FileSegByHour(object):
 							self.currentDatasets['toLatLng'] = [linelist[3], linelist[2]]
 							self.currentDatasets['toAdmin'] = linelist[6]
 					tmp = "%s,T,%d" % (newLinePreStr, admin)
-					self.currentDatasets.data.append([tmp, ydayCurrent])
+					self.currentDatasets['data'].append([tmp, ydayCurrent])
 				else:
 					self.updLastTravelRecs()
 
