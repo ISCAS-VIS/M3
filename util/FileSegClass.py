@@ -38,7 +38,8 @@ class FileSegByHour(object):
 			'fromAdmin': '',
 			'toLatLng': [0, 0],
 			'toAdmin': '',
-			'data': []
+			'data': [],
+			'stateId': 0
 		}
 	
 	def run(self):
@@ -73,7 +74,7 @@ class FileSegByHour(object):
 
 				state = linelist[4]
 				
-				if state == 'U':
+				if state == 'U' or line == '':
 					continue
 
 				# 分析日期
@@ -98,9 +99,14 @@ class FileSegByHour(object):
 					if self.currentDatasets['fromLatLng'][0] == 0:
 						self.currentDatasets['fromLatLng'] = [linelist[3], linelist[2]]
 						self.currentDatasets['fromAdmin'] = linelist[6]
+						self.currentDatasets['stateId'] = linelist[5]
 					else:
-						self.currentDatasets['toLatLng'] = [linelist[3], linelist[2]]
-						self.currentDatasets['toAdmin'] = linelist[6]
+						# 判断 stateId 是否一致
+						if linelist[5] != self.currentDatasets['stateId']:
+							self.updLastTravelRecs()
+						else:
+							self.currentDatasets['toLatLng'] = [linelist[3], linelist[2]]
+							self.currentDatasets['toAdmin'] = linelist[6]
 					tmp = "%s,T,%d" % (newLinePreStr, admin)
 					self.currentDatasets.data.append([tmp, ydayCurrent])
 				else:
@@ -126,6 +132,8 @@ class FileSegByHour(object):
 			self.MATRIX[ydayCurrent] = []
 
 	def updLastTravelRecs(self):
+		if self.currentDatasets['fromAdmin'] == '':
+			return 0
 		# 		
 		fromGid = formatGridID(getCityLocs(self.CITY), self.currentDatasets['fromLatLng'])
 		toGid = formatGridID(getCityLocs(self.CITY), self.currentDatasets['toLatLng'])
