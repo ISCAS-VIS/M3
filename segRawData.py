@@ -31,8 +31,7 @@ def mergeLargeRecords(city, baseurl, count):
 	"""
 	通过整个文件读取的方式合并记录数
 		:param city: 
-		:param stdindir: 
-		:param subpath: 
+		:param baseurl: 
 		:param count: 
 	"""
 	

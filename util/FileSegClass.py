@@ -24,7 +24,7 @@ class FileSegByHour(object):
 
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
-		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'result')
+		self.INPUT_PATH = PROP['IDIRECTORY']
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byday-sg')
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
