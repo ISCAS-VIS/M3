@@ -26,16 +26,13 @@ class UniAdmDiswithEdgeBasic(object):
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
 		self.DIRECTORY = PROP['DIRECTORY'] 
-		self.SUBOPATH = PROP['SUBOPATH']
+		self.INPUT_DIR = os.path.join(self.DIRECTORY, 'bj-byday-sg')
+		self.OUTPUT_DIR = os.path.join(self.DIRECTORY, PROP['stdoutdir'])
 		self.INUM = PROP['INUM']
 		self.DAY = -1
-		self.bjbounds = PROP['bounds']
 
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
-
-		idir = os.path.join(self.DIRECTORY, 'bj-byday-sg')
-		odir = os.path.join(self.DIRECTORY, self.SUBOPATH)
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
@@ -46,8 +43,7 @@ class UniAdmDiswithEdgeBasic(object):
 			self.DAY = number
 			
 			# 处理星期几的存储
-			tmpWed = (number+2) % 7
-			self.WEEKDAY = 7 if tmpWed == 0 else tmpWed  # 1-7
+			self.WEEKDAY = (number+1) % 7  # 0-6
 
 			# MAP 存储点信息，EMAP 存储边信息
 			self.MAP = [self.genAdmMapObj() for e in xrange(0, 24)]
@@ -59,20 +55,23 @@ class UniAdmDiswithEdgeBasic(object):
 				'travel': '-1'
 			} for x in xrange(0, 24)]
 
-			ifilename = 'hares-%d' % number  # 输入文件名称
+			ifilename = 'rawdata-%d' % number  # 输入文件名称
 			logging.info('Job-%d File-%d Operating...' % (self.INDEX, number))
-			self.updateDis(os.path.join(idir, ifilename))
+			self.updateDis(os.path.join(self.INPUT_DIR, ifilename))
 		
 			# 结果写进文件
-			# # MATRIX
-			opFile = os.path.join(odir, 'apoint-%d' % (self.INDEX))
-			oeFile = os.path.join(odir, 'aaedge-%d' % (self.INDEX))
+			opFile = os.path.join(self.OUTPUT_DIR, 'apoint-%d' % (self.INDEX))
+			oeFile = os.path.join(self.OUTPUT_DIR, 'aaedge-%d' % (self.INDEX))
 			self.writeData(opFile, oeFile)
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
 
 	def genAdmMapObj(self):
+		"""
+		生成基于行政区划的点聚集矩阵
+			:param self: 
+		"""
 		res = []
 		for key in xrange(0, 16):
 			res.append([key+1, 0, 0])
@@ -86,18 +85,16 @@ class UniAdmDiswithEdgeBasic(object):
 				line = line.strip('\n')
 				linelist = line.split(',')
 
-				state = linelist[3]
+				state = linelist[5]
 				id = linelist[0]
-				hour = int(linelist[1]) % 24
-				adm = int(linelist[6])-1  # 0-15
+				hour = int(linelist[2])  # int(linelist[1]) % 24
+				adm = int(linelist[6])-1  # 0-15, 只用于点统计
 
 				if state == 'T':
 					resnum += 1
 
-					fromGid = int(linelist[4])
-					toGid = int(linelist[5])
-					fromAid = self.getAidFromGid(fromGid)
-					toAid = self.getAidFromGid(toGid)
+					fromAid = int(linelist[9])
+					toAid = int(linelist[10])
 
 					if fromAid == -1 or toAid == -1:
 						continue
@@ -109,8 +106,7 @@ class UniAdmDiswithEdgeBasic(object):
 						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromAid, toAid),
 						'fromAid': fromAid,
 						'toAid': toAid,
-						'mapId': mapId,
-						'adm': adm
+						'mapId': mapId
 					})
 				else:
 					resnum += 1
@@ -122,14 +118,6 @@ class UniAdmDiswithEdgeBasic(object):
 		stream.close()
 		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
 
-	def getAidFromGid(self, gid):
-		for polygon in self.bjbounds:
-			point = parseFormatGID(getCityLocs('beijing'), gid)
-			if polygon['b'].contains(Point(point['lng'], point['lat'])):
-				return polygon['id']
-		
-		return -1
-
 	def dealOnePoint(self, data):
 		id = data['id']
 		hour = data['hour']
@@ -139,24 +127,18 @@ class UniAdmDiswithEdgeBasic(object):
 		# 判断此记录是否与上次一致
 		if id == self.LASTREC[hour]['sid']:
 			# 判断 poi ID 在指定时段中是否出现过
-			# print adm, self.LASTREC[hour]
 			if adm not in self.LASTREC[hour]['adm']:
 				self.LASTREC[hour]['adm'].append(adm)
 				self.MAP[hour][adm][1] += 1  # index, people, number
 		else:
 			self.LASTREC[hour]['sid'] = id
 			self.LASTREC[hour]['travel'] = '-1'
-			# self.LASTREC[hour]['adm'] = [adm]
+			self.LASTREC[hour]['adm'] = [adm]
 			self.MAP[hour][adm][1] += 1
 
 		self.MAP[hour][adm][2] += 1
 
 	def dealOneEdge(self, data):
-		"""
-		
-			:param self: 
-			:param data: 
-		"""
 		id = data['id']
 		mapId = data['mapId']
 		hour = data['hour']
@@ -198,7 +180,6 @@ class UniAdmDiswithEdgeBasic(object):
 		with open(edgeFile, 'ab') as res:
 			# 24 时间段
 			for hour in xrange(0, 24):
-
 				for key, value in self.EMAP[hour].iteritems():
 					resArr.append('%s,%s,%d,%d,%d,%d,%d' % (value[0], value[1], value[3], value[4], value[2], hour, self.WEEKDAY))
 			

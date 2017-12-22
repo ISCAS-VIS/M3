@@ -4,14 +4,10 @@
 
 import sys
 import time
-# import os
-import json
 import logging
 import getopt
 from multiprocessing import Process
 from util.UniAdmDiswithEdgeBasic import UniAdmDiswithEdgeBasic
-from util.preprocess import getAdminNumber
-from shapely.geometry import shape
 
 def processTask(x, city, directory, inum, subopath, bounds): 
 	PROP = {
@@ -19,8 +15,7 @@ def processTask(x, city, directory, inum, subopath, bounds):
 		'CITY': city, 
 		'DIRECTORY': directory, 
 		'INUM': inum,
-		'SUBOPATH': subopath,
-		'bounds': bounds
+		'stdoutdir': subopath
 	}
 
 	task = UniAdmDiswithEdgeBasic(PROP)
@@ -31,12 +26,7 @@ def usage():
 	"""
 	使用说明函数
 	"""
-	print '''Usage Guidance
-help	-h	get usage guidance
-city	-c	city or region name, such as beijing
-directory	-d	the root directory of records and results, such as /China/beijing
-inum	-i	number of input files
-'''
+	print "python -d /datasets -i 86"
 
 
 def main(argv):
@@ -46,7 +36,8 @@ def main(argv):
 		city 表示城市， directory 表示路径， inum 表示输入文件总数， jnum 表示处理进程数， subopath 为结果存储的子目录名字
 	"""
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:j:", ["help", "city=", 'directory=', 'inum=', 'jnum='])
+		argsArray = ["help", "city=", 'directory=', 'inum=', 'jnum=']
+		opts, args = getopt.getopt(argv, "hc:d:i:j:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
@@ -70,23 +61,11 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	bounds = []
-	with open('/home/joe/Documents/git/statePrediction/datasets/beijingBoundary.json', 'rb') as s:
-		tmp = json.load(s, encoding='utf-8')
-		tmp = tmp['features']
-		for each in tmp:
-			id = getAdminNumber(each['properties']['name'].encode("utf-8"))
-			bounds.append({
-				'id': id,
-				'b': shape(each['geometry'])
-			})
-	s.close()
-
 	# @多进程运行程序 START
 	jobs = []
 
 	for x in xrange(0, jnum):
-		task = Process(target=processTask, args=(x, city, directory, inum, subopath, bounds))
+		task = Process(target=processTask, args=(x, city, directory, inum, subopath))
 		jobs.append(task)
 		jobs[x].start()
 

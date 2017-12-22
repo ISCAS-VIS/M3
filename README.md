@@ -39,7 +39,7 @@ util/
 ```
 
 
-* `FileSegClass.py` - 按照日期对文件进行分类重写存储，相关字段预先处理，结果供 Matrix 聚集计算使用（在切分带行政区划的数据时，只计算了点的 aid，对于来源和目的地的 aid 只计算了 gid 并进行存储）
+* `FileSegClass.py` - 按照日期对文件进行分类重写存储，相关字段预先处理，包括 gid/aid/from\_gid/to\_aid/seg/hour/wday 等等必要字段，结果供后续多种 Matrix 聚集计算使用
 
 | 属性 | 说明 |
 |---| ---------- |
@@ -47,7 +47,7 @@ util/
 | 后续步骤 | （具体）聚集计算方案 |
 | 依赖项 | 无 |
 | 输入 | 未经任何处理 result 中的原始数据 |
-| 输出 | bj-byday-sg 中分天存储的数据 |
+| 输出 | bj-byday-sg 中分天存储的 rawdata- 数据 |
 | 外部调用 | segRawData.py |
 | 使用进程 | 20 |
 
