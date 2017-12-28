@@ -31,13 +31,7 @@ def usage():
 	"""
 	使用说明函数
 	"""
-	print '''Usage Guidance
-help	-h	get usage guidance
-city	-c	city or region name, such as beijing
-directory	-d	the root directory of records and results, such as /China/beijing
-inum	-i	number of input files
-onum	-o	number of output files
-'''
+	print "python -d /datasets -i 86"
 
 
 def main(argv):
@@ -46,13 +40,14 @@ def main(argv):
 		:param argv: city 表示城市， directory 表示路径， inum 表示输入文件总数， onum 表示输出文件总数， jnum 表示处理进程数，通常和 onum 一致， subopath 为结果存储的子目录名字
 	"""
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:o:j:", ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum='])
+		argsArray = ["help", "city=", 'directory=', 'inum=', 'onum=', 'jnum=']
+		opts, args = getopt.getopt(argv, "hc:d:i:o:j:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
-	city, directory, inum, onum, jnum, subopath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 86, 20, 20, 'bj-newvis-sg'
+	city, directory, inum, onum, jnum, stdoutdir = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 86, 20, 20, 'bj-newvis-sg'
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -89,14 +84,14 @@ def main(argv):
 	jobs = []
 
 	for x in xrange(0, jnum):
-		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, poiMap, subopath)))
+		jobs.append(Process(target=processTask, args=(x, city, directory, inum, onum, poiMap, stdoutdir)))
 		jobs[x].start()
 
 	for job in jobs:
 		job.join()
 
 	# 文件过于庞大，故不做合并处理
-	# mergeMultiProcessMatFiles(directory, subopath, jnum)
+	# mergeMultiProcessMatFiles(directory, stdoutdir, jnum)
 
 	# @多进程运行程序 END
 

@@ -1,6 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
+# Input Format:
+# 1 id: 'String',
+# 2 seg: 'Number',
+# 3 hour: 'Number', // 0-23
+# 4 wday: 'Number', // 0-6
+# 5 gid: 'Number',
+# 6 state: 'S/T',
+# 7 admin: 'Number', // 1-16
+# 8 from_gid: 'Number',
+# 9 to_gid: 'Number',
+# 10 from_aid: 'Number',
+# 11 to_aid: 'Number'
+# 
 # Output Format:
 # [hares-j[x]]
 # nid, lat, lng, dev_num, rec_num, seg
@@ -10,7 +23,6 @@
 import os
 import gc
 import logging
-from util.preprocess import writeDayObjecttoFile
 
 
 class UniPOIDisBasic(object):
@@ -23,8 +35,9 @@ class UniPOIDisBasic(object):
 
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
-		self.DIRECTORY = PROP['DIRECTORY'] 
-		self.SUBOPATH = PROP['SUBOPATH']
+		self.DIRECTORY = PROP['DIRECTORY']
+		self.INPUT_DIR = os.path.join(self.DIRECTORY, 'bj-byday-sg')
+		self.OUTPUT_DIR = os.path.join(self.DIRECTORY, PROP['SUBOPATH'])
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
 		self.DAY = -1
@@ -32,9 +45,6 @@ class UniPOIDisBasic(object):
 
 	def run(self):
 		logging.info('TASK-%d running...' % (self.INDEX))
-
-		idir = os.path.join(self.DIRECTORY, 'bj-byday-sg')
-		odir = os.path.join(self.DIRECTORY, self.SUBOPATH)
 
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
@@ -49,13 +59,13 @@ class UniPOIDisBasic(object):
 				'poi': []
 			} for x in xrange(0, 24)]
 
-			ifilename = 'hares-%d' % number
+			ifilename = 'rawdata-%d' % number
 			logging.info('Job-%d File-%d Operating...' % (self.INDEX, number))
-			self.updateDis(os.path.join(idir, ifilename))
+			self.updateDis(os.path.join(self.INPUT_DIR, ifilename))
 		
 			# 结果写进文件
 			# # MATRIX
-			writeDayObjecttoFile(self.INDEX, self.CITY, self.MAP, odir, self.DAY)
+			self.writeDayObjecttoFile(self.INDEX, self.CITY, self.MAP, self.OUTPUT_DIR, self.DAY)
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
@@ -80,13 +90,13 @@ class UniPOIDisBasic(object):
 					continue
                 
 				# print linelist[2]
-				linelist[2] = int(linelist[2])
-				if linelist[2] in self.poiMap:
+				gid = int(linelist[2])
+				if gid in self.poiMap:
 					resnum += 1
 					self.dealPointState({
 						'id': linelist[0],
-						'hour': int(linelist[1]) % 24,
-						'poi': self.poiMap[linelist[2]]
+						'hour': int(linelist[2]),
+						'poi': self.poiMap[gid]
 					})
 		stream.close()
 		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
@@ -109,3 +119,26 @@ class UniPOIDisBasic(object):
 			self.MAP[hour][poi][1] += 1
 
 		self.MAP[hour][poi][2] += 1
+
+	def writeDayObjecttoFile(self):
+		"""
+		将进程中单天所有时间单位的 POI 分布数据转化为字符串存储进文件
+		"""
+		data = self.MAP
+		with open(os.path.join(self.OUTPUT_DIR, 'ppoint-j%d' % (self.INDEX)), 'ab') as res:
+			# 24 时间段
+			for x in xrange(0, 24):
+				resString = []
+				seg = self.DAY * 24 + x
+
+				# 网格数遍历
+				for i in data[x]:
+					oneRec = data[x][i]
+
+					# 只记录有人定位的有效网格
+					if oneRec[1] != 0:
+						singleRes = "%s,%d,%d,%d" % (oneRec[0], oneRec[1], oneRec[2], seg)
+						resString.append(singleRes)
+
+				res.write('\n'.join(resString) + '\n')
+		res.close()

@@ -11,23 +11,23 @@ if __name__ == '__main__':
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	# CSV -> Mongo.node.sample.js[matrix]
+	# CSV -> Mongo.node.sample.js[ppoint]
+	csvToMatrixJson({
+		'keys': [],
+		'DIRECTORY': '/datahouse/tao.jiang/bj-newvis-sg',
+		'FilePrefix': 'ppoint-j',
+		'INUM': 20,
+		'type': 'node'
+	}).run()
+
+	# CSV -> Mongo.edge.sample.js[ppedge] 
 	# csvToMatrixJson({
 	# 	'keys': [],
 	# 	'DIRECTORY': '/enigma/tao.jiang/datasets/JingJinJi/records/bj-newvis-sg',
-	# 	'FilePrefix': 'hares-j',
+	# 	'FilePrefix': 'ppedge-',
 	# 	'INUM': 20,
-	# 	'type': 'node'
+	# 	'type': 'edge'
 	# }).run()
-
-	# CSV -> Mongo.edge.sample.js[ppedge] 
-	csvToMatrixJson({
-		'keys': [],
-		'DIRECTORY': '/enigma/tao.jiang/datasets/JingJinJi/records/bj-newvis-sg',
-		'FilePrefix': 'ppedge-',
-		'INUM': 20,
-		'type': 'edge'
-	}).run()
 
 	# CSV -> [apoint]
 

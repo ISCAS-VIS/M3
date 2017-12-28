@@ -32,3 +32,12 @@ LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/apoint-at" INTO TABLE 
 -- aaedge 行政区划边数据
 CREATE TABLE `stvis`.`aaedge` ( `id` INT NOT NULL AUTO_INCREMENT , `from_nid` INT NOT NULL , `to_nid` INT NOT NULL , `rec_num` INT NOT NULL , `dev_num` INT NOT NULL , `seg` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/aaedge-at" INTO TABLE aaedge COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6,@col7) set from_nid=@col1,to_nid=@col2,dev_num=@col3,rec_num=@col4,seg=DATE_ADD("2016-07-05", INTERVAL @col5 HOUR);
+
+-- v2
+-- anodev2 点数据
+CREATE TABLE `stvis`.`anodev2` ( `id` INT NOT NULL AUTO_INCREMENT , `nid` MEDIUMINT NOT NULL , `rec_num` INT NOT NULL , `dev_num` INT NOT NULL , `seg` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/apoint-at" INTO TABLE anodev2 COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6) set nid=@col1,dev_num=@col2,rec_num=@col3,seg=DATE_ADD("2016-07-05", INTERVAL @col4 HOUR);
+
+-- aaedgev2 行政区划边数据
+CREATE TABLE `stvis`.`aaedgev2` ( `id` INT NOT NULL AUTO_INCREMENT , `from_nid` INT NOT NULL , `to_nid` INT NOT NULL , `rec_num` INT NOT NULL , `dev_num` INT NOT NULL , `seg` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/aaedge-at" INTO TABLE aaedgev2 COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6,@col7) set from_nid=@col1,to_nid=@col2,dev_num=@col3,rec_num=@col4,seg=DATE_ADD("2016-07-05", INTERVAL @col5 HOUR);

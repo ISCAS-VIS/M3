@@ -5,12 +5,12 @@
 # [hares-jat]
 # JSON
 # 
-# CSV -> Mongo.node.sample.js[matrix]
+# CSV -> Mongo.node.sample.js[ppoint]
 # CSV -> Mongo.edge.sample.js[ppedge]
-
 
 import json
 import os
+
 
 class csvToMatrixJson(object):
 	"""

@@ -298,29 +298,4 @@ def writeDayMatrixtoFile(index, city, data, opath, day):
 			res.write('\n'.join(resString) + '\n')
 	res.close()
 
-def writeDayObjecttoFile(index, city, data, opath, day):
-	"""
-	将进程中单天所有时间单位的 POI 分布数据转化为字符串存储进文件
-		:param index: 
-		:param city: 
-		:param data: 
-		:param opath: 
-		:param day: 
-	"""
-	with open(os.path.join(opath, 'hares-j%d' % (index)), 'ab') as res:
-		# 24 时间段
-		for x in xrange(0, 24):
-			resString = []
-			seg = day * 24 + x
 
-			# 网格数遍历
-			for i in data[x]:
-				oneRec = data[x][i]
-
-				# 只记录有人定位的有效网格
-				if oneRec[1] != 0:
-					singleRes = "%s,%d,%d,%d" % (oneRec[0], oneRec[1], oneRec[2], seg)
-					resString.append(singleRes)
-
-			res.write('\n'.join(resString) + '\n')
-	res.close()
