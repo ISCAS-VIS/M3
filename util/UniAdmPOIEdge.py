@@ -3,7 +3,8 @@
 # 
 # Output Format:
 # [ppedge-[x]]
-# from_pid, to_pid, dev_num, rec_num, seg
+# from_pid, to_pid, dev_num, rec_num, seg, hour, wday
+# 改进后计算脚本，适用于 Admin - POI 下的点边信息聚集计算方案
 
 import os
 import gc
@@ -23,16 +24,15 @@ class UniAdmPOIEdge(object):
 		self.MATRIX = [{} for each in xrange(0, 24)]
 		self.poiMap = PROP['poiMap']
 		self.DIRECTORY = PROP['DIRECTORY'] 
-		self.SUBOPATH = PROP['SUBOPATH']
+		self.INPUT_DIR = os.path.join(self.DIRECTORY, 'bj-byday-sg')
+		self.OUTPUT_DIR = os.path.join(self.DIRECTORY, PROP['stdoutdir'])
 		self.INUM = PROP['INUM']
+		self.WDAY = -1
 
 	def run(self):
 		logging.info('Starting...')
 
 		# 遍历文件 0 - 86 中一个
-		idir = os.path.join(self.DIRECTORY, 'bj-byday-sg')
-		odir = os.path.join(self.DIRECTORY, self.SUBOPATH)
-
 		for x in xrange(0, 10000):
 			number = self.INDEX + 20 * x
 			if number > self.INUM:
@@ -46,11 +46,11 @@ class UniAdmPOIEdge(object):
 				'travel': '-1'
 			} for x in xrange(0, 24)]
 
-			ifilename = 'hares-%d' % number
+			ifilename = 'rawdata-%d' % number
 			logging.info('Job-%d File-%d Operating...' % (self.INDEX, number))
-			self.updateEdge(os.path.join(idir, ifilename))
+			self.updateEdge(os.path.join(self.INPUT_DIR, ifilename))
 
-			self.writeData(os.path.join(odir, 'ppedge-%d' % (self.INDEX)))
+			self.writeData(os.path.join(self.OUTPUT_DIR, 'apedge-%d' % (self.INDEX)))
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
@@ -62,25 +62,25 @@ class UniAdmPOIEdge(object):
 				line = line.strip('\n')
 				linelist = line.split(',')
 
-				state = linelist[3]
-				fromGrid = int(linelist[4])
-				toGrid = int(linelist[5])
-				invalidTState = state == 'T' and (fromGrid == 0 or toGrid == 0)
-				if state == 'S' or invalidTState:
+				if self.WDAY == -1:
+					self.WDAY = int(linelist[3])
+
+				state = linelist[5]
+				fromAid = int(linelist[9])
+				toGid = int(linelist[8])
+				if state == 'S':
 					continue
                 
-				linelist[2] = int(linelist[2])
-				if fromGrid in self.poiMap and toGrid in self.poiMap:
-					fromPid = self.poiMap[fromGrid]
-					toPid = self.poiMap[toGrid]
+				if toGid in self.poiMap:
+					toPid = self.poiMap[toGid]
 					resnum += 1
-					hour = int(linelist[1]) % 24
-					mapId = "%s,%s" % (fromPid, toPid)
+					hour = int(linelist[2])
+					mapId = "%s,%s" % (fromAid, toPid)
 					self.dealOneEdge({
 						'id': linelist[0],
 						'hour': hour,
-						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromPid, toPid),
-						'fromPid': fromPid,
+						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromAid, toPid),
+						'fromAid': fromAid,
 						'toPid': toPid,
 						'mapId': mapId
 					})
@@ -97,7 +97,7 @@ class UniAdmPOIEdge(object):
 		mapId = data['mapId']
 		hour = data['hour']
 		fhour = self.DAY * 24 + data['hour']
-		fromPid = data['fromPid']
+		fromAid = data['fromAid']
 		toPid = data['toPid']
 		existidentifier = data['existidentifier']
 		
@@ -106,13 +106,13 @@ class UniAdmPOIEdge(object):
 			# 同一个人新纪录，如果记录相同则不作处理
 			if existidentifier != self.LASTREC[hour]['travel']:
 				self.LASTREC[hour]['travel'] = existidentifier
-				self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
+				self.updateMap(mapId, hour, [fromAid, toPid, fhour, 1, 0])
 		else:
 			self.LASTREC[hour] = {
 				'id': id,
 				'travel': existidentifier
 			}
-			self.updateMap(mapId, hour, [fromPid, toPid, fhour, 1, 0])
+			self.updateMap(mapId, hour, [fromAid, toPid, fhour, 1, 0])
 		
 		self.MAP[hour][mapId][4] += 1
 
@@ -136,7 +136,7 @@ class UniAdmPOIEdge(object):
 			# 24 时间段
 			for hour in xrange(0, 24):
 				for key, value in self.MAP[hour].iteritems():
-					resArr.append('%s,%s,%d,%d,%d' % (value[0], value[1], value[3], value[4], value[2]))
+					resArr.append('%s,%s,%d,%d,%d,%d,%d' % (value[0], value[1], value[3], value[4], value[2], hour, self.WDAY))
 			
 			res.write('\n'.join(resArr) + '\n')
 		res.close()

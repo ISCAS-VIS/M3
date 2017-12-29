@@ -23,7 +23,7 @@ class UniPOIEdgeBasic(object):
 		self.MATRIX = [{} for each in xrange(0, 24)]
 		self.poiMap = PROP['poiMap']
 		self.DIRECTORY = PROP['DIRECTORY'] 
-		self.SUBOPATH = PROP['SUBOPATH']
+		self.SUBOPATH = PROP['stdoutdir']
 		self.INUM = PROP['INUM']
 
 	def run(self):

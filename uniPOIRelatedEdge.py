@@ -8,20 +8,25 @@ import logging
 import getopt
 from multiprocessing import Process
 from util.UniPOIEdgeBasic import UniPOIEdgeBasic
+from util.UniAdmPOIEdge import UniAdmPOIEdge
 from util.dbopts import connectMongo
 
 
-def processTask(x, city, directory, inum, poiMap, subopath): 
+def processTask(type, x, city, directory, inum, poiMap, stdoutdir): 
 	PROP = {
 		'INDEX': x, 
 		'CITY': city, 
 		'DIRECTORY': directory, 
 		'INUM': inum,
 		'poiMap': poiMap,
-		'SUBOPATH': subopath
+		'stdoutdir': stdoutdir
 	}
 
-	task = UniPOIEdgeBasic(PROP)
+	if type == 'pp':
+		task = UniPOIEdgeBasic(PROP)
+	elif type == 'ap':
+		task = UniAdmPOIEdge(PROP)
+	
 	task.run()
 
 
@@ -29,13 +34,7 @@ def usage():
 	"""
 	使用说明函数
 	"""
-	print '''Usage Guidance
-help	-h	get usage guidance
-city	-c	city or region name, such as beijing
-directory	-d	the root directory of records and results, such as /China/beijing
-inum	-i	number of input files
-onum	-o	number of output files
-'''
+	print "python run.py -d /datasets -t pp -i 86"
 
 
 def main(argv):
@@ -44,13 +43,15 @@ def main(argv):
 		:param argv: city 表示城市， directory 表示路径， inum 表示输入文件总数， onum 表示输出文件总数， jnum 表示处理进程数，通常和 onum 一致， subopath 为结果存储的子目录名字
 	"""
 	try:
-		opts, args = getopt.getopt(argv, "hc:d:i:j:", ["help", "city=", 'directory=', 'inum=', 'jnum='])
+		argsArray = ["help", "city=", 'directory=', 'inum=', 'jnum=', 'type=']
+		opts, args = getopt.getopt(argv, "hc:d:i:j:t:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
-	city, directory, inum, jnum, subopath = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 86, 20, 'bj-newvis-sg'
+	city, directory, inum, jnum, stdoutdir = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records', 86, 20, 'bj-newvis-sg'
+	type = 'pp'
 	for opt, arg in opts:
 		if opt == '-h':
 			usage()
@@ -63,6 +64,8 @@ def main(argv):
 			inum = int(arg)
 		elif opt in ('-j', '--jnum'):
 			jnum = int(arg)
+		elif opt in ('-t', '--type'):
+			type = arg
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
@@ -85,14 +88,14 @@ def main(argv):
 	jobs = []
 
 	for x in xrange(0, jnum):
-		jobs.append(Process(target=processTask, args=(x, city, directory, inum, poiMap, subopath)))
+		jobs.append(Process(target=processTask, args=(type, x, city, directory, inum, poiMap, stdoutdir)))
 		jobs[x].start()
 
 	for job in jobs:
 		job.join()
 
 	# 文件过于庞大，故不做合并处理
-	# mergeMultiProcessMatFiles(directory, subopath, jnum)
+	# mergeMultiProcessMatFiles(directory, stdoutdir, jnum)
 
 	# @多进程运行程序 END
 
@@ -100,5 +103,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
-	logging.basicConfig(filename='logger-unippoiedge.log', level=logging.DEBUG)
+	logging.basicConfig(filename='logger-unipoirelatededge.log', level=logging.DEBUG)
 	main(sys.argv[1:])
