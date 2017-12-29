@@ -65,7 +65,7 @@ class UniPOIDisBasic(object):
 		
 			# 结果写进文件
 			# # MATRIX
-			self.writeDayObjecttoFile(self.INDEX, self.CITY, self.MAP, self.OUTPUT_DIR, self.DAY)
+			self.writeDayObjecttoFile()
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
