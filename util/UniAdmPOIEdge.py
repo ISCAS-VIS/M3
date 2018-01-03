@@ -27,6 +27,7 @@ class UniAdmPOIEdge(object):
 		self.INPUT_DIR = os.path.join(self.DIRECTORY, 'bj-byday-sg')
 		self.OUTPUT_DIR = os.path.join(self.DIRECTORY, PROP['stdoutdir'])
 		self.INUM = PROP['INUM']
+		self.type = PROP['edgeType']
 		self.WDAY = -1
 
 	def run(self):
@@ -50,7 +51,7 @@ class UniAdmPOIEdge(object):
 			logging.info('Job-%d File-%d Operating...' % (self.INDEX, number))
 			self.updateEdge(os.path.join(self.INPUT_DIR, ifilename))
 
-			self.writeData(os.path.join(self.OUTPUT_DIR, 'apedge-%d' % (self.INDEX)))
+			self.writeData(os.path.join(self.OUTPUT_DIR, '%sedge-%d' % (self.type, self.INDEX)))
 			self.MAP = []
 			self.LASTREC = []
 			gc.collect()
@@ -67,27 +68,45 @@ class UniAdmPOIEdge(object):
 
 				state = linelist[5]
 				fromAid = int(linelist[9])
+				toAid = int(linelist[10])
+				fromGid = int(linelist[7])
 				toGid = int(linelist[8])
 				if state == 'S':
 					continue
                 
-				if toGid in self.poiMap:
-					toPid = self.poiMap[toGid]
-					resnum += 1
-					hour = int(linelist[2])
-					mapId = "%s,%s" % (fromAid, toPid)
-					self.dealOneEdge({
-						'id': linelist[0],
-						'hour': hour,
-						'existidentifier': '%s-%d-%s-%s' % (id, hour, fromAid, toPid),
-						'fromAid': fromAid,
-						'toPid': toPid,
-						'mapId': mapId
-					})
+				# 分条件
+				if self.type == 'ap':
+					if toGid in self.poiMap:
+						toPid = self.poiMap[toGid]
+						resnum += 1
+						hour = int(linelist[2])
+						mapId = "%s,%s" % (fromAid, toPid)
+						self.dealAPEdge({
+							'id': linelist[0],
+							'hour': hour,
+							'existidentifier': '%s-%d-%s-%s' % (id, hour, fromAid, toPid),
+							'fromAid': fromAid,
+							'toPid': toPid,
+							'mapId': mapId
+						})
+				elif self.type == 'pa':
+					if fromGid in self.poiMap:
+						fromPid = self.poiMap[fromGid]
+						resnum += 1
+						hour = int(linelist[2])
+						mapId = "%s,%s" % (fromPid, toAid)
+						self.dealPAEdge({
+							'id': linelist[0],
+							'hour': hour,
+							'existidentifier': '%s-%d-%s-%s' % (id, hour, fromPid, toAid),
+							'fromPid': fromPid,
+							'toAid': toAid,
+							'mapId': mapId
+						})
 		stream.close()
 		print "Process %d, day %d, result number %d" % (self.INDEX, self.DAY, resnum)
 
-	def dealOneEdge(self, data):
+	def dealAPEdge(self, data):
 		"""
 		判断处理单条记录函数
 			:param self: 
@@ -113,6 +132,35 @@ class UniAdmPOIEdge(object):
 				'travel': existidentifier
 			}
 			self.updateMap(mapId, hour, [fromAid, toPid, fhour, 1, 0])
+		
+		self.MAP[hour][mapId][4] += 1
+	
+	def dealPAEdge(self, data):
+		"""
+		判断处理单条记录函数
+			:param self: 
+			:param data: 
+		"""
+		id = data['id']
+		mapId = data['mapId']
+		hour = data['hour']
+		fhour = self.DAY * 24 + data['hour']
+		fromPid = data['fromPid']
+		toAid = data['toAid']
+		existidentifier = data['existidentifier']
+		
+		# 人未变
+		if id == self.LASTREC[hour]['id']:
+			# 同一个人新纪录，如果记录相同则不作处理
+			if existidentifier != self.LASTREC[hour]['travel']:
+				self.LASTREC[hour]['travel'] = existidentifier
+				self.updateMap(mapId, hour, [fromPid, toAid, fhour, 1, 0])
+		else:
+			self.LASTREC[hour] = {
+				'id': id,
+				'travel': existidentifier
+			}
+			self.updateMap(mapId, hour, [fromPid, toAid, fhour, 1, 0])
 		
 		self.MAP[hour][mapId][4] += 1
 

@@ -19,12 +19,13 @@ def processTask(type, x, city, directory, inum, poiMap, stdoutdir):
 		'DIRECTORY': directory, 
 		'INUM': inum,
 		'poiMap': poiMap,
-		'stdoutdir': stdoutdir
+		'stdoutdir': stdoutdir,
+		'edgeType': type
 	}
 
 	if type == 'pp':
 		task = UniPOIEdgeBasic(PROP)
-	elif type == 'ap':
+	elif type == 'ap' or type == 'pa':
 		task = UniAdmPOIEdge(PROP)
 	
 	task.run()
