@@ -26,7 +26,7 @@ class POIExec(object):
 		print 'Start to process POI files...'
 		for each in self.POITypes:
 			input = os.path.join(self.basepath, '%s.json' % (each))
-			output = os.path.join(self.basepath, 'mongoUTF8.json')
+			output = os.path.join(self.basepath, 'mongoUTF8.%s' % (self.type))
 			self.iterateFile({
 				'input': input
 			})
@@ -84,5 +84,5 @@ class POIExec(object):
 			if self.type == 'json':
 				res.write(json.dumps(self.RES).encode('utf-8'))
 			else:
-				res.write('\n'.join(self.RES))
+				res.write('\n'.join(self.RES).encode('utf-8'))
 		res.close()

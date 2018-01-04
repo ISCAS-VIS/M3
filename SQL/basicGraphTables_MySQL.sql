@@ -45,7 +45,7 @@ LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/aaedge-at" INTO TABLE 
 
 -- pbase 基础数据
 CREATE TABLE `stvis`.`pbase` ( `id` INT NOT NULL AUTO_INCREMENT , `nid` CHAR(18) NOT NULL , `lng` DOUBLE NOT NULL , `lat` DOUBLE NOT NULL , `name` CHAR(40) NOT NULL , `poitype` CHAR(7) NOT NULL , `bizarea` CHAR(30) NOT NULL , `address` CHAR(100) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
-LOAD DATA LOCAL INFILE "/home/taojiang/git/statePrediction/datasets/beijingAdmin.csv" INTO TABLE pbase COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6,@col7,@col8) set nid=@col1,name=@col3,lat=@col6,lng=@col7,poitype=@co2,bizarea=@co4,address=@co5;
+LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/baseData/mongoUTF8.csv" INTO TABLE pbase COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6,@col7,@col8) set nid=@col1,name=@col3,lat=@col7,lng=@col6,poitype=@col2,bizarea=@col4,address=@col5;
 
 -- pnode 点数据(id不能为数字，需要为字符串)
 CREATE TABLE `stvis`.`pnode` ( `id` INT NOT NULL AUTO_INCREMENT , `nid` CHAR(18) NOT NULL , `rec_num` INT NOT NULL , `dev_num` INT NOT NULL , `seg` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
@@ -54,3 +54,7 @@ LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/ppoint-at" INTO TABLE 
 -- apedge 边数据
 CREATE TABLE `stvis`.`apedge` ( `id` INT NOT NULL AUTO_INCREMENT , `from_nid` INT NOT NULL , `to_nid` CHAR(18) NOT NULL , `rec_num` INT NOT NULL , `dev_num` INT NOT NULL , `seg` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/apedge-at" INTO TABLE apedge COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6,@col7) set from_nid=@col1,to_nid=@col2,dev_num=@col3,rec_num=@col4,seg=DATE_ADD("2016-07-05", INTERVAL @col5 HOUR);
+
+-- paedge
+CREATE TABLE `stvis`.`paedge` ( `id` INT NOT NULL AUTO_INCREMENT , `from_nid` CHAR(18) NOT NULL , `to_nid` INT NOT NULL , `rec_num` INT NOT NULL , `dev_num` INT NOT NULL , `seg` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/bj-newvis-sg/paedge-at" INTO TABLE paedge COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6,@col7) set from_nid=@col1,to_nid=@col2,dev_num=@col3,rec_num=@col4,seg=DATE_ADD("2016-07-05", INTERVAL @col5 HOUR);

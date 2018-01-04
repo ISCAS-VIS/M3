@@ -32,7 +32,7 @@ def main(argv):
 		elif opt in ("-d", "--directory"):
 			directory = arg
 		elif opt in ("-t", "--type"):
-			exectype = opt
+			exectype = arg
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
