@@ -69,7 +69,7 @@ class POIExec(object):
 					pid = "%s%s" % (ptype, each['id'])
 					name = each['name']
 					business_area = each['business_area']
-					address = each['address']
+					address = each['address'].replace(',', u'，')
 					cpstr = "%s,%s" % (str(each['cp'][0]), str(each['cp'][1]))
 
 					singlerec = "%s,%s,%s,%s,%s,%s" % (pid, ptype, name, business_area, address, cpstr)
