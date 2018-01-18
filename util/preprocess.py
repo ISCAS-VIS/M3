@@ -39,6 +39,29 @@ def getCityLocs(city):
 	return newCitylocslist[city]
 
 
+def getAdjacentMatrix(args):
+	adminAdjacencyMatrix = [
+		[],
+		[2, 3, 4],
+		[1, 3, 4, 6],
+		[1, 4, 6, 9, 10, 11, 12],
+		[1, 2, 3, 5, 6, 7, 8, 12],
+		[4, 6, 7],
+		[2, 3, 4, 5, 7, 11],
+		[4, 5, 6, 8, 11],
+		[7, 8, 12],
+		[3, 10, 12],
+		[3, 9, 11, 13, 14, 15],
+		[3, 6, 7, 10, 13, 16],
+		[3, 4, 8, 9],
+		[10, 11, 15, 16],
+		[10, 15],
+		[10, 13, 14],
+		[11, 13]
+	]
+
+	return adminAdjacencyMatrix
+
 def formatTime(timestr):
 	"""格式化时间戳
 	

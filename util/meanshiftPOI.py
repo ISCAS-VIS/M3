@@ -5,6 +5,7 @@
 import os
 import numpy as np
 from sklearn.cluster import MeanShift, estimate_bandwidth
+from preprocess import getAdjacentMatrix
 
 
 class MeanshiftPOI(object):
@@ -16,6 +17,7 @@ class MeanshiftPOI(object):
 		self.PIDList = []
 		self.PFMatrix = []
 		self.mstype = PROP['mstype']  # 记录 meanshift 聚类类别，用于构建不同的特征矩阵
+		self.adjacentMatrix = getAdjacentMatrix()
 
 	def run(self):
 		if self.mstype == 'c12_t1':
