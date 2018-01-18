@@ -34,7 +34,7 @@ class MeanshiftPOI(object):
 
 				pid = linelist[0]
 				aid = int(linelist[1])-1
-				num = linelist[2]
+				num = float(linelist[2])
 
 				if currentPID != pid:
 					self.PIDList.append(currentPID)
@@ -62,7 +62,7 @@ class MeanshiftPOI(object):
 
 	def meanShiftProcess(self):
 		# ###################################################
-		# Compute clustering with MeanShift
+		# 通用 MeanShift 聚类函数
 
 		# The following bandwidth can be automatically detected using
 		bandwidth = estimate_bandwidth(self.PFMatrix, quantile=0.2, n_samples=500)
@@ -84,9 +84,14 @@ class MeanshiftPOI(object):
 		self.OutputToFile(res)
 
 	def OutputToFile(self, res):
-		ostream = ','.join(["%s,%d" % (e[0], e[1]) for e in res])
+		"""
+		通用输出文件函数
+			:param self: 
+			:param res: 
+		"""
+		ostream = '\n'.join(["%s,%s" % (e[0], e[1]) for e in res])
 
-		ofile = os.path.join(self.OUTPUT_PATH, 'meanshiftResult_%d' % (self.mstype))
+		ofile = os.path.join(self.OUTPUT_PATH, 'meanshiftResult_%s' % (self.mstype))
 		with open(ofile, 'ab') as f:
 			f.write(ostream)
 		f.close()
