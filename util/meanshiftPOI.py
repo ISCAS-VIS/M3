@@ -38,7 +38,11 @@ class MeanshiftPOI(object):
 
 				if currentPID != pid:
 					self.PIDList.append(currentPID)
-					self.PFMatrix.append([each/currentPFSum for each in currentPFVec])
+					singleVec = [each/currentPFSum for each in currentPFVec]
+					if currentPFSum == 0.0:
+						singleVec = currentPFVec
+					
+					self.PFMatrix.append(singleVec)
 					currentPFVec = [0.0 for x in xrange(0, 16)]
 					currentPFSum = 0.0
 					currentPID = pid
