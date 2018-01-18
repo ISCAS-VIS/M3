@@ -26,8 +26,8 @@ class MeanshiftPOI(object):
 	def constructPOIMatrix(self, file):
 		with open(file, 'rb') as f:
 			currentPID = ''
-			currentPFVec = [0 for x in xrange(0, 16)]
-			currentPFSum = 0.0
+			currentPFVec = [0.0 for x in xrange(0, 16)]
+			currentPFSum = 0
 			for line in f:
 				line = line.strip('\n')
 				linelist = line.split(',')
@@ -38,13 +38,13 @@ class MeanshiftPOI(object):
 
 				if currentPID != pid:
 					self.PIDList.append(currentPID)
-					singleVec = [each/currentPFSum for each in currentPFVec]
-					if currentPFSum == 0.0:
-						singleVec = currentPFVec
+					singleVec = currentPFVec
+					if currentPFSum != 0:
+						singleVec = [each/currentPFSum for each in currentPFVec]
 					
 					self.PFMatrix.append(singleVec)
 					currentPFVec = [0.0 for x in xrange(0, 16)]
-					currentPFSum = 0.0
+					currentPFSum = 0
 					currentPID = pid
 				else:
 					currentPFSum += num
@@ -52,7 +52,10 @@ class MeanshiftPOI(object):
 			
 			if self.PIDList[-1] != currentPID:
 				self.PIDList.append(currentPID)
-				self.PFMatrix.append([each/currentPFSum for each in currentPFVec])
+				singleVec = currentPFVec
+				if currentPFSum != 0:
+					singleVec = [each/currentPFSum for each in currentPFVec]
+				self.PFMatrix.append(singleVec)
 		f.close()
 
 		self.PFMatrix = np.array(self.PFMatrix)
