@@ -14,8 +14,8 @@ class MeanshiftPOI(object):
 
 		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'clusterPOI')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'clusterPOI')
-		self.PIDList = []
-		self.PFMatrix = []
+		self.PIDList = []  # 用于识别 PID 以及结果聚合
+		self.PFMatrix = []  # 用于聚类
 		self.mstype = PROP['mstype']  # 记录 meanshift 聚类类别，用于构建不同的特征矩阵
 		self.adjacentMatrix = getAdjacentMatrix()
 

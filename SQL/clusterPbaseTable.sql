@@ -1,0 +1,4 @@
+-- pbaseCluster
+
+CREATE TABLE `stvis`.`pbaseCluster` ( `id` INT NOT NULL AUTO_INCREMENT , `nid` CHAR(18) NOT NULL , `lng` DOUBLE NOT NULL , `lat` DOUBLE NOT NULL , `name` CHAR(40) NOT NULL , `poitype` CHAR(7) NOT NULL , `bizarea` CHAR(30) NOT NULL , `address` CHAR(100) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+LOAD DATA LOCAL INFILE "/datahouse/tao.jiang/baseData/mongoUTF8.csv" INTO TABLE pbaseCluster COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '' ESCAPED BY '"' LINES TERMINATED BY '\n' (@col1,@col2,@col3,@col4,@col5,@col6,@col7,@col8) set nid=@col1,name=@col3,lat=@col7,lng=@col6,poitype=@col2,bizarea=@col4,address=@col5;
