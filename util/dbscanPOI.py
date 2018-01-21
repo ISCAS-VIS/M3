@@ -92,7 +92,7 @@ class DBScanPOI(object):
 			:param res: 
 		"""
 		res = self.PClusterRes
-		ostream = '\n'.join('\n'.join(res))
+		ostream = '\n'.join(res)
 
 		ofile = os.path.join(self.OUTPUT_PATH, 'dbscanResult_ms%d' % (self.msNum))
 		with open(ofile, 'ab') as f:
