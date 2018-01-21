@@ -91,7 +91,8 @@ class MeanshiftPOI(object):
 			:param self: 
 			:param res: 
 		"""
-		ostream = '\n'.join(["%s,%s" % (e[0], e[1]) if e[0] != '' for e in res])
+		res.pop(0)
+		ostream = '\n'.join(["%s,%s" % (e[0], e[1]) for e in res])
 
 		ofile = os.path.join(self.OUTPUT_PATH, 'meanshiftResult_%s' % (self.mstype))
 		with open(ofile, 'ab') as f:
