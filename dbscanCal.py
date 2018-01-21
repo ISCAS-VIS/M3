@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # 
 
-import os
 import sys
 import time
 import logging
@@ -10,7 +9,7 @@ import getopt
 from util.dbscanPOI import DBScanPOI
 
 
-def processTask(directory, clusterNum): 
+def processTask(directory, clusterNum, eps, min_samples): 
 	PROP = {
 		'clusterNum': clusterNum, 
 		'IDIRECTORY': directory,
@@ -18,7 +17,7 @@ def processTask(directory, clusterNum):
 	}
 
 	task = DBScanPOI(PROP)
-	task.run()
+	task.run(eps, min_samples)
 
 
 def usage():
@@ -33,10 +32,11 @@ def main(argv):
 	主入口函数
 		:param argv: 
 		city 表示城市， directory 表示路径
+		eps, sample 分别为 DBScan 的两个入参
 	"""
 	try:
-		argsArray = ["help", "city=", 'directory=', "msnum="]
-		opts, args = getopt.getopt(argv, "hc:d:m:", argsArray)
+		argsArray = ["help", "city=", 'directory=', "msnum=", "eps=", "sample="]
+		opts, args = getopt.getopt(argv, "hc:d:m:e:s:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
@@ -44,6 +44,7 @@ def main(argv):
 
 	city, directory = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records'
 	msnum = 6
+	eps, min_samples = 0.01, 10
 
 	for opt, arg in opts:
 		if opt == '-h':
@@ -55,9 +56,13 @@ def main(argv):
 			directory = arg
 		elif opt in ('-m', '--msnum'):
 			msnum = int(arg)
+		elif opt in ("-e", "--eps"):
+			eps = float(arg)
+		elif opt in ('-s', '--sample'):
+			min_samples = int(arg)
 
 	STARTTIME = time.time()
-	print "%s: Start approach at %s" % (city, STARTTIME)
+	print "%s: Start approach at %s" % (city, STARTTIME, eps, min_samples)
 
 	processTask(directory, msnum)
 	print "END TIME: %s" % time.time()

@@ -20,13 +20,13 @@ class DBScanPOI(object):
 		self.PClusterVec = [[] for x in xrange(0, PROP['clusterNum'])]  # 用于聚类
 		self.PClusterRes = []  
 
-	def run(self):
+	def run(self, eps, min_samples):
 		ipoifile = os.path.join(self.INPUT_DIRECTORY, 'baseData', 'mongoUTF8.csv')
 		imsfile = os.path.join(self.INPUT_DIRECTORY, 'clusterPOI', 'meanshiftResult_c12_t1')
 		self.constructPOILngLatList(ipoifile)
 		self.constructPOIMatrix(imsfile)
-		self.dbscanProcess()
-		self.OutputToFile()
+		self.dbscanProcess(eps, min_samples)
+		self.OutputToFile("_eps_%f_sam_%d" % (eps, min_samples))
 	
 	def constructPOILngLatList(self, file):
 		with open(file, 'rb') as f:
@@ -54,12 +54,12 @@ class DBScanPOI(object):
 				self.PClusterVec[cid].append(self.PIDLngLatList[pid])
 		f.close()
 	
-	def dbscanProcess(self):
+	def dbscanProcess(self, eps, min_samples):
 		# ######################
 		# Compute DBSCAN
 		for x in xrange(0, self.msNum):
 			X = self.PClusterVec[x]
-			db = DBSCAN(eps=0.3, min_samples=10).fit(X)
+			db = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
 			core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 			core_samples_mask[db.core_sample_indices_] = True
 			labels = db.labels_
@@ -85,7 +85,7 @@ class DBScanPOI(object):
 		
 		print "Total dbscan cluster number: %d" % (self.dbscanBaseNum)
 	
-	def OutputToFile(self):
+	def OutputToFile(self, dbscanOptSubFix):
 		"""
 		通用输出文件函数
 			:param self: 
@@ -94,7 +94,7 @@ class DBScanPOI(object):
 		res = self.PClusterRes
 		ostream = '\n'.join(res)
 
-		ofile = os.path.join(self.OUTPUT_PATH, 'dbscanResult_ms%d' % (self.msNum))
+		ofile = os.path.join(self.OUTPUT_PATH, 'dbscanResult_ms%d%s' % (self.msNum, dbscanOptSubFix))
 		with open(ofile, 'ab') as f:
 			f.write(ostream)
 		f.close()
