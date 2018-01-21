@@ -9,11 +9,12 @@ import getopt
 from util.dbscanPOI import DBScanPOI
 
 
-def processTask(directory, clusterNum, eps, min_samples): 
+def processTask(directory, clusterNum, eps, min_samples, msfile): 
 	PROP = {
 		'clusterNum': clusterNum, 
 		'IDIRECTORY': directory,
-		'ODIRECTORY': directory
+		'ODIRECTORY': directory,
+		'msFile': msfile
 	}
 
 	task = DBScanPOI(PROP)
@@ -24,7 +25,7 @@ def usage():
 	"""
 	使用说明函数
 	"""
-	print "python test.py -d /datasets -m 6"
+	print "python test.py -d /datasets -m 6 -e 0.01 -s 10 -f meanshiftResult_c12_t1"
 
 
 def main(argv):
@@ -33,10 +34,11 @@ def main(argv):
 		:param argv: 
 		city 表示城市， directory 表示路径
 		eps, sample 分别为 DBScan 的两个入参
+		msname 表示 meanshift 文件名
 	"""
 	try:
-		argsArray = ["help", "city=", 'directory=', "msnum=", "eps=", "sample="]
-		opts, args = getopt.getopt(argv, "hc:d:m:e:s:", argsArray)
+		argsArray = ["help", "city=", 'directory=', "msnum=", "eps=", "sample=", "msfile"]
+		opts, args = getopt.getopt(argv, "hc:d:m:e:s:f:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
@@ -45,6 +47,7 @@ def main(argv):
 	city, directory = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records'
 	msnum = 6
 	eps, min_samples = 0.01, 10
+	msfile = "meanshiftResult_c12_t1"
 
 	for opt, arg in opts:
 		if opt == '-h':
@@ -60,11 +63,13 @@ def main(argv):
 			eps = float(arg)
 		elif opt in ('-s', '--sample'):
 			min_samples = int(arg)
+		elif opt in ("-f", "--msfile"):
+			msfile = arg
 
 	STARTTIME = time.time()
-	print "%s: Start approach at %s" % (city, STARTTIME, eps, min_samples)
+	print "%s: Start approach at %s" % (city, STARTTIME)
 
-	processTask(directory, msnum)
+	processTask(directory, msnum, eps, min_samples, msfile)
 	print "END TIME: %s" % time.time()
 
 

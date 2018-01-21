@@ -15,6 +15,7 @@ class DBScanPOI(object):
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'clusterPOI')
 		self.PIDLngLatList = {}
 		self.msNum = PROP['clusterNum']
+		self.msFile = PROP['msFile']
 		self.dbscanBaseNum = 0
 		self.PIDList = [[] for x in xrange(0, PROP['clusterNum'])]  # 用于识别 PID 以及结果聚合
 		self.PClusterVec = [[] for x in xrange(0, PROP['clusterNum'])]  # 用于聚类
@@ -22,7 +23,7 @@ class DBScanPOI(object):
 
 	def run(self, eps, min_samples):
 		ipoifile = os.path.join(self.INPUT_DIRECTORY, 'baseData', 'mongoUTF8.csv')
-		imsfile = os.path.join(self.INPUT_DIRECTORY, 'clusterPOI', 'meanshiftResult_c12_t1')
+		imsfile = os.path.join(self.INPUT_DIRECTORY, 'clusterPOI', self.msFile)
 		self.constructPOILngLatList(ipoifile)
 		self.constructPOIMatrix(imsfile)
 		self.dbscanProcess(eps, min_samples)
