@@ -50,6 +50,7 @@ class DBScanPOI(object):
 				cid = int(linelist[1])
 
 				self.PIDList[cid].append(line)
+				# print cid, pid
 				self.PClusterVec[cid].append(self.PIDLngLatList[pid])
 		f.close()
 	

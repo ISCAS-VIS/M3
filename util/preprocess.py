@@ -39,7 +39,7 @@ def getCityLocs(city):
 	return newCitylocslist[city]
 
 
-def getAdjacentMatrix(args):
+def getAdjacentMatrix():
 	adminAdjacencyMatrix = [
 		[],
 		[2, 3, 4],
@@ -61,6 +61,7 @@ def getAdjacentMatrix(args):
 	]
 
 	return adminAdjacencyMatrix
+
 
 def formatTime(timestr):
 	"""格式化时间戳
