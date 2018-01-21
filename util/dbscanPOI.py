@@ -72,11 +72,18 @@ class DBScanPOI(object):
 				index += 1
 			C = np.array(labels)[:, np.newaxis]
 			res = np.hstack((A, C))
+			res = ["%s,%s" % (e[0], e[1]) for e in res]
 			self.PClusterRes += res
+
+			print "PIDList [0]: %s, res [0]: %s" % (self.PIDList[x][0], res[0])
 
 			# Number of clusters in labels, ignoring noise if present.
 			n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 			self.dbscanBaseNum += n_clusters_
+
+			print "Current Meanshift Cluster Order: %d, dbscan sub-cluster number: %d" % (x, n_clusters_)
+		
+		print "Total dbscan cluster number: %d" % (self.dbscanBaseNum)
 	
 	def OutputToFile(self):
 		"""
@@ -85,7 +92,7 @@ class DBScanPOI(object):
 			:param res: 
 		"""
 		res = self.PClusterRes
-		ostream = '\n'.join([','.join(e) for e in res])
+		ostream = '\n'.join('\n'.join(res))
 
 		ofile = os.path.join(self.OUTPUT_PATH, 'dbscanResult_ms%d' % (self.msNum))
 		with open(ofile, 'ab') as f:
