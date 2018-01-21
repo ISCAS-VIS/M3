@@ -91,7 +91,7 @@ class MeanshiftPOI(object):
 			:param self: 
 			:param res: 
 		"""
-		res.pop(0)
+		np.delete(res, 0, 0)
 		ostream = '\n'.join(["%s,%s" % (e[0], e[1]) for e in res])
 
 		ofile = os.path.join(self.OUTPUT_PATH, 'meanshiftResult_%s' % (self.mstype))
