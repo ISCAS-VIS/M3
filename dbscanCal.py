@@ -10,9 +10,9 @@ import getopt
 from util.dbscanPOI import DBScanPOI
 
 
-def processTask(mstype, directory): 
+def processTask(directory, clusterNum): 
 	PROP = {
-		'mstype': mstype, 
+		'clusterNum': clusterNum, 
 		'IDIRECTORY': directory,
 		'ODIRECTORY': directory
 	}
@@ -25,7 +25,7 @@ def usage():
 	"""
 	使用说明函数
 	"""
-	print "python test.py -d /datasets -t c12_t1"
+	print "python test.py -d /datasets -m 6"
 
 
 def main(argv):
@@ -35,15 +35,15 @@ def main(argv):
 		city 表示城市， directory 表示路径
 	"""
 	try:
-		argsArray = ["help", "city=", 'directory=', "type="]
-		opts, args = getopt.getopt(argv, "hc:d:t:", argsArray)
+		argsArray = ["help", "city=", 'directory=', "msnum="]
+		opts, args = getopt.getopt(argv, "hc:d:m:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
 		sys.exit(2)
 
 	city, directory = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records'
-	mstype = 'c12_t1'
+	msnum = 6
 
 	for opt, arg in opts:
 		if opt == '-h':
@@ -53,13 +53,13 @@ def main(argv):
 			city = arg
 		elif opt in ("-d", "--directory"):
 			directory = arg
-		elif opt in ('-t', '--type'):
-			mstype = arg
+		elif opt in ('-m', '--msnum'):
+			msnum = int(arg)
 
 	STARTTIME = time.time()
 	print "%s: Start approach at %s" % (city, STARTTIME)
 
-	processTask(mstype, directory)
+	processTask(directory, msnum)
 	print "END TIME: %s" % time.time()
 
 
