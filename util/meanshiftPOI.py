@@ -38,6 +38,12 @@ class MeanshiftPOI(object):
 				aid = int(linelist[1])-1
 				num = float(linelist[2])
 
+				if currentPID == '':
+					currentPID = pid
+					currentPFSum += num
+					currentPFVec[aid] += num
+					continue
+
 				if currentPID != pid:
 					self.PIDList.append(currentPID)
 					singleVec = currentPFVec
@@ -91,7 +97,6 @@ class MeanshiftPOI(object):
 			:param self: 
 			:param res: 
 		"""
-		np.delete(res, 0, 0)
 		ostream = '\n'.join(["%s,%s" % (e[0], e[1]) for e in res])
 
 		ofile = os.path.join(self.OUTPUT_PATH, 'meanshiftResult_%s' % (self.mstype))
