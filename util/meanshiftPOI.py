@@ -19,12 +19,14 @@ class MeanshiftPOI(object):
 		self.mstype = PROP['mstype']  # 记录 meanshift 聚类类别，用于构建不同的特征矩阵
 		self.adjacentMatrix = getAdjacentMatrix()
 
-	def run(self):
+	def run(self, quantile, n_samples):
 		if self.mstype == 'c12_t1':
 			ifile = os.path.join(self.INPUT_PATH, 'paedge_%s.csv' % (self.mstype))
 			self.constructPOIMatrix(ifile)
-		self.meanShiftProcess()
-		
+		res = self.meanShiftProcess(quantile, n_samples)
+		msOptSubFix = "_quan_%f_sam_%d" % (quantile, n_samples)
+		self.OutputToFile(res, msOptSubFix)
+
 	def constructPOIMatrix(self, file):
 		with open(file, 'rb') as f:
 			currentPID = ''
@@ -68,12 +70,12 @@ class MeanshiftPOI(object):
 
 		self.PFMatrix = np.array(self.PFMatrix)
 
-	def meanShiftProcess(self):
+	def meanShiftProcess(self, quantile, n_samples):
 		# ###################################################
 		# 通用 MeanShift 聚类函数
 
 		# The following bandwidth can be automatically detected using
-		bandwidth = estimate_bandwidth(self.PFMatrix, quantile=0.2, n_samples=500)
+		bandwidth = estimate_bandwidth(self.PFMatrix, quantile=quantile, n_samples=n_samples)
 
 		ms = MeanShift(bandwidth=bandwidth, bin_seeding=True)
 		ms.fit(self.PFMatrix)
@@ -88,10 +90,9 @@ class MeanshiftPOI(object):
 		A = np.array(self.PIDList)[:, np.newaxis]
 		B = np.array(labels)[:, np.newaxis]
 				
-		res = np.hstack((A, B))
-		self.OutputToFile(res)
+		return np.hstack((A, B))
 
-	def OutputToFile(self, res):
+	def OutputToFile(self, res, msOptSubFix):
 		"""
 		通用输出文件函数
 			:param self: 
@@ -99,7 +100,8 @@ class MeanshiftPOI(object):
 		"""
 		ostream = '\n'.join(["%s,%s" % (e[0], e[1]) for e in res])
 
-		ofile = os.path.join(self.OUTPUT_PATH, 'meanshiftResult_%s' % (self.mstype))
+		fileName = 'meanshiftResult_%s%s' % (self.mstype, msOptSubFix)
+		ofile = os.path.join(self.OUTPUT_PATH, fileName)
 		with open(ofile, 'ab') as f:
 			f.write(ostream)
 		f.close()

@@ -47,7 +47,7 @@ def main(argv):
 	city, directory = 'beijing', '/home/tao.jiang/datasets/JingJinJi/records'
 	msnum = 6
 	eps, min_samples = 0.01, 10
-	msfile = "meanshiftResult_c12_t1"
+	msfile = "meanshiftResult_c12_t1_quan_0.020000_sam_500"
 
 	for opt, arg in opts:
 		if opt == '-h':
