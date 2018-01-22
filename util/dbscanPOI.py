@@ -83,9 +83,9 @@ class DBScanPOI(object):
 			n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 			self.dbscanBaseNum += n_clusters_
 
-			print "MS Cluster Order: %d, DS sub-cluster number: %d" % (x, n_clusters_)
+			print "MS No.%d, DS Cluster number: %d" % (x, n_clusters_)
 		
-		print "Total dbscan cluster number: %d" % (self.dbscanBaseNum)
+		print "number of dbscan clusters in all: %d" % (self.dbscanBaseNum)
 	
 	def OutputToFile(self, dsOptSubFix):
 		"""
@@ -96,7 +96,7 @@ class DBScanPOI(object):
 		res = self.PClusterRes
 		ostream = '\n'.join(res)
 
-		fileName = 'dbscanResult%s%s' % (self.msNum, self.msOptSubFix, dsOptSubFix)
+		fileName = 'dbscanResult%s%s' % (self.msOptSubFix, dsOptSubFix)
 		ofile = os.path.join(self.OUTPUT_PATH, fileName)
 		with open(ofile, 'wb') as f:
 			f.write(ostream)

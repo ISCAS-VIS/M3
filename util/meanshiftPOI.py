@@ -87,7 +87,7 @@ class MeanshiftPOI(object):
 		labels_unique = np.unique(labels)
 		n_clusters_ = len(labels_unique)
 
-		print("number of estimated clusters : %d" % n_clusters_)
+		print("number of MS estimated clusters : %d" % n_clusters_)
 
 		A = np.array(self.PIDList)[:, np.newaxis]
 		B = np.array(labels)[:, np.newaxis]

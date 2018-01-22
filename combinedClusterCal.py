@@ -85,6 +85,15 @@ def main(argv):
 	STARTTIME = time.time()
 	print "%s: Start approach at %s" % (city, STARTTIME)
 
+	print '''
+	===	Cluster Opts	===
+	quantile	= %f
+	n_samples	= %d
+	eps			= %f
+	min_samples	= %d
+	===	Cluster Opts	===
+	''' % (quantile, n_samples, eps, min_samples)
+
 	processTask(mstype, directory, quantile, n_samples, eps, min_samples)
 	print "END TIME: %s" % time.time()
 
