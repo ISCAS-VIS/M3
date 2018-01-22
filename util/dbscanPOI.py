@@ -16,6 +16,7 @@ class DBScanPOI(object):
 		self.PIDLngLatList = {}
 		self.msNum = PROP['clusterNum']
 		self.msFile = PROP['msFile']
+		self.msOptSubFix = PROP['msOptSubFix']
 		self.dbscanBaseNum = 0
 		self.PIDList = [[] for x in xrange(0, PROP['clusterNum'])]  # 用于识别 PID 以及结果聚合
 		self.PClusterVec = [[] for x in xrange(0, PROP['clusterNum'])]  # 用于聚类
@@ -76,17 +77,17 @@ class DBScanPOI(object):
 			res = ["%s,%s" % (e[0], e[1]) for e in res]
 			self.PClusterRes += res
 
-			print "PIDList [0]: %s, res [0]: %s" % (self.PIDList[x][0], res[0])
+			# print "PIDList [0]: %s, res [0]: %s" % (self.PIDList[x][0], res[0])
 
 			# Number of clusters in labels, ignoring noise if present.
 			n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 			self.dbscanBaseNum += n_clusters_
 
-			print "Current Meanshift Cluster Order: %d, dbscan sub-cluster number: %d" % (x, n_clusters_)
+			print "MS Cluster Order: %d, DS sub-cluster number: %d" % (x, n_clusters_)
 		
 		print "Total dbscan cluster number: %d" % (self.dbscanBaseNum)
 	
-	def OutputToFile(self, dbscanOptSubFix):
+	def OutputToFile(self, dsOptSubFix):
 		"""
 		通用输出文件函数
 			:param self: 
@@ -95,7 +96,8 @@ class DBScanPOI(object):
 		res = self.PClusterRes
 		ostream = '\n'.join(res)
 
-		ofile = os.path.join(self.OUTPUT_PATH, 'dbscanResult_ms%d%s' % (self.msNum, dbscanOptSubFix))
-		with open(ofile, 'ab') as f:
+		fileName = 'dbscanResult%s%s' % (self.msNum, self.msOptSubFix, dsOptSubFix)
+		ofile = os.path.join(self.OUTPUT_PATH, fileName)
+		with open(ofile, 'wb') as f:
 			f.write(ostream)
 		f.close()
