@@ -25,7 +25,7 @@ class MeanshiftPOI(object):
 			self.constructPOIMatrix(ifile)
 		n_clusters_, res = self.meanShiftProcess(quantile, n_samples)
 		msOptSubFix = "_quan_%f_sam_%d" % (quantile, n_samples)
-		self.OutputToFile(res, msOptSubFix)
+		self.outputToFile(res, msOptSubFix)
 
 		return n_clusters_
 
@@ -94,7 +94,7 @@ class MeanshiftPOI(object):
 				
 		return n_clusters_, np.hstack((A, B))
 
-	def OutputToFile(self, res, msOptSubFix):
+	def outputToFile(self, res, msOptSubFix):
 		"""
 		通用输出文件函数
 			:param self: 

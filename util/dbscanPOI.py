@@ -28,7 +28,7 @@ class DBScanPOI(object):
 		self.constructPOILngLatList(ipoifile)
 		self.constructPOIMatrix(imsfile)
 		self.dbscanProcess(eps, min_samples)
-		self.OutputToFile("_eps_%f_sam_%d" % (eps, min_samples))
+		self.outputToFile("_eps_%f_sam_%d" % (eps, min_samples))
 	
 	def constructPOILngLatList(self, file):
 		with open(file, 'rb') as f:
@@ -87,7 +87,7 @@ class DBScanPOI(object):
 		
 		print "number of dbscan clusters in all: %d" % (self.dbscanBaseNum)
 	
-	def OutputToFile(self, dsOptSubFix):
+	def outputToFile(self, dsOptSubFix):
 		"""
 		通用输出文件函数
 			:param self: 
