@@ -7,6 +7,9 @@
 # Output Format:
 # [hares-x]
 # id, seg, hour, wday, gid, state, admin, from_gid, to_gid, from_aid, to_aid
+# 
+# [tripFlow-x] 
+# hour, id, time, lat, lng, from_lat, from_lng, from_time, to_lat, to_Lng, to_time
 
 import logging
 import os
@@ -25,7 +28,7 @@ class FileSegByHour(object):
 		self.INDEX = PROP['INDEX']
 		self.CITY = PROP['CITY'] 
 		self.INPUT_PATH = PROP['IDIRECTORY']
-		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byday-sg')
+		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byday-tf')
 		self.INUM = PROP['INUM']
 		self.ONUM = PROP['ONUM']
 		self.MAXDAY = PROP['MAXDAY']
@@ -38,6 +41,8 @@ class FileSegByHour(object):
 			'fromAdmin': '',
 			'toLatLng': [0, 0],
 			'toAdmin': '',
+			'fromTime': '',
+			'toTime': '',
 			'data': [],
 			'stateId': 0
 		}
@@ -52,7 +57,7 @@ class FileSegByHour(object):
 
 			ifilename = 'part-%05d' % number
 			logging.info('Job-%d File-%s Operating...' % (self.INDEX, ifilename))
-			self.iterateFile(os.path.join(self.INPUT_PATH, ifilename))
+			self.iterateFileOnlyTravel(os.path.join(self.INPUT_PATH, ifilename))
 
 		# 捡完所有漏掉的记录，遍历输入文件
 		for x in xrange(0, self.MAXDAY):
@@ -67,6 +72,7 @@ class FileSegByHour(object):
 		logging.info('End Job-%d' % (self.INDEX))
 
 	def iterateFile(self, ifile):
+    	# stay travel 都处理的情况
 		with open(ifile, 'rb') as stream:
 			for line in stream:
 				line = line.strip('\n')
@@ -120,6 +126,53 @@ class FileSegByHour(object):
 				
 		stream.close()
 
+	def iterateFileOnlyTravel(self, ifile):
+    	# travel 情况
+		with open(ifile, 'rb') as stream:
+			for line in stream:
+				line = line.strip('\n')
+				linelist = line.split(',')
+
+				state = linelist[4]
+				
+				if state == 'U' or line == '' or state == 'S':
+					continue
+
+				# 分析日期
+				tmp = formatTime(linelist[1])
+				ydayCurrent = tmp['yday'] - 187
+				
+				wday = tmp['wday']
+				hour = tmp['hour']
+				seg = ydayCurrent * 24 + hour
+				
+				if ydayCurrent < 0 or ydayCurrent >= self.MAXDAY:
+					continue
+				
+				id = linelist[0]
+				admin = getAdminNumber(linelist[6])
+				gid = formatGridID(getCityLocs(self.CITY), [linelist[3], linelist[2]])
+				newLinePreStr = "%d,%s,%s,%s,%s" % (hour, id, linelist[1], linelist[2], linelist[3])
+
+				# T 时对比当前 from 是否为初始状态，若为初始状态当前数据存在 from，否则存在 to
+				if self.currentDatasets['fromLatLng'][0] == 0:
+					self.currentDatasets['fromLatLng'] = [linelist[3], linelist[2]]
+					self.currentDatasets['fromAdmin'] = linelist[6]
+					self.currentDatasets['fromTime'] = linelist[1]
+					self.currentDatasets['stateId'] = linelist[5]
+				else:
+					# 判断 stateId 是否一致
+					if linelist[5] != self.currentDatasets['stateId']:
+						self.updLastTravelRecsOnlyTravel()
+					else:
+						self.currentDatasets['toLatLng'] = [linelist[3], linelist[2]]
+						self.currentDatasets['toAdmin'] = linelist[6]
+						self.currentDatasets['toTime'] = linelist[1]
+				# tmp = "%s,T,%d" % (newLinePreStr, admin)
+				self.currentDatasets['data'].append([newLinePreStr, ydayCurrent])
+				
+		stream.close()
+
 	def checkWriteOpt(self, ydayCurrent):
 		# 计数存储，看情况写入文件
 		if self.COUNT[ydayCurrent] >= self.SAFECOUNT:
@@ -153,4 +206,27 @@ class FileSegByHour(object):
 		# 重置
 		self.currentDatasets['fromLatLng'] = [0, 0]
 		self.currentDatasets['fromAdmin'] = ''
+		self.currentDatasets['data'] = []
+
+	def updLastTravelRecsOnlyTravel(self):
+		if self.currentDatasets['fromAdmin'] == '':
+			return 0
+		#
+		fromLatLng = ','.join(self.currentDatasets['fromLatLng'])
+		toLatLng = ','.join(self.currentDatasets['toLatLng'])
+		supStr = "%s,%s,%s,%s" % (fromLatLng, self.currentDatasets['fromTime'], toLatLng, self.currentDatasets['toTime'])
+
+		# 遍历记录
+		for each in self.currentDatasets['data']:
+			ydayCurrent = each[1]
+			newline = "%s,%s" % (each[0], supStr)
+
+			self.COUNT[ydayCurrent] += 1
+			self.MATRIX[ydayCurrent].append(newline)
+			self.checkWriteOpt(ydayCurrent)
+
+		# 重置
+		self.currentDatasets['fromLatLng'] = [0, 0]
+		self.currentDatasets['fromAdmin'] = ''
+		self.currentDatasets['fromTime'] = ''
 		self.currentDatasets['data'] = []

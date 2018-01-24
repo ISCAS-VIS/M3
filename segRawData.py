@@ -45,6 +45,7 @@ def mergeLargeRecords(city, baseurl, count):
 
 
 def usage():
+	# /datahouse/zhtan/datasets/VIS-rawdata-region/
 	print "python -d /datasets -p /datasets -i 3999"
 
 

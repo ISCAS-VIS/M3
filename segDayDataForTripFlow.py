@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
+# 将切分成天的数据按照小时进行切分存储，且只保留 travel 状态数据
 
 import os
 
 def main():
-	INPUT_DIRECTORY = '/datahouse/tao.jiang/bj-byday-sg'
+	INPUT_DIRECTORY = '/datahouse/tao.jiang/bj-byday-tf'
 	OUTPUT_DIRECTORY = '/datahouse/tao.jiang/bj-byhour-onlytrip'
 
 	for x in xrange(0, 87):
@@ -16,10 +17,7 @@ def main():
 			for line in f:
 				line = line.strip('\n')
 				linelist = line.split(',')
-				hour = int(linelist[2])
-				state = linelist[5]
-				if state == 'S':
-					continue
+				hour = int(linelist[0])
 
 				res[hour].append(line)
 		f.close()
