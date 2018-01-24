@@ -7,7 +7,7 @@ import os
 
 def main():
 	INPUT_DIRECTORY = '/datahouse/tao.jiang/bj-byday-tf'
-	OUTPUT_DIRECTORY = '/datahouse/tao.jiang/bj-byhour-onlytrip'
+	OUTPUT_DIRECTORY = '/datahouse/tao.jiang/bj-byhour-tf'
 
 	for x in xrange(0, 87):
 		print "Processing File-%d" % (x)
@@ -25,7 +25,7 @@ def main():
 		# 存储结果
 		for i in xrange(0, 24):
 			seg = x * 24 + i
-			ofile = os.path.join(OUTPUT_DIRECTORY, 'travelData-seg-%d' % (seg))
+			ofile = os.path.join(OUTPUT_DIRECTORY, 'traveldata-%d' % (seg))
 			with open(ofile, 'wb') as f:
 				f.write('\n'.join(res[i]))
 			f.close()

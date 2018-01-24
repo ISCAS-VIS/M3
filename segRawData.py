@@ -92,11 +92,10 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	path = os.path.join(stdoutdir, 'bj-byday-sg')
+	path = os.path.join(stdoutdir, 'bj-byhour-onlytrip')
 	mergeLargeRecords(city, path, 87)
 
 	# @多进程运行程序 END
-
 	print "END TIME: %s" % time.time()
 
 

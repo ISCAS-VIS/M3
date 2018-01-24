@@ -18,10 +18,15 @@ def haversine(lon1, lat1, lon2, lat2):  # 经度1，纬度1，经度2，纬度2 
 	a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2  
 	c = 2 * asin(sqrt(a))   
 	r = 6371  # 地球平均半径，单位为公里  
-	return c * r * 1000 
+	return c * r * 1000.0 
 
 
-def getFormatGID(locs, point, LngSPLIT=0.0064, LatSPLIT=0.005):
+def getFormatGID(point, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
+	'north': 41.0500,  # 41.050,
+	'south': 39.4570,  # 39.457,
+	'west': 115.4220,  # 115.422,
+	'east': 117.5000,  # 117.500
+}):
 	"""
 	[NEW] 根据经纬度计算城市网格编号
 	
@@ -46,7 +51,12 @@ def getFormatGID(locs, point, LngSPLIT=0.0064, LatSPLIT=0.005):
 			'latind': latind
 		}
 
-def parseFormatGID(locs, id, LngSPLIT=0.0064, LatSPLIT=0.005):
+def parseFormatGID(id, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
+	'north': 41.0500,  # 41.050,
+	'south': 39.4570,  # 39.457,
+	'west': 115.4220,  # 115.422,
+	'east': 117.5000,  # 117.500
+}):
 	"""
 	[NEW] 根据城市网格编号还原经纬度信息，注意：经纬度为中心点信息并非西南角信息
 		:param locs: 
