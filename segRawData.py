@@ -81,18 +81,18 @@ def main(argv):
 	print "Start approach at %s" % STARTTIME
 
 	# @多进程运行程序 START
-	jobs = []
+	# jobs = []
 
-	for x in xrange(0, jnum):
-		jobs.append(Process(target=processTask, args=(x, city, stdindir, stdoutdir, inum, onum, 87, 300000)))
-		jobs[x].start()
+	# for x in xrange(0, jnum):
+	# 	jobs.append(Process(target=processTask, args=(x, city, stdindir, stdoutdir, inum, onum, 87, 300000)))
+	# 	jobs[x].start()
 
-	for job in jobs:
-		job.join()
+	# for job in jobs:
+	# 	job.join()
 
 	# 处理剩余数据进文件
 	# 合并操作
-	path = os.path.join(stdoutdir, 'bj-byhour-onlytrip')
+	path = os.path.join(stdoutdir, 'bj-byhour-tf')
 	mergeLargeRecords(city, path, 87)
 
 	# @多进程运行程序 END
