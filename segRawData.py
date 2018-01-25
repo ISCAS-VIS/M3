@@ -92,7 +92,7 @@ def main(argv):
 
 	# 处理剩余数据进文件
 	# 合并操作
-	path = os.path.join(stdoutdir, 'bj-byhour-tf')
+	path = os.path.join(stdoutdir, 'bj-byday-tf')
 	mergeLargeRecords(city, path, 87)
 
 	# @多进程运行程序 END
