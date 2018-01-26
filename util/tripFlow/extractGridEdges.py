@@ -16,13 +16,13 @@ class ExtractGridEdges(object):
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-rec')
 		self.index = PROP['index']
 		# self.SAFECOUNT = PROP['SAFECOUNT']
-		self.res = []
+		self.res = {'o': {}, 'd': {}}
     
 	def run(self):
 		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))
-		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-%d' % (self.index))
+		
 		self.iterateFile(ifile)
-		self.outputToFile(ofile)
+		self.outputToFile()
 		
 	def iterateFile(self, file):	
 		with open(file, 'rb') as f:
@@ -56,7 +56,16 @@ class ExtractGridEdges(object):
 						speed = distance / (toTime-fromTime)
 						direction = ''
 						vecStr = "%d,%d,%f,%s" % (fromGid, toGid, speed, direction)
-						self.res.append(vecStr)
+
+						if fromGid in self.res['o'].keys():
+							self.res['o'][fromGid].append(vecStr)
+						else:
+							self.res['o'][fromGid] = [vecStr]
+
+						if toGid in self.res['d'].keys():
+							self.res['d'][toGid].append(vecStr)
+						else:
+							self.res['d'][toGid] = [vecStr]
 						# 计算速度、方向，组成边向量
 						
 						fromLat = toLat
@@ -70,12 +79,24 @@ class ExtractGridEdges(object):
 
 		f.close()
 	
-	def outputToFile(self, file):
+	def outputToFile(self):
 		"""
 		通用输出文件函数
 			:param self: 
 			:param res: 
 		"""
-		with open(file, 'wb') as f:
-			f.write('\n'.join(self.res))
+		ofile = os.path.join(self.OUTPUT_PATH, 'triporec-%d' % (self.index))
+		dfile = os.path.join(self.OUTPUT_PATH, 'tripdrec-%d' % (self.index))
+		ores, dres = [], []
+		
+		for key, value in self.res['o'].iteritems():
+			ores.append('\n'.join(value))
+		for key, value in self.res['d'].iteritems():
+			dres.append('\n'.join(value))
+
+		with open(ofile, 'wb') as f:
+			f.write('\n'.join(ores))
+		f.close()
+		with open(dfile, 'wb') as f:
+			f.write('\n'.join(dres))
 		f.close()
