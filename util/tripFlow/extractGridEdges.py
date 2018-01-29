@@ -28,7 +28,8 @@ class ExtractGridEdges(object):
 		self.iterateFile(ifile)
 		return self.outputToFile()
 		
-	def iterateFile(self, file):	
+	def iterateFile(self, file):
+		count = 0
 		with open(file, 'rb') as f:
 			firstLine = True
 			currentNo = -1
@@ -37,6 +38,7 @@ class ExtractGridEdges(object):
 			fromTime = -1
 
 			for line in f:
+				count += 1
 				line = line.strip('\n')
 				linelist = line.split(',')
 
@@ -54,7 +56,7 @@ class ExtractGridEdges(object):
 				else:
 					if currentNo == no:  # 同一段旅程
 						# 如果当前点位置不变则继续遍历
-						if fromLat == toLat and fromLng == toLng:
+						if (fromLat == toLat and fromLng == toLng) or fromTime == toTime:
 							continue
 
 						fPoint = [fromLng, fromLat]
@@ -95,6 +97,7 @@ class ExtractGridEdges(object):
 						fromTime = toTime
 
 		f.close()
+		print "Total %d records in this file." % (count)
 
 	def getIntersection(self, fPoint, tPoint, fromGid, toGid, direction):
 		# [lng, lat]
@@ -149,12 +152,17 @@ class ExtractGridEdges(object):
 		# 待更新
 		ores = []
 		i = 0
-		memres = [[] for x in xrange(0,4)]
-		for key, val in self.res.iteritems():
-			for subkey ,subval in val.iteritems():
+		gidNum, recNum = 0, 0
+		memres = [[] for x in xrange(0, 4)]
+		for key, val in self.res.iteritems():  # 东西南北四个方向遍历
+			for subkey ,subval in val.iteritems():  # 每个方向里不同 gid 数据遍历
+				gidNum += 1
+				recNum += len(subval)
 				ores.append('\n'.join(subval))
 				memres[i] += subval
 			i += 1
+		
+		print "Total %d gids and %d records in four directions" % (gidNum, recNum)
 
 		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-%d' % (self.index))
 		with open(ofile, 'wb') as f:

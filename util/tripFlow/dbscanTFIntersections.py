@@ -29,12 +29,13 @@ class DBScanTFIntersections(object):
 
 	def run(self):
 		self.iterateRes()
-		return self.outputToFile()
+		self.dbscanProcess()
+		self.outputToFile()
 		
 	def iterateRes(self):
 		# 四个方向分别聚类
 		for x in xrange(0, self.directionNum):
-			direction = self.res[x][0].split(',')[-1]
+			currentDir = -1
 			
 			for line in self.res[x]:
 				linelist = line.split(',')
@@ -45,15 +46,20 @@ class DBScanTFIntersections(object):
 				gdirStr = linelist[3]
 				speed = linelist[4]
 				direction = linelist[5]
-				gidInfo = parseFormatGID(gid)
+				gidInfo = parseFormatGID(gid, 'e')
 				gLat = gidInfo['y']
 				gLng = gidInfo['x']
+
+				if currentDir == -1:
+					currentDir = direction
 
 				self.dbInput[x].append([lng, lat])
 				subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 				self.subInfo[x].append([gid, gLng, gLat, subprops])
 
-	def dbscanProcess(self, X):
+			print "Current Direction: %s - process completed. Total %d records." % (currentDir, len(self.res[x]))
+
+	def dbscanProcess(self):
 		# ######################
 		# Compute DBSCAN
 		for x in xrange(0, self.directionNum):
@@ -107,5 +113,4 @@ class DBScanTFIntersections(object):
 		with open(ofile, 'wb') as f:
 			f.write('\n'.join(ores))
 		f.close()
-
-		return memres
+		

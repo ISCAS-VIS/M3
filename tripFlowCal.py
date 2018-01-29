@@ -69,7 +69,7 @@ def main(argv):
 	===	Cluster Opts	===
 	stdindir	= %s
 	stdoutdir	= %s
-	eps			= %f
+	eps		= %f
 	min_samples	= %d
 	===	Cluster Opts	===
 	''' % (stdindir, stdoutdir, eps, min_samples)
@@ -77,7 +77,9 @@ def main(argv):
 	processTask(x, eps, min_samples, stdindir, stdoutdir)
 
 	# @多进程运行程序 END
-	print "END TIME: %s" % time.time()
+	ENDTIME = time.time()
+	print "END TIME: %s" % ENDTIME
+	print "Total minutes: %f" % ((ENDTIME-STARTTIME)/60.0)
 
 
 if __name__ == '__main__':

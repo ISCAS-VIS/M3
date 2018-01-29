@@ -14,7 +14,7 @@ def getRealDistance(lon1, lat1, lon2, lat2):  # 经度1，纬度1，经度2，�
 	lat1 = float(lat1)
 	lon2 = float(lon2)
 	lat2 = float(lat2)
-	
+
 	lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])  
 
 	# haversine公式  
@@ -115,10 +115,7 @@ def getDirection(fPoint, tPoint):
 		return 'e'
 	elif toLng < fromLng and absLng > absLat:
 		return 'w'
-	elif toLat >= fromLat and absLng > absLat:
+	elif toLat >= fromLat and absLng < absLat:
 		return 'n'
 	else:
 		return 's'
-    		
-def calLineIntersection():
-	# y = 
