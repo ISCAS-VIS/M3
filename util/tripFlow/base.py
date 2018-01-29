@@ -4,12 +4,17 @@
 
 from math import radians, cos, sin, asin, sqrt  
 
-def haversine(lon1, lat1, lon2, lat2):  # 经度1，纬度1，经度2，纬度2 （十进制度数）  
+def getRealDistance(lon1, lat1, lon2, lat2):  # 经度1，纬度1，经度2，纬度2 （十进制度数）  
 	""" 
 	Calculate the great circle distance between two points  
 	on the earth (specified in decimal degrees) 
 	"""  
-	# 将十进制度数转化为弧度  
+	# 将十进制度数转化为弧度
+	lon1 = float(lon1)
+	lat1 = float(lat1)
+	lon2 = float(lon2)
+	lat2 = float(lat2)
+	
 	lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])  
 
 	# haversine公式  
@@ -51,7 +56,7 @@ def getFormatGID(point, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 			'latind': latind
 		}
 
-def parseFormatGID(id, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
+def parseFormatGID(id, direction, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 	'north': 41.0500,  # 41.050,
 	'south': 39.4570,  # 39.457,
 	'west': 115.4220,  # 115.422,
@@ -77,6 +82,12 @@ def parseFormatGID(id, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 	lng = (locs['west'] + lngind * LngSPLIT)
 	lngcen = (lng + LngSPLIT/2.0)
 	latcen = (lat + LatSPLIT/2.0)
+	dlineDict = {
+		'n': lat + LatSPLIT,
+		's': lat,
+		'e': lng + LngSPLIT,
+		'w': lng
+	}
 
 	return {
 		'lat': latcen,
@@ -84,5 +95,30 @@ def parseFormatGID(id, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 		'nid': nid,
 		'pid': -1,
 		'y': latind,
-		'x': lngind
+		'x': lngind,
+		'dlinePoint': dlineDict[direction]
 	}
+
+
+def getDirection(fPoint, tPoint):
+	# 获取方向信息
+	# [Lng, Lat]
+	fromLat = float(fPoint[1])
+	fromLng = float(fPoint[0])
+	toLat = float(tPoint[1])
+	toLng = float(tPoint[0])
+
+	absLat = abs(toLat-fromLat)
+	absLng = abs(toLng-fromLng)
+
+	if toLng >= fromLng and absLng > absLat:  # 向右半边运动
+		return 'e'
+	elif toLng < fromLng and absLng > absLat:
+		return 'w'
+	elif toLat >= fromLat and absLng > absLat:
+		return 'n'
+	else:
+		return 's'
+    		
+def calLineIntersection():
+	# y = 

@@ -3,10 +3,15 @@
 # 
 # Input Data Format
 # [hour, id, time, lat, lng, from_lat, from_lng, from_time, to_lat, to_Lng, to_time]
+# 
+# Output Data Format
+# [lng, lat, gid, from/to, speed, direction]
 
 import os
 from util.tripFlow.base import getFormatGID
-from util.tripFlow.base import haversine
+from util.tripFlow.base import getRealDistance
+from util.tripFlow.base import getDirection
+from util.tripFlow.base import parseFormatGID
 
 
 class ExtractGridEdges(object):
@@ -15,23 +20,22 @@ class ExtractGridEdges(object):
 		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-tf')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-rec')
 		self.index = PROP['index']
-		# self.SAFECOUNT = PROP['SAFECOUNT']
-		self.res = {'o': {}, 'd': {}}
+		self.res = {'e': {}, 'n': {}, 'w': {}, 's': {}}
     
 	def run(self):
 		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))
 		
 		self.iterateFile(ifile)
-		self.outputToFile()
+		return self.outputToFile()
 		
 	def iterateFile(self, file):	
 		with open(file, 'rb') as f:
 			firstLine = True
 			currentNo = -1
-			# count = 0
 			fromLat = -1
 			fromLng = -1
 			fromTime = -1
+
 			for line in f:
 				line = line.strip('\n')
 				linelist = line.split(',')
@@ -49,24 +53,37 @@ class ExtractGridEdges(object):
 					fromTime = toTime
 				else:
 					if currentNo == no:  # 同一段旅程
-						# count += 1
-						fromGid = getFormatGID([fromLng, fromLat])['gid']
-						toGid = getFormatGID(toLng, toLat)['gid']
-						distance = haversine(fromLng, fromLat, toLng, toLat)
+						# 如果当前点位置不变则继续遍历
+						if fromLat == toLat and fromLng == toLng:
+							continue
+
+						fPoint = [fromLng, fromLat]
+						tPoint = [toLng, toLat]
+
+						fromGid = getFormatGID(fPoint)['gid']
+						toGid = getFormatGID(tPoint)['gid']
+						distance = getRealDistance(fromLng, fromLat, toLng, toLat)
 						speed = distance / (toTime-fromTime)
-						direction = ''
-						vecStr = "%d,%d,%f,%s" % (fromGid, toGid, speed, direction)
+						direction = getDirection(fPoint, tPoint)  # w n s e 四个字符之一
 
-						if fromGid in self.res['o'].keys():
-							self.res['o'][fromGid].append(vecStr)
-						else:
-							self.res['o'][fromGid] = [vecStr]
+						# 处理相交点
+						fGidIPoint, tGidIPoint = self.getIntersection(fPoint, tPoint, fromGid, toGid, direction)
+						fGidIPointStr = "%.6f,%.6f" % (fGidIPoint[0], fGidIPoint[1])
+						tGidIPointStr = "%.6f,%.6f" % (tGidIPoint[0], tGidIPoint[1])
 
-						if toGid in self.res['d'].keys():
-							self.res['d'][toGid].append(vecStr)
+						# 结果字符串
+						fromVecStr = "%s,%d,from,%f,%s" % (fGidIPointStr, fromGid, speed, direction)
+						toVecStr = "%s,%d,to,%f,%s" % (tGidIPointStr, toGid, speed, direction)
+
+						if fromGid in self.res[direction].keys():
+							self.res[direction][fromGid].append(fromVecStr)
 						else:
-							self.res['d'][toGid] = [vecStr]
-						# 计算速度、方向，组成边向量
+							self.res[direction][fromGid] = [fromVecStr]
+
+						if toGid in self.res[direction].keys():
+							self.res[direction][toGid].append(toVecStr)
+						else:
+							self.res[direction][toGid] = [toVecStr]
 						
 						fromLat = toLat
 						fromLng = toLng
@@ -78,6 +95,49 @@ class ExtractGridEdges(object):
 						fromTime = toTime
 
 		f.close()
+
+	def getIntersection(self, fPoint, tPoint, fromGid, toGid, direction):
+		# [lng, lat]
+
+		fGIPoint, tGIPoint = [], []
+		fromLat = float(fPoint[1])
+		fromLng = float(fPoint[0])
+		toLat = float(tPoint[1])
+		toLng = float(tPoint[0])
+
+		# 处理 from/to
+		toDirection = {
+			'n': 's',
+			's': 'n',
+			'w': 'e',
+			'e': 'w'
+		}
+		pfRes = parseFormatGID(fromGid, direction)
+		ptRes = parseFormatGID(toGid, toDirection[direction])
+		fGidLine = pfRes['dlinePoint']
+		tGidLine = ptRes['dlinePoint']
+		fLng = pfRes['x']
+		fLat = pfRes['y']
+		tLng = ptRes['x']
+		tLat = ptRes['y']
+
+		# 计算交点
+		if direction in ['n', 's']:  # 与平行维度线相交
+			k = (toLng - fromLng) / (toLat - fromLat)
+			b1, b2 = fLng, tLng
+			fIlng = b1 + (fGidLine - fromLat) * k
+			fGIPoint = [fIlng, fGidLine]
+			tIlng = b2 + (tGidLine - fromLat) * k
+			tGIPoint = [tIlng, tGidLine]
+		else:  # 与平行经度线相交
+			k = (toLat - fromLat) / (toLng - fromLng)
+			b1, b2 = fLat, tLat
+			fIlat = b1 + (fGidLine - fromLng) * k
+			fGIPoint = [fGidLine, fIlat]
+			tIlat = b2 + (tGidLine - fromLng) * k
+			tGIPoint = [tGidLine,tIlat]
+
+		return fGIPoint, tGIPoint
 	
 	def outputToFile(self):
 		"""
@@ -85,18 +145,20 @@ class ExtractGridEdges(object):
 			:param self: 
 			:param res: 
 		"""
-		ofile = os.path.join(self.OUTPUT_PATH, 'triporec-%d' % (self.index))
-		dfile = os.path.join(self.OUTPUT_PATH, 'tripdrec-%d' % (self.index))
-		ores, dres = [], []
 		
-		for key, value in self.res['o'].iteritems():
-			ores.append('\n'.join(value))
-		for key, value in self.res['d'].iteritems():
-			dres.append('\n'.join(value))
+		# 待更新
+		ores = []
+		i = 0
+		memres = [[] for x in xrange(0,4)]
+		for key, val in self.res.iteritems():
+			for subkey ,subval in val.iteritems():
+				ores.append('\n'.join(subval))
+				memres[i] += subval
+			i += 1
 
+		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-%d' % (self.index))
 		with open(ofile, 'wb') as f:
 			f.write('\n'.join(ores))
 		f.close()
-		with open(dfile, 'wb') as f:
-			f.write('\n'.join(dres))
-		f.close()
+
+		return memres
