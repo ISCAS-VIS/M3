@@ -65,7 +65,7 @@ def main(argv):
 			stdoutdir = arg
 		elif opt in ("-e", "--eps"):
 			eps = float(arg)
-		elif opt in ('-s', '--sample'):
+		elif opt in ('-m', '--min_samples'):
 			min_samples = int(arg)
 
 	STARTTIME = time.time()
