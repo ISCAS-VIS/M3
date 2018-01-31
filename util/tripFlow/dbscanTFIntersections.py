@@ -3,6 +3,10 @@
 # 
 # Input Data Format
 # [lng, lat, gid, from/to, speed, direction]
+# 
+# Output data format
+# 分方向分 Grid 聚集的结果
+# [clusterID, lng, lat, gid, gLng, gLat, from/to, speed, direction]
 
 import os
 import numpy as np
@@ -30,8 +34,8 @@ class DBScanTFIntersections(object):
 	def run(self):
 		self.iterateRes()
 		noiseRate = self.dbscanProcess()
-		self.outputToFile()
-		return noiseRate
+		ofilename = self.outputToFile()
+		return noiseRate, ofilename
 		
 	def iterateRes(self):
 		# 四个方向分别聚类
@@ -119,8 +123,11 @@ class DBScanTFIntersections(object):
 				onerecStr = "%s,%s,%s" % (label, lngLatStr, subInfoStr)
 				ores.append(onerecStr)
 
-		ofile = os.path.join(self.OUTPUT_PATH, 'tfres-%d' % (self.index))
+		ofilename = 'tfres-%d' % (self.index)
+		ofile = os.path.join(self.OUTPUT_PATH, ofilename)
 		with open(ofile, 'wb') as f:
 			f.write('\n'.join(ores))
 		f.close()
+
+		return ofilename
 		

@@ -9,6 +9,7 @@ import logging
 import getopt
 from util.tripFlow.extractGridEdges import ExtractGridEdges
 from util.tripFlow.dbscanTFIntersections import DBScanTFIntersections
+from util.tripFlow.mergeClusterEdges import MergeClusterEdges
 
 			
 def processTask(x, eps, min_samples, stdindir, stdoutdir): 
@@ -20,6 +21,7 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 	task = ExtractGridEdges(PROP)
 	res = task.run()
 
+	clusterofilename = ''
 	while (True):
 		clusterPROP = {
 			'index': x, 
@@ -28,13 +30,31 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 			'eps': eps,
 			'min_samples': min_samples
 		}
+		print '''
+===	Cluster Opts	===
+index	= %d
+stdindir	= %s
+stdoutdir	= %s
+eps		= %f
+min_samples	= %d
+===	Cluster Opts	===
+''' % (x, stdindir, stdoutdir, eps, min_samples)
+
 		clusterTask = DBScanTFIntersections(clusterPROP)
-		noiseRate = clusterTask.run()
+		noiseRate, clusterofilename = clusterTask.run()
 
 		if noiseRate <= 0.5:
 			break
 		else:
 			eps += 0.005
+
+	mergePROP = {
+		'index': x, 
+		'IDIRECTORY': stdindir, 
+		'ODIRECTORY': stdoutdir
+	}
+	mergeTask = MergeClusterEdges(mergePROP)
+	mergeTask.run()
 
 
 def usage():
@@ -71,14 +91,14 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	print '''
-	===	Cluster Opts	===
-	stdindir	= %s
-	stdoutdir	= %s
-	eps		= %f
-	min_samples	= %d
-	===	Cluster Opts	===
-	''' % (stdindir, stdoutdir, eps, min_samples)
+	# print '''
+	# ===	Cluster Opts	===
+	# stdindir	= %s
+	# stdoutdir	= %s
+	# eps		= %f
+	# min_samples	= %d
+	# ===	Cluster Opts	===
+	# ''' % (stdindir, stdoutdir, eps, min_samples)
 	x = 9
 	processTask(x, eps, min_samples, stdindir, stdoutdir)
 
