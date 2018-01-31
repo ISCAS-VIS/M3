@@ -46,7 +46,7 @@ min_samples	= %d
 		if noiseRate <= 0.5:
 			break
 		else:
-			eps += 0.005
+			eps += 0.001
 
 	mergePROP = {
 		'index': x, 
