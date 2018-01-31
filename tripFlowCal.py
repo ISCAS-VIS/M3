@@ -20,15 +20,21 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 	task = ExtractGridEdges(PROP)
 	res = task.run()
 
-	clusterPROP = {
-		'index': x, 
-		'ODIRECTORY': stdoutdir,
-		'res': res,
-		'eps': eps,
-		'min_samples': min_samples
-	}
-	clusterTask = DBScanTFIntersections(clusterPROP)
-	clusterTask.run()
+	while (True):
+		clusterPROP = {
+			'index': x, 
+			'ODIRECTORY': stdoutdir,
+			'res': res,
+			'eps': eps,
+			'min_samples': min_samples
+		}
+		clusterTask = DBScanTFIntersections(clusterPROP)
+		noiseRate = clusterTask.run()
+
+		if noiseRate <= 0.5:
+			break
+		else:
+			eps += 0.005
 
 
 def usage():

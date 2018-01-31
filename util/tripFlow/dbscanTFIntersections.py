@@ -29,8 +29,9 @@ class DBScanTFIntersections(object):
 
 	def run(self):
 		self.iterateRes()
-		self.dbscanProcess()
+		noiseRate = self.dbscanProcess()
 		self.outputToFile()
+		return noiseRate
 		
 	def iterateRes(self):
 		# 四个方向分别聚类
@@ -62,6 +63,9 @@ class DBScanTFIntersections(object):
 	def dbscanProcess(self):
 		# ######################
 		# Compute DBSCAN
+		# 
+		noiseNum, totalNum = 0, 0
+
 		for x in xrange(0, self.directionNum):
 			X = self.dbInput[x]
 			db = DBSCAN(eps=self.eps, min_samples=self.min_samples).fit(X)
@@ -71,9 +75,12 @@ class DBScanTFIntersections(object):
 
 			# A = np.array(self.PIDList[x])[:, np.newaxis]
 			index = 0
+			totalNum += len(labels)
 			while index < len(labels):
 				if labels[index] != -1:
 					labels[index] += self.dbscanBaseNum
+				else:
+					noiseNum += 1
 				index += 1
 			# C = np.array(labels)[:, np.newaxis]
 			# res = np.hstack((A, C))
@@ -90,6 +97,9 @@ class DBScanTFIntersections(object):
 			print "Direction No.%d, DS Cluster number: %d" % (x, n_clusters_)
 		
 		print "number of dbscan clusters in all: %d" % (self.dbscanBaseNum)
+		noiseRate = float(noiseNum)/totalNum
+		print "Total noise rate: %f" % (noiseRate)
+		return noiseRate
 	
 	def outputToFile(self):
 		"""
