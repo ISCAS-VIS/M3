@@ -52,8 +52,8 @@ class DBScanTFIntersections(object):
 				speed = linelist[4]
 				direction = linelist[5]
 				gidInfo = parseFormatGID(gid, 'e')
-				gLat = gidInfo['y']
-				gLng = gidInfo['x']
+				gLat = gidInfo['lat']
+				gLng = gidInfo['lng']
 
 				if currentDir == -1:
 					currentDir = direction

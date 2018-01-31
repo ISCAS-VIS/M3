@@ -27,7 +27,7 @@ class MergeClusterEdges(object):
 		
 	def iterateFile(self, ifile):
 		# clusterID, lng, lat, gid, gLng, gLat, from/to, speed, direction
-		with open(file, 'rb') as f:
+		with open(ifile, 'rb') as f:
 			firstLine = True
 			count = 0
 			currentPeriod = {}

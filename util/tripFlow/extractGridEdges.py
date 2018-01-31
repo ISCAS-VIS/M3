@@ -119,10 +119,10 @@ class ExtractGridEdges(object):
 		ptRes = parseFormatGID(toGid, toDirection[direction])
 		fGidLine = pfRes['dlinePoint']
 		tGidLine = ptRes['dlinePoint']
-		fLng = pfRes['x']
-		fLat = pfRes['y']
-		tLng = ptRes['x']
-		tLat = ptRes['y']
+		fLng = pfRes['lng']
+		fLat = pfRes['lat']
+		tLng = ptRes['lng']
+		tLat = ptRes['lat']
 
 		# 计算交点
 		if direction in ['n', 's']:  # 与平行维度线相交
