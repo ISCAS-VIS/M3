@@ -18,3 +18,5 @@ INNER JOIN `stvis`.`your_temp_table` B on A.nid = B.nid
 SET A.m12_default = B.m12_default, A.d_001_10 = B.d_001_10;
 
 DROP TEMPORARY TABLE `your_temp_table`;
+
+-- tripflow construction

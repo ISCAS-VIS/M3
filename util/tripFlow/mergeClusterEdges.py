@@ -5,7 +5,7 @@
 # [clusterID, lng, lat, gid, gLng, gLat, from/to, speed, direction]
 # 
 # Output Data Format
-# 
+# [gLng, gLat, gdirStr, speed, recordNum, dLng, dLat, seg]
 
 import os
 import math
@@ -20,16 +20,16 @@ class MergeClusterEdges(object):
 		self.res = []
 
 	def run(self):
-		pass
 		ifile = os.path.join(self.INPUT_PATH, 'tfres-%d' % (self.index))
-		self.iterateFile(ifile)
+		totalNum = self.iterateFile(ifile)
+		print "One edge is consisted of %d records averagely." % (totalNum/len(self.res))
+
 		self.outputToFile()
 		
 	def iterateFile(self, ifile):
-		# clusterID, lng, lat, gid, gLng, gLat, from/to, speed, direction
+		count = 0
 		with open(ifile, 'rb') as f:
 			firstLine = True
-			count = 0
 			currentPeriod = {}
 
 			for line in f:
@@ -85,6 +85,9 @@ class MergeClusterEdges(object):
 					else:
 						currentPeriod['data'][subid] = [onerec]
 				# end
+		f.close()
+
+		return count
 
 	def updateMergedRes(self, data):
 		# 更新 self.res 函数

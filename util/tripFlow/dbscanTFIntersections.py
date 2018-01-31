@@ -62,7 +62,7 @@ class DBScanTFIntersections(object):
 				subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 				self.subInfo[x].append([gid, gLng, gLat, subprops])
 
-			print "Current Direction: %s - process completed. Total %d records." % (currentDir, len(self.res[x]))
+			print "Direction: %s - process completed. Total %d records." % (currentDir, len(self.res[x]))
 
 	def dbscanProcess(self):
 		# ######################
@@ -77,7 +77,6 @@ class DBScanTFIntersections(object):
 			core_samples_mask[db.core_sample_indices_] = True
 			labels = db.labels_
 
-			# A = np.array(self.PIDList[x])[:, np.newaxis]
 			index = 0
 			totalNum += len(labels)
 			while index < len(labels):
@@ -86,10 +85,6 @@ class DBScanTFIntersections(object):
 				else:
 					noiseNum += 1
 				index += 1
-			# C = np.array(labels)[:, np.newaxis]
-			# res = np.hstack((A, C))
-			# res = ["%s,%s" % (e[0], e[1]) for e in res]
-			# self.PClusterRes += res
 
 			# print "PIDList [0]: %s, res [0]: %s" % (self.PIDList[x][0], res[0])
 
@@ -100,9 +95,16 @@ class DBScanTFIntersections(object):
 
 			print "Direction No.%d, DS Cluster number: %d" % (x, n_clusters_)
 		
-		print "number of dbscan clusters in all: %d" % (self.dbscanBaseNum)
 		noiseRate = float(noiseNum)/totalNum
-		print "Total noise rate: %f" % (noiseRate)
+		print '''
+===	Stats Info	===
+Number of dbscan clusters in all:	%d
+Records(has CID):	%d
+Records(total):	%d
+Noise Rate:	%f
+===	Stats Info	===
+''' % (self.dbscanBaseNum, noiseNum, totalNum, noiseRate)
+
 		return noiseRate
 	
 	def outputToFile(self):
