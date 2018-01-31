@@ -70,13 +70,9 @@ def parseFormatGID(id, direction, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 	"""
 
 	LNGNUM = int((locs['east'] - locs['west']) / LngSPLIT + 1)
-	latind = 0
-	lngind = 0
-	nid = 0
 
 	latind = int(id / LNGNUM)
 	lngind = id - latind * LNGNUM
-	nid = id
 	
 	lat = (locs['south'] + latind * LatSPLIT)
 	lng = (locs['west'] + lngind * LngSPLIT)
@@ -92,7 +88,7 @@ def parseFormatGID(id, direction, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 	return {
 		'lat': latcen,
 		'lng': lngcen,
-		'nid': nid,
+		'nid': id,
 		'pid': -1,
 		'y': latind,
 		'x': lngind,
