@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # 
 # tripFlow 计算
+# 
+# python tripFlowCal.py -d /home/joe/Documents/git/fake -p /home/joe/Documents/git/fake -e 0.01 -m 40
 
 import sys
 import time
