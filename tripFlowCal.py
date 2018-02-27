@@ -21,14 +21,17 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 		'ODIRECTORY': stdoutdir
 	}
 	task = ExtractGridEdges(PROP)
-	res = task.run()
+	resByDir, resByCate = task.run()
+	dataType = 'category'  # direction, category
 
 	clusterofilename = ''
 	while (True):
 		clusterPROP = {
 			'index': x, 
 			'ODIRECTORY': stdoutdir,
-			'res': res,
+			'resByDir': resByDir,
+			'resByCate': resByCate,
+			'dataType': dataType,
 			'eps': eps,
 			'min_samples': min_samples
 		}
