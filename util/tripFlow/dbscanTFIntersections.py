@@ -19,10 +19,12 @@ class DBScanTFIntersections(object):
 		super(DBScanTFIntersections, self).__init__()
 		# self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-tf')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-res')
-		self.directionNum = 4
 		self.index = PROP['index']
-		self.res = PROP['res']
+		self.dataType = PROP['dataType']
+		self.resByCate = PROP['resByCate']
+		self.resByDir = PROP['resByDir']
 
+		self.directionNum = 4 if self.dataType == 'direction' else 2
 		self.dbLabel = [[] for x in xrange(0, self.directionNum)]
 		self.dbInput = [[] for x in xrange(0, self.directionNum)]
 		self.subInfo = [[] for x in xrange(0, self.directionNum)]
@@ -32,9 +34,17 @@ class DBScanTFIntersections(object):
 		self.dbscanBaseNum = 0
 
 	def run(self):
-		self.iterateResByDirection()
-		noiseRate = self.dbscanProcess()
-		ofilename = self.outputToFile()
+		noiseRate = None
+		ofilename = None
+		if self.dataType == 'direction':
+			self.iterateResByDirection()
+			noiseRate = self.dbscanCalByDirection()
+			ofilename = self.outputToFile()
+		else:
+			self.iterateResByCategory()
+			noiseRate = self.dbscanCalByCategory()
+			ofilename = self.outputToFile()
+		
 		return noiseRate, ofilename
 		
 	def iterateResByDirection(self):
@@ -42,7 +52,7 @@ class DBScanTFIntersections(object):
 		for x in xrange(0, self.directionNum):
 			currentDir = -1
 			
-			for line in self.res[x]:
+			for line in self.resByDir[x]:
 				linelist = line.split(',')
 
 				lng = float(linelist[0])
@@ -62,9 +72,41 @@ class DBScanTFIntersections(object):
 				subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 				self.subInfo[x].append([gid, gLng, gLat, subprops])
 
-			print "Direction: %s - process completed. Total %d records." % (currentDir, len(self.res[x]))
+			print "Direction: %s - process completed. Total %d records." % (currentDir, len(self.resByDir[x]))
 
-	def dbscanProcess(self):
+	def iterateResByCategory(self):
+		# 暂时只拿 from 的数据进行聚类，所以所有结果存在 index=0 的元素中
+		# for x in xrange(0, 2):
+		x = 0
+
+		accumulator = 0
+		for gid, tripsArray in self.resByCate.iteritems():
+			tripsLen = len(tripsArray)
+			tmpInput, tmpSubInfo = [], []
+			for index in xrange(0, tripsLen):
+				linelist = tripsArray[index].split(',')
+
+				lng = float(linelist[0])
+				lat = float(linelist[1])
+				gid = int(linelist[2])
+				gdirStr = linelist[3]
+				speed = linelist[4]
+				direction = linelist[5]
+				gidInfo = parseFormatGID(gid, 'e')
+				gLat = gidInfo['lat']
+				gLng = gidInfo['lng']
+
+				tmpInput.append([lng, lat])
+				subprops = "%s,%s,%s" % (gdirStr, speed, direction)
+				tmpSubInfo.append([gid, gLng, gLat, subprops])
+
+			self.dbInput[x] += tmpInput
+			self.subInfo[x] += tmpSubInfo
+			accumulator += 1
+		
+		print "Category: %s - process completed. Total %d gids." % ('from', len(self.dbInput[x]))
+
+	def dbscanCalByDirection(self):
 		# ######################
 		# Compute DBSCAN
 		# 
@@ -106,6 +148,49 @@ Noise Rate:	%f
 ''' % (self.dbscanBaseNum, noiseNum, totalNum, noiseRate)
 
 		return noiseRate
+
+# 	def dbscanCalByCategory(self):
+# 		# ######################
+# 		# Compute DBSCAN
+# 		# 
+# 		noiseNum, totalNum = 0, 0
+
+# 		for x in xrange(0, self.directionNum):
+# 			X = self.dbInput[x]
+# 			db = DBSCAN(eps=self.eps, min_samples=self.min_samples).fit(X)
+# 			core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+# 			core_samples_mask[db.core_sample_indices_] = True
+# 			labels = db.labels_
+
+# 			index = 0
+# 			totalNum += len(labels)
+# 			while index < len(labels):
+# 				if labels[index] != -1:
+# 					labels[index] += self.dbscanBaseNum
+# 				else:
+# 					noiseNum += 1
+# 				index += 1
+
+# 			# print "PIDList [0]: %s, res [0]: %s" % (self.PIDList[x][0], res[0])
+
+# 			# Number of clusters in labels, ignoring noise if present.
+# 			n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+# 			self.dbscanBaseNum += n_clusters_
+# 			self.dbLabel[x] = labels
+
+# 			print "Direction No.%d, DS Cluster number: %d" % (x, n_clusters_)
+		
+# 		noiseRate = float(noiseNum)/totalNum
+# 		print '''
+# ===	Stats Info	===
+# Number of dbscan clusters in all:	%d
+# Records(has CID):	%d
+# Records(total):	%d
+# Noise Rate:	%f
+# ===	Stats Info	===
+# ''' % (self.dbscanBaseNum, noiseNum, totalNum, noiseRate)
+
+# 		return noiseRate
 	
 	def outputToFile(self):
 		"""

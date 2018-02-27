@@ -12,6 +12,7 @@ from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import getRealDistance
 from util.tripFlow.base import getDirection
 from util.tripFlow.base import parseFormatGID
+from math import sqrt, pow
 
 
 class ExtractGridEdges(object):
@@ -20,7 +21,8 @@ class ExtractGridEdges(object):
 		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-tf')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-rec')
 		self.index = PROP['index']
-		self.res = {'e': {}, 'n': {}, 'w': {}, 's': {}}
+		self.resByDir = {'e': {}, 'n': {}, 'w': {}, 's': {}}  # 分方向结果
+		self.resByCate = {'from': {}, 'to': {}}  # 分进出结果
     
 	def run(self):
 		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))  # 小时文件
@@ -69,24 +71,7 @@ class ExtractGridEdges(object):
 						speed = distance / (toTime-fromTime)
 						direction = getDirection(fPoint, tPoint)  # w n s e 四个字符之一
 
-						# 处理方向与网格间的相交点
-						fGidIPoint, tGidIPoint = self.getIntersection(fPoint, tPoint, fromGid, toGid, direction)
-						fGidIPointStr = "%.6f,%.6f" % (fGidIPoint[0], fGidIPoint[1])
-						tGidIPointStr = "%.6f,%.6f" % (tGidIPoint[0], tGidIPoint[1])
-
-						# 结果字符串
-						fromVecStr = "%s,%d,from,%f,%s" % (fGidIPointStr, fromGid, speed, direction)
-						toVecStr = "%s,%d,to,%f,%s" % (tGidIPointStr, toGid, speed, direction)
-
-						if fromGid in self.res[direction].keys():
-							self.res[direction][fromGid].append(fromVecStr)
-						else:
-							self.res[direction][fromGid] = [fromVecStr]
-
-						if toGid in self.res[direction].keys():
-							self.res[direction][toGid].append(toVecStr)
-						else:
-							self.res[direction][toGid] = [toVecStr]
+						self.updateResByLine(fPoint, tPoint, fromGid, toGid, direction, speed)
 						
 						fromLat = toLat
 						fromLng = toLng
@@ -100,7 +85,60 @@ class ExtractGridEdges(object):
 		f.close()
 		print "Total %d records in this file." % (count)
 
-	def getIntersection(self, fPoint, tPoint, fromGid, toGid, direction):
+	def updateResByLine(self, fPoint, tPoint, fromGid, toGid, direction, speed):
+		# 处理方向与网格间的相交点
+		fGidIPoint, tGidIPoint = self.getGridIntersection(fPoint, tPoint, fromGid, toGid, direction)
+		fGidIPointStr = "%.6f,%.6f" % (fGidIPoint[0], fGidIPoint[1])
+		tGidIPointStr = "%.6f,%.6f" % (tGidIPoint[0], tGidIPoint[1])
+
+		# 分方向结果字符串
+		# [lng, lat, gid, from/to, speed, direction]
+		fromVecStr = "%s,%d,from,%f,%s" % (fGidIPointStr, fromGid, speed, direction)
+		toVecStr = "%s,%d,to,%f,%s" % (tGidIPointStr, toGid, speed, direction)
+
+		# 处理一：分方向的旅途元数据存储
+		if fromGid in self.resByDir[direction].keys():
+			self.resByDir[direction][fromGid].append(fromVecStr)
+		else:
+			self.resByDir[direction][fromGid] = [fromVecStr]
+
+		if toGid in self.resByDir[direction].keys():
+			self.resByDir[direction][toGid].append(toVecStr)
+		else:
+			self.resByDir[direction][toGid] = [toVecStr]
+		# END
+
+		fX = fPoint[1] - fGidIPoint[1]
+		fY = fPoint[0] - fGidIPoint[0]
+		tX = tPoint[1] - tGidIPoint[1]
+		tY = tPoint[0] - tGidIPoint[0]
+		fiDis = sqrt(pow(fX, 2) + pow(fY, 2))
+		tiDis = sqrt(pow(tX, 2) + pow(tY, 2))
+
+		tmpLng = fPoint[0] + (fGidIPoint[0] - fPoint[0]) / fiDis
+		tmpLat = fPoint[1] + (fGidIPoint[1] - fPoint[1]) / fiDis
+		fCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
+		fromCVecStr = "%s,%d,from,%f,%s" % (fCircleIPointStr, fromGid, speed, direction)
+
+		tmpLng = tPoint[0] + (tGidIPoint[0] - tPoint[0]) / tiDis
+		tmpLat = tPoint[1] + (tGidIPoint[1] - tPoint[1]) / tiDis
+		tCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
+		toCVecStr = "%s,%d,to,%f,%s" % (tCircleIPointStr, toGid, speed, direction)
+
+		# 处理二：分出入的旅途元数据（归一化向量）存储
+		if fromGid in self.resByCate['from'].keys():
+			self.resByCate['from'][fromGid].append(fromCVecStr)
+		else:
+			self.resByCate['from'][fromGid] = [fromCVecStr]
+
+		if toGid in self.resByCate['to'].keys():
+			self.resByCate['to'][toGid].append(toCVecStr)
+		else:
+			self.resByCate['to'][toGid] = [toCVecStr]
+
+		return 0
+
+	def getGridIntersection(self, fPoint, tPoint, fromGid, toGid, direction):
 		"""
 		计算交叉点，所有点格式均为 [lng, lat]
 			:param self: 
@@ -149,9 +187,6 @@ class ExtractGridEdges(object):
 			tIlat = b2 + (tGidLine - fromLng) * k
 			tGIPoint = [tGidLine,tIlat]
 
-		# 计算网格中心圆交点
-		
-		
 		return fGIPoint, tGIPoint
 	
 	def outputToFile(self):
@@ -166,7 +201,7 @@ class ExtractGridEdges(object):
 		i = 0
 		gidNum, recNum = 0, 0
 		memres = [[] for x in xrange(0, 4)]
-		for key, val in self.res.iteritems():  # 东西南北四个方向遍历
+		for key, val in self.resByDir.iteritems():  # 东西南北四个方向遍历
 			for subkey ,subval in val.iteritems():  # 每个方向里不同 gid 数据遍历，subval 为数组
 				gidNum += 1
 				recNum += len(subval)
@@ -181,4 +216,4 @@ class ExtractGridEdges(object):
 			f.write('\n'.join(ores))
 		f.close()
 
-		return memres
+		return memres, self.resByCate
