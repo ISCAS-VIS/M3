@@ -23,7 +23,7 @@ class ExtractGridEdges(object):
 		self.res = {'e': {}, 'n': {}, 'w': {}, 's': {}}
     
 	def run(self):
-		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))
+		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))  # 小时文件
 		
 		self.iterateFile(ifile)
 		return self.outputToFile()
@@ -41,7 +41,8 @@ class ExtractGridEdges(object):
 				count += 1
 				line = line.strip('\n')
 				linelist = line.split(',')
-
+				
+				# 旅程标识
 				no = "%s-%s-%s-%s" % (linelist[5], linelist[6], linelist[8], linelist[9])
 				toLat = linelist[3]
 				toLng = linelist[4]
@@ -68,7 +69,7 @@ class ExtractGridEdges(object):
 						speed = distance / (toTime-fromTime)
 						direction = getDirection(fPoint, tPoint)  # w n s e 四个字符之一
 
-						# 处理相交点
+						# 处理方向与网格间的相交点
 						fGidIPoint, tGidIPoint = self.getIntersection(fPoint, tPoint, fromGid, toGid, direction)
 						fGidIPointStr = "%.6f,%.6f" % (fGidIPoint[0], fGidIPoint[1])
 						tGidIPointStr = "%.6f,%.6f" % (tGidIPoint[0], tGidIPoint[1])
@@ -100,7 +101,15 @@ class ExtractGridEdges(object):
 		print "Total %d records in this file." % (count)
 
 	def getIntersection(self, fPoint, tPoint, fromGid, toGid, direction):
-		# [lng, lat]
+		"""
+		计算交叉点，所有点格式均为 [lng, lat]
+			:param self: 
+			:param fPoint: 来源点
+			:param tPoint: 到达点
+			:param fromGid: 来源 gid
+			:param toGid: 到达 gid
+			:param direction: 方向
+		"""
 
 		fGIPoint, tGIPoint = [], []
 		fromLat = float(fPoint[1])
@@ -124,7 +133,7 @@ class ExtractGridEdges(object):
 		tLng = ptRes['lng']
 		tLat = ptRes['lat']
 
-		# 计算交点
+		# 计算网格方边交点
 		if direction in ['n', 's']:  # 与平行维度线相交
 			k = (toLng - fromLng) / (toLat - fromLat)
 			b1, b2 = fLng, tLng
@@ -140,6 +149,9 @@ class ExtractGridEdges(object):
 			tIlat = b2 + (tGidLine - fromLng) * k
 			tGIPoint = [tGidLine,tIlat]
 
+		# 计算网格中心圆交点
+		
+		
 		return fGIPoint, tGIPoint
 	
 	def outputToFile(self):
@@ -155,7 +167,7 @@ class ExtractGridEdges(object):
 		gidNum, recNum = 0, 0
 		memres = [[] for x in xrange(0, 4)]
 		for key, val in self.res.iteritems():  # 东西南北四个方向遍历
-			for subkey ,subval in val.iteritems():  # 每个方向里不同 gid 数据遍历
+			for subkey ,subval in val.iteritems():  # 每个方向里不同 gid 数据遍历，subval 为数组
 				gidNum += 1
 				recNum += len(subval)
 				ores.append('\n'.join(subval))

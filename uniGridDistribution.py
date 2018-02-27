@@ -38,6 +38,9 @@ city	-c	city or region name, such as beijing
 directory	-d	the root directory of records and results, such as /China/beijing
 inum	-i	number of input files
 onum	-o	number of output files
+
+e.g. 
+python ./uniGridDistribution.py -i 3999 -o 20 -d /enigma/tao.jiang/datasets/JingJinJi/records
 '''
 
 

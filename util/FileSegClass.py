@@ -10,6 +10,8 @@
 # 
 # [tripFlow-x] 
 # hour, id, time, lat, lng, from_lat, from_lng, from_time, to_lat, to_Lng, to_time
+# 
+# 现使用处理方式为只过滤 travel 的数据
 
 import logging
 import os
@@ -72,7 +74,7 @@ class FileSegByHour(object):
 		logging.info('End Job-%d' % (self.INDEX))
 
 	def iterateFile(self, ifile):
-    	# stay travel 都处理的情况
+		# stay travel 都处理的情况
 		with open(ifile, 'rb') as stream:
 			for line in stream:
 				line = line.strip('\n')
@@ -100,7 +102,8 @@ class FileSegByHour(object):
 				newLinePreStr = "%s,%d,%d,%d,%d" % (id, seg, hour, wday, gid)
 
 				# 分状态处理原始数据
-				# S 时 currentDatasets 数据重置（重置前查看是否需要转存上一段 T 的数据）， T 时对比当前 from 是否为初始状态，若为初始状态当前数据存在 from，否则存在 to
+				# S 时 currentDatasets 数据重置（重置前查看是否需要转存上一段 T 的数据）
+				# T 时对比当前 from 是否为初始状态，若为初始状态当前数据存在 from，否则存在 to
 				if state == 'T':
 					if self.currentDatasets['fromLatLng'][0] == 0:
 						self.currentDatasets['fromLatLng'] = [linelist[3], linelist[2]]

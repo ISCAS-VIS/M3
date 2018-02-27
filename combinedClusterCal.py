@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
+# 先 MeanShift 再 DBScan 记录，在最新版数据中未使用
 
 
 import sys

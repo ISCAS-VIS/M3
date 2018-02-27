@@ -96,7 +96,7 @@ util/
 | 依赖项 | 无 |
 | 输入 | bj-byday 中按天分的预处理后的数据文件 |
 | 输出 | bj-newvis 中 nodes 文件 |
-| 外部调用 | ugd-speedup.py |
+| 外部调用 | uniGridDistribution-speedup.py |
 | 使用进程 | 20 |
 
 * `UniPOIDisBasic.py` - 改进后计算脚本，适用于 0.0005 精度 Grid 映射 POI 的聚集数据计算方案
@@ -124,7 +124,7 @@ util/
 | 使用进程 | 1 |
 
 * `GridPropMatchAdmin.py` - 废弃，由原始数据提供商处理完加入到原始数据字段中
-* `UniAdmDisBasic.py` - 空
+* `uniAdmDisBasic.py` - 空
 
 * `UniPOIEdgeBasic.py` - POI 到 POI 的边权聚集脚本
 

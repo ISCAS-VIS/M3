@@ -32,12 +32,12 @@ class DBScanTFIntersections(object):
 		self.dbscanBaseNum = 0
 
 	def run(self):
-		self.iterateRes()
+		self.iterateResByDirection()
 		noiseRate = self.dbscanProcess()
 		ofilename = self.outputToFile()
 		return noiseRate, ofilename
 		
-	def iterateRes(self):
+	def iterateResByDirection(self):
 		# 四个方向分别聚类
 		for x in xrange(0, self.directionNum):
 			currentDir = -1
