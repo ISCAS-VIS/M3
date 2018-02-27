@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# 将切分成天的数据按照小时进行切分存储，且只保留 travel 状态数据
+# 将切分成天的数据按照小时进行切分存储，且只保留 travel 状态数据，该部分逻辑在 segRawData 中实现，不包含在本脚本中
+# 运行依赖： rawdata-%d 已经在脚本 segRawData.py 中处理完毕
 
 import os
 

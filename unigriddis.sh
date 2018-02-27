@@ -1,1 +1,0 @@
-python ./uniGridDistribution.py -i 3999 -o 20 -d /enigma/tao.jiang/datasets/JingJinJi/records
