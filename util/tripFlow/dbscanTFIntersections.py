@@ -113,15 +113,15 @@ class DBScanTFIntersections(object):
 
 				accumulator += 1
 			
-			noiseRate = noiseNum / totalNum
+			noiseRate = float(noiseNum) / totalNum
 			print '''
-	===	Stats Info	===
-	Number of dbscan clusters in all:	%d
-	Grid ID number: %d
-	Records(total):	%d
-	Noise Rate:	%f
-	===	Stats Info	===
-	''' % (self.dbscanBaseNum, len(self.dbInput[x]), totalNum, noiseRate)
+===	DBScan Info	===
+Number of dbscan clusters in all:	%d
+Grid ID number: %d
+Records(total):	%d
+Noise Rate:	%f
+===	DBScan Info	===
+''' % (self.dbscanBaseNum, accumulator, totalNum, noiseRate)
 
 		return noiseRate
 
@@ -158,12 +158,12 @@ class DBScanTFIntersections(object):
 		
 		noiseRate = float(noiseNum)/totalNum
 		print '''
-===	Stats Info	===
+===	DBScan Info	===
 Number of dbscan clusters in all:	%d
 Records(has CID):	%d
 Records(total):	%d
 Noise Rate:	%f
-===	Stats Info	===
+===	DBScan Info	===
 ''' % (self.dbscanBaseNum, noiseNum, totalNum, noiseRate)
 
 		return noiseRate

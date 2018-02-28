@@ -25,7 +25,13 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 	dataType = 'category'  # direction, category
 
 	clusterofilename = ''
+	iterationTimes = 0
 	while (True):
+		if (iterationTimes == 10):
+			eps -= 0.005
+			min_samples -= 5
+			iterationTimes = 0
+		
 		clusterPROP = {
 			'index': x, 
 			'ODIRECTORY': stdoutdir,
@@ -36,13 +42,13 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 			'min_samples': min_samples
 		}
 		print '''
-===	Cluster Opts	===
+===	Cluster Parameters	===
 index	= %d
 stdindir	= %s
 stdoutdir	= %s
 eps		= %f
 min_samples	= %d
-===	Cluster Opts	===
+===	Cluster Parameters	===
 ''' % (x, stdindir, stdoutdir, eps, min_samples)
 
 		clusterTask = DBScanTFIntersections(clusterPROP)
@@ -52,6 +58,7 @@ min_samples	= %d
 			break
 		else:
 			eps += 0.001
+			iterationTimes += 1
 
 	mergePROP = {
 		'index': x, 
