@@ -77,11 +77,12 @@ class DBScanTFIntersections(object):
 		# 暂时只拿 from 的数据进行聚类，所以所有结果存在 index=0 的元素中
 		# noiseRate 只会返回最后一个计算的结果，如果 from/to 均计算过，只有一个结果被保留
 		noiseRate = 0
+		cateKeys = {0: 'from', 1: 'to'}
 
 		for x in xrange(0, self.typeNum):
 			accumulator = 0
 			totalNum, noiseNum = 0, 0
-			for gid, tripsArray in self.resByCate.iteritems():
+			for gid, tripsArray in self.resByCate[cateKeys[x]].iteritems():
 				tripsLen = len(tripsArray)
 				totalNum += tripsLen
 				tmpInput, tmpSubInfo = [], []
