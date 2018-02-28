@@ -48,9 +48,10 @@ class MergeClusterEdges(object):
 				gLat = float(linelist[5])
 				gLng = float(linelist[4])
 
+				# gdirStr: from/to
 				[gdirStr, speed, direction] = linelist[6:9]
 
-				id = "%d-%s" % (gid, direction) 
+				id = "%d-%s" % (gid, direction) if self.dataType == 'direction' else str(gid)
 				subid = "%d-%s" % (cid, gdirStr)
 				onerec = [cid, lng, lat, gid, gLng, gLat, gdirStr, speed]
 				
