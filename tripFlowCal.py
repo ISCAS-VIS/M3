@@ -3,7 +3,8 @@
 # 
 # tripFlow 计算
 # 
-# python tripFlowCal.py -d /home/joe/Documents/git/fake -p /home/joe/Documents/git/fake -e 0.01 -m 40
+# python tripFlowCal.py -d /home/joe/Documents/git/fake -p /home/joe/Documents/git/fake -e 0.01 -m 40 [grid]
+# [circle]
 
 import sys
 import time
@@ -23,12 +24,13 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 	task = ExtractGridEdges(PROP)
 	resByDir, resByCate = task.run()
 	dataType = 'category'  # direction, category
+	EPS_INTERVAL = 0.001 if dataType == 'direction' else 0.4
 
 	clusterofilename = ''
 	iterationTimes = 0
 	while (True):
-		if (iterationTimes == 10):
-			eps -= 0.005
+		if (iterationTimes == 50):
+			eps -= EPS_INTERVAL*50
 			min_samples -= 5
 			iterationTimes = 0
 		
@@ -57,7 +59,7 @@ min_samples	= %d
 		if noiseRate <= 0.5:
 			break
 		else:
-			eps += 0.001
+			eps += EPS_INTERVAL
 			iterationTimes += 1
 
 	mergePROP = {
