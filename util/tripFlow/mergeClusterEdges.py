@@ -17,10 +17,11 @@ class MergeClusterEdges(object):
 		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-res')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-res')
 		self.index = PROP['index']
+		self.dataType = PROP['dataType']
 		self.res = []
 
 	def run(self):
-		ifile = os.path.join(self.INPUT_PATH, 'tfres-%d' % (self.index))
+		ifile = os.path.join(self.INPUT_PATH, 'tfres-%s-%d' % (self.dataType, self.index))
 		totalNum = self.iterateFile(ifile)
 		print "One edge is consisted of %d records averagely." % (totalNum/len(self.res))
 
@@ -126,7 +127,7 @@ class MergeClusterEdges(object):
 			:param res: 
 		"""
 
-		ofilename = 'mcres-%d' % (self.index)
+		ofilename = 'mcres-%s-%d' % (self.dataType, self.index)
 		ofile = os.path.join(self.OUTPUT_PATH, ofilename)
 		with open(ofile, 'wb') as f:
 			f.write('\n'.join(self.res))
