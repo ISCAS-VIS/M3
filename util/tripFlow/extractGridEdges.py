@@ -211,7 +211,18 @@ class ExtractGridEdges(object):
 		
 		print "Total %d gids and %d records in four directions" % (gidNum, recNum)
 
-		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-%d' % (self.index))
+		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-direction-%d' % (self.index))
+		with open(ofile, 'wb') as f:
+			f.write('\n'.join(ores))
+		f.close()
+
+		# Category
+		ores = []
+		for key, val in self.resByCate.iteritems():  # 东西南北四个方向遍历
+			for subkey ,subval in val.iteritems():  # 每个方向里不同 gid 数据遍历，subval 为数组
+				ores.append('\n'.join(subval))
+		
+		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-category-%d' % (self.index))
 		with open(ofile, 'wb') as f:
 			f.write('\n'.join(ores))
 		f.close()

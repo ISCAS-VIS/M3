@@ -56,7 +56,8 @@ min_samples	= %d
 	mergePROP = {
 		'index': x, 
 		'IDIRECTORY': stdindir, 
-		'ODIRECTORY': stdoutdir
+		'ODIRECTORY': stdoutdir,
+		'dataType': dataType
 	}
 	mergeTask = MergeClusterEdges(mergePROP)
 	mergeTask.run()
