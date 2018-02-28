@@ -7,8 +7,8 @@ git checkout dev
 git add .
 # commit changes
 read commitMessage
-now = $(date +"%Y-%m-%d %H:%M:%S")
-git commit -am "[$now] $commitMessage"
+NOW = $(date +"%Y-%m-%d %H:%M:%S")
+git commit -am "[$NOW] $commitMessage"
 # push to git remote repository
 git push origin dev
 ###########################
