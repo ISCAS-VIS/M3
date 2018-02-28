@@ -171,6 +171,7 @@ Noise Rate:	%f
 	def dbscanCalByCategory(self, X):
 		# ######################
 		# Compute DBSCAN
+		noiseNum = 0
 
 		db = DBSCAN(eps=self.eps, min_samples=self.min_samples).fit(X)
 		core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
@@ -178,10 +179,12 @@ Noise Rate:	%f
 		labels = db.labels_
 
 		index = 0
+		labelOutput = []
 		while index < len(labels):
 			if labels[index] != -1:
-				labels[index] += self.dbscanBaseNum
+				labelOutput.append(labels[index] + self.dbscanBaseNum)
 			else:
+				labelOutput.append(-1)
 				noiseNum += 1
 			index += 1
 
@@ -189,7 +192,7 @@ Noise Rate:	%f
 		n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 		self.dbscanBaseNum += n_clusters_
 		return {
-			'labels': labels, 
+			'labels': labelOutput, 
 			'noiseNum': noiseNum
 		}
 
