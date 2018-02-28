@@ -62,8 +62,8 @@ class ExtractGridEdges(object):
 						if (fromLat == toLat and fromLng == toLng) or fromTime == toTime:
 							continue
 
-						fPoint = [fromLng, fromLat]
-						tPoint = [toLng, toLat]
+						fPoint = [float(fromLng), float(fromLat)]
+						tPoint = [float(toLng), float(toLat)]
 
 						fromGid = getFormatGID(fPoint)['gid']
 						toGid = getFormatGID(tPoint)['gid']
