@@ -23,7 +23,7 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 	}
 	task = ExtractGridEdges(PROP)
 	resByDir, resByCate = task.run()
-	dataType = 'category'  # direction, category
+	dataType = 'category'  # 确定是按照方向聚类还是角度聚类 direction, category
 	EPS_INTERVAL = 0.001 if dataType == 'direction' else 0.4
 
 	clusterofilename = ''

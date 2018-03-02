@@ -8,11 +8,12 @@
 # [lng, lat, gid, from/to, speed, direction]
 
 import os
+import json
 from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import getRealDistance
 from util.tripFlow.base import getDirection
 from util.tripFlow.base import parseFormatGID
-from math import sqrt, pow
+from math import sqrt, pow, acos, pi
 
 
 class ExtractGridEdges(object):
@@ -118,12 +119,14 @@ class ExtractGridEdges(object):
 		tmpLng = fPoint[0] + (fGidIPoint[0] - fPoint[0]) / fiDis
 		tmpLat = fPoint[1] + (fGidIPoint[1] - fPoint[1]) / fiDis
 		fCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
-		fromCVecStr = "%s,%d,from,%f,%s" % (fCircleIPointStr, fromGid, speed, direction)
+		fangle = acos(tmpLat) * 180 / pi
+		fromCVecStr = "%s,%d,from,%f,%s,%.1f" % (fCircleIPointStr, fromGid, speed, direction, fangle)
 
 		tmpLng = tPoint[0] + (tGidIPoint[0] - tPoint[0]) / tiDis
 		tmpLat = tPoint[1] + (tGidIPoint[1] - tPoint[1]) / tiDis
 		tCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
-		toCVecStr = "%s,%d,to,%f,%s" % (tCircleIPointStr, toGid, speed, direction)
+		tangle = acos(tmpLat) * 180 / pi
+		toCVecStr = "%s,%d,to,%f,%s,%.1f" % (tCircleIPointStr, toGid, speed, direction, tangle)
 
 		# 处理二：分出入的旅途元数据（归一化向量）存储
 		if fromGid in self.resByCate['from'].keys():
@@ -216,15 +219,10 @@ class ExtractGridEdges(object):
 			f.write('\n'.join(ores))
 		f.close()
 
-		# Category
-		ores = []
-		for key, val in self.resByCate.iteritems():  # 东西南北四个方向遍历
-			for subkey ,subval in val.iteritems():  # 每个方向里不同 gid 数据遍历，subval 为数组
-				ores.append('\n'.join(subval))
-		
-		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-category-%d' % (self.index))
+		# smooth - Category and angle
+		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-smooth-%d.json' % (self.index))
 		with open(ofile, 'wb') as f:
-			f.write('\n'.join(ores))
+			json.dump(self.resByCate, f)
 		f.close()
 
 		return memres, self.resByCate
