@@ -9,8 +9,6 @@
 # [clusterID, lng, lat, gid, gLng, gLat, from/to, speed, direction]
 
 import os
-import numpy as np
-from sklearn.cluster import DBSCAN
 from util.tripFlow.base import parseFormatGID
 from util.tripFlow.LinkList import LinkList
 
@@ -36,6 +34,8 @@ class LineTFIntersections(object):
 	def run(self):
 		noiseRate = self.iterateRes()
 		ofilename = self.outputToFile()
+
+		return noiseRate, ofilename 
 
 	def iterateRes(self):
 		cateKeys = {0: 'from', 1: 'to'}
@@ -90,7 +90,7 @@ Noise Rate:	%f
 
 	def lineCLusterCalculation(self, angleArray):
 		angleList = [0 for x in xrange(0, 720)]
-		visitedList = [0 for x in xrange(0, 720)]
+		# visitedList = [0 for x in xrange(0, 720)]
 		labelList = {}
 		res = []
 		arrayLen = len(angleArray)
@@ -170,7 +170,7 @@ Noise Rate:	%f
 					# 没有新增
 					break
 				else:
-    				lIndex, rIndex = tmplIndex, tmprIndex
+					lIndex, rIndex = tmplIndex, tmprIndex
 					lAngle, rAngle = tmplAngle, tmprAngle
 					tfNum = tmptfNum
 			
@@ -199,7 +199,7 @@ Noise Rate:	%f
 				cIndex = lIndex
 				x = 0
 				while(x < lIndex):
-    				tmpItem = ALL.getitem(x)
+					tmpItem = ALL.getitem(x)
 					tmpAngle = tmpItem['index'] % 360
 					notCross = tmpAngle >= lAngle and tmpAngle <= rAngle
 					comeCross = rAngle < lAngle and (tmpAngle >= lAngle or tmpAngle <= rAngle)
