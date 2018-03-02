@@ -116,16 +116,22 @@ class ExtractGridEdges(object):
 		fiDis = sqrt(pow(fX, 2) + pow(fY, 2))
 		tiDis = sqrt(pow(tX, 2) + pow(tY, 2))
 
-		tmpLng = fPoint[0] + (fGidIPoint[0] - fPoint[0]) / fiDis
-		tmpLat = fPoint[1] + (fGidIPoint[1] - fPoint[1]) / fiDis
+		angleLng = (fGidIPoint[0] - fPoint[0]) / fiDis
+		angleLat = (fGidIPoint[1] - fPoint[1]) / fiDis
+		tmpLng = fPoint[0] + angleLng
+		tmpLat = fPoint[1] + angleLat
 		fCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
-		fangle = acos(tmpLat) * 180 / pi
+		# print tmpLat
+		fangle = acos(angleLat) * 180 / pi
 		fromCVecStr = "%s,%d,from,%f,%s,%.1f" % (fCircleIPointStr, fromGid, speed, direction, fangle)
 
-		tmpLng = tPoint[0] + (tGidIPoint[0] - tPoint[0]) / tiDis
-		tmpLat = tPoint[1] + (tGidIPoint[1] - tPoint[1]) / tiDis
+		angleLat = (tGidIPoint[1] - tPoint[1]) / tiDis
+		angleLng = (tGidIPoint[0] - tPoint[0]) / tiDis
+		tmpLng = tPoint[0] + angleLng
+		tmpLat = tPoint[1] + angleLat
 		tCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
-		tangle = acos(tmpLat) * 180 / pi
+		# print tmpLat
+		tangle = acos(angleLat) * 180 / pi
 		toCVecStr = "%s,%d,to,%f,%s,%.1f" % (tCircleIPointStr, toGid, speed, direction, tangle)
 
 		# 处理二：分出入的旅途元数据（归一化向量）存储
