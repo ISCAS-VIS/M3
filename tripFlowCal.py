@@ -13,6 +13,7 @@ import getopt
 from util.tripFlow.extractGridEdges import ExtractGridEdges
 from util.tripFlow.dbscanTFIntersections import DBScanTFIntersections
 from util.tripFlow.mergeClusterEdges import MergeClusterEdges
+from util.tripFlow.lineTFIntersections import LineTFIntersections
 
 			
 def processTask(x, eps, min_samples, stdindir, stdoutdir): 
@@ -23,11 +24,12 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 	}
 	task = ExtractGridEdges(PROP)
 	resByDir, resByCate = task.run()
-	dataType = 'category'  # 确定是按照方向聚类还是角度聚类 direction, category
+	dataType = 'angle'  # 确定是按照方向聚类还是角度聚类 direction, category
 	EPS_INTERVAL = 0.001 if dataType == 'direction' else 0.4
 
 	clusterofilename = ''
 	iterationTimes = 0
+
 	while (True):
 		if (iterationTimes == 50):
 			eps -= EPS_INTERVAL*50
@@ -52,6 +54,12 @@ eps		= %f
 min_samples	= %d
 ===	Cluster Parameters	===
 ''' % (x, stdindir, stdoutdir, eps, min_samples)
+
+		# 角度聚类单独处理
+		if dataType == 'angle':
+			clusterTask = LineTFIntersections(clusterPROP)
+			noiseRate, clusterofilename = clusterTask.run()
+			break
 
 		clusterTask = DBScanTFIntersections(clusterPROP)
 		noiseRate, clusterofilename = clusterTask.run()
