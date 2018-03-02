@@ -56,7 +56,7 @@ class LineTFIntersections(object):
 					gdirStr = linelist[3]
 					speed = linelist[4]
 					direction = linelist[5]
-					angle = int(linelist[6])
+					angle = int(float(linelist[6]))
 					gidInfo = parseFormatGID(gid, 'e')
 					gLat = gidInfo['lat']
 					gLng = gidInfo['lng']
@@ -116,10 +116,10 @@ Noise Rate:	%f
 		sIndex = 0
 		while(ALL.getitem(sIndex)['index'] < 180):
 			sIndex += 1
-		eIndex = sIndex+1
-		while(ALL.getitem(eIndex)['index'] < 540):
-			eIndex += 1
-		eIndex -= 1
+		# eIndex = sIndex+1
+		# while(ALL.getitem(eIndex)['index'] < 540):
+		# 	eIndex += 1
+		# eIndex -= 1
 
 		cIndex = sIndex
 		clusteID = 0
