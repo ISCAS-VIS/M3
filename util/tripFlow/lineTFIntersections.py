@@ -43,15 +43,15 @@ class LineTFIntersections(object):
 		for x in xrange(0, self.typeNum):
 			accumulator = 0
 			totalNum, noiseNum = 0, 0
-			for gid, tripsArray in self.resByCate[cateKeys[x]].iteritems():
+			for gid, tripsArray in self.resByAng[cateKeys[x]].iteritems():
 				tripsLen = len(tripsArray)
 				totalNum += tripsLen
 				tmpLngLat, tmpAngle, tmpSubInfo = [], [], []
 				for index in xrange(0, tripsLen):
 					linelist = tripsArray[index].split(',')
 
-					lng = float(linelist[0])
-					lat = float(linelist[1])
+					# lng = float(linelist[0])
+					# lat = float(linelist[1])
 					gid = int(linelist[2])
 					gdirStr = linelist[3]
 					speed = linelist[4]
@@ -61,7 +61,7 @@ class LineTFIntersections(object):
 					gLat = gidInfo['lat']
 					gLng = gidInfo['lng']
 					
-					tmpLngLat.append([lng, lat])
+					tmpLngLat.append(linelist[0] + ',' + linelist[1])
 					tmpAngle.append(angle)
 					subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 					tmpSubInfo.append("%d,%.6f,%.6f,%s" % (gid, gLng, gLat, subprops))
@@ -239,7 +239,7 @@ Noise Rate:	%f
 		for i in xrange(0, self.typeNum):
 			for j in xrange(0, len(self.dbLabel[i])):
 				label = self.dbLabel[i][j]
-				lngLatStr = "%.6f,%.6f" % (self.dbInput[i][j][0], self.dbInput[i][j][1])
+				lngLatStr = self.dbInput[i][j]
 				subInfoStr = self.subInfo[i][j]
 				onerecStr = "%s,%s,%s" % (label, lngLatStr, subInfoStr)
 				ores.append(onerecStr)
