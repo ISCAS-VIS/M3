@@ -41,6 +41,7 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 			'ODIRECTORY': stdoutdir,
 			'resByDir': resByDir,
 			'resByCate': resByCate,
+			'resByAng': resByCate,
 			'dataType': dataType,
 			'eps': eps,
 			'min_samples': min_samples
