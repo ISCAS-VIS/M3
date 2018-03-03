@@ -125,9 +125,10 @@ class LinkList(object):
 			return
 
 		if index == 0:
-			q = Node(item, self.head)
-
-			self.head = q
+			p = self.head
+			self.head = p.next
+			self.head.prev = 0
+			return 
 
 		p = self.head
 		post  = self.head
