@@ -123,10 +123,10 @@ class LinkList(object):
 			print 'Linklist is empty.'
 			return
 		
-		if self.getlength() == 1:
-			self.head = 0
-
 		if index == 0:
+			if self.getlength() == 1:
+				self.head = 0
+				return 
 			p = self.head
 			self.head = p.next
 			self.head.prev = 0
