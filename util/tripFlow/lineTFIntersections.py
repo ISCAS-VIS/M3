@@ -173,6 +173,7 @@ Noise Rate:	%f
 					lIndex, rIndex = tmplIndex, tmprIndex
 					lAngle, rAngle = tmplAngle, tmprAngle
 					tfNum = tmptfNum
+					endFlag = True
 				print "rho iteration"
 			
 			# 满足 cluster 条件，否则放弃
