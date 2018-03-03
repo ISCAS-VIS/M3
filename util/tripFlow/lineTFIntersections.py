@@ -153,7 +153,7 @@ Noise Rate:	%f
 					else:
 						break
 				
-				while tmprIndex < listLen:
+				while tmprIndex < (listLen-1):
 					tmpItem = ALL.getitem(tmprIndex+1)
 					tmpNum = tmpItem['data']
 					tRho = (tmpNum + tfNum) / (tmpItem['index'] - lAngle + 1)
