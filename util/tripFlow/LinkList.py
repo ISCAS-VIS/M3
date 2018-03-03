@@ -50,14 +50,14 @@ class LinkList(object):
 	def getlength(self):
 		p = self.head
 		length = 0
-		while p!=0:
-			length+=1
+		while p != 0:
+			length += 1
 			p = p.next
 
 		return length
 
 	def is_empty(self):
-		if self.getlength() ==0:
+		if self.getlength() == 0:
 			return True
 		else:
 			return False
@@ -65,10 +65,9 @@ class LinkList(object):
 	def clear(self):
 		self.head = 0
 
-
 	def append(self, item):
 		q = Node(item)
-		if self.head ==0:
+		if self.head == 0:
 			self.head = q
 		else:
 			p = self.head
@@ -120,9 +119,12 @@ class LinkList(object):
 			p.prev = q
 
 	def delete(self, index):
-		if self.is_empty() or index<0 or index >self.getlength():
+		if self.is_empty() or index < 0 or index > self.getlength():
 			print 'Linklist is empty.'
 			return
+		
+		if self.getlength() == 1:
+			self.head = 0
 
 		if index == 0:
 			p = self.head
