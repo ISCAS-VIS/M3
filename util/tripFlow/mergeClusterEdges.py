@@ -23,7 +23,8 @@ class MergeClusterEdges(object):
 	def run(self):
 		ifile = os.path.join(self.INPUT_PATH, 'tfres-%s-%d' % (self.dataType, self.index))
 		totalNum = self.iterateFile(ifile)
-		print "One edge is consisted of %d records averagely." % (totalNum/len(self.res))
+		if len(self.res) != 0:
+			print "One edge is consisted of %d records averagely." % (totalNum/len(self.res))
 
 		self.outputToFile()
 		
