@@ -174,11 +174,11 @@ Noise Rate:	%f
 					lAngle, rAngle = tmplAngle, tmprAngle
 					tfNum = tmptfNum
 					endFlag = True
-				print "rho iteration"
+				# print "rho iteration"
 			
 			# 满足 cluster 条件，否则放弃
 			if tfNum >= N:
-				for x in xrange(lIndex, rIndex+1):
+				for x in xrange(rIndex, lIndex-1):
 					angle = ALL.getitem(x)['index'] % 360
 					if angle not in labelList.keys():
 						labelList[angle] = clusteID + self.dbscanBaseNum
