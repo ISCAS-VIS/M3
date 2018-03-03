@@ -112,8 +112,8 @@ class LinkList(object):
 			p = p.next
 			j+=1
 
-		if index ==j:
-			q = Node(item,p)
+		if index == j:
+			q = Node(item, p)
 			post.next = q
 			q.prev = post
 			q.next = p
@@ -124,22 +124,23 @@ class LinkList(object):
 			print 'Linklist is empty.'
 			return
 
-		if index ==0:
-			q = Node(item,self.head)
+		if index == 0:
+			q = Node(item, self.head)
 
 			self.head = q
 
 		p = self.head
 		post  = self.head
 		j = 0
-		while p.next!=0 and j<index:
+		while p.next != 0 and j < index:
 			post = p
 			p = p.next
 			j+=1
 
-		if index ==j:
+		if index == j:
 			post.next = p.next
-			p.next.prev = post
+			if p.next != 0: 
+				p.next.prev = post
 
 	def index(self, value):
 		if self.is_empty():
