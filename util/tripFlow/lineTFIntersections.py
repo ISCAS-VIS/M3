@@ -173,6 +173,7 @@ Noise Rate:	%f
 					lIndex, rIndex = tmplIndex, tmprIndex
 					lAngle, rAngle = tmplAngle, tmprAngle
 					tfNum = tmptfNum
+				print "rho iteration"
 			
 			# 满足 cluster 条件，否则放弃
 			if tfNum >= N:
@@ -195,6 +196,8 @@ Noise Rate:	%f
 						ALL.delete(x)
 					else:
 						x += 1
+					
+					print "left to the last iteration"
 				
 				cIndex = lIndex
 				x = 0
@@ -208,6 +211,8 @@ Noise Rate:	%f
 						cIndex -= 1
 					else:
 						x += 1
+					
+					print "0 to left iteration"
 			else:
 				cIndex += 1
 
