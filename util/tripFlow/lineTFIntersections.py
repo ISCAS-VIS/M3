@@ -198,7 +198,7 @@ Noise Rate:	%f
 					else:
 						x += 1
 					
-					print "left to the last iteration"
+					# print "left to the last iteration"
 				
 				cIndex = lIndex
 				x = 0
@@ -210,6 +210,7 @@ Noise Rate:	%f
 					if notCross or comeCross:
 						ALL.delete(x)
 						cIndex -= 1
+						lIndex -= 1
 					else:
 						x += 1
 					
