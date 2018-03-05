@@ -31,7 +31,7 @@ Edges in total:	%d
 Records used in clusters:	%d
 One edge is consisted of %d records averagely
 ===	Edge Merging Info	===
-''' % (totalNum, len(self.res), totalNum/len(self.res))
+''' % (len(self.res), totalNum, totalNum/len(self.res))
 
 		self.outputToFile()
 		
