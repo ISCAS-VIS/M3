@@ -180,7 +180,7 @@ Noise Rate:	%f
 			# 满足 cluster 条件，否则放弃
 			# print "tfNum: %d" % tfNum
 			if tfNum >= N:
-				print "Current tfNum is %d, lIndex is %d, rIndex is %d, clusterID is %d" % (tfNum, lIndex, rIndex, clusteID)
+				# print "Current tfNum is %d, lIndex is %d, rIndex is %d, clusterID is %d" % (tfNum, lIndex, rIndex, clusteID)
 				for x in xrange(rIndex, lIndex-1, -1):
 					angle = ALL.getitem(x)['index'] % 360
 					angle = str(angle)
@@ -219,11 +219,13 @@ Noise Rate:	%f
 						x += 1
 					
 					# print "0 to left iteration"
+				
+				# 只有聚类成功才增加 clusteID
+				clusteID += 1
 			else:
 				cIndex += 1
 
 			# 扫尾工作
-			clusteID += 1
 			listLen = ALL.getlength()
 
 		# 返回结果计算
