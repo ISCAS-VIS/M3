@@ -123,6 +123,7 @@ Noise Rate:	%f
 
 		cIndex = sIndex
 		clusteID = 0
+		print "Start from %d" % cIndex
 		while(cIndex < listLen):
 			base = ALL.getitem(cIndex)
 			tfNum, lIndex, rIndex = base['data'], cIndex, cIndex
@@ -132,7 +133,7 @@ Noise Rate:	%f
 				break
 
 			# 左右循环直至没有新元素加入则停止，并做好标记和删除工作
-			cRho = tfNum / (rAngle - lAngle + 1)
+			cRho = tfNum * self.eps / (rAngle - lAngle + 1)
 			endFlag = True
 			# 密度符合条件的情况下则一直向两边遍历
 			while (cRho >= rho):
@@ -143,7 +144,7 @@ Noise Rate:	%f
 				while tmplIndex > 0:
 					tmpItem = ALL.getitem(tmplIndex-1)
 					tmpNum = tmpItem['data']
-					tRho = (tmpNum + tfNum) / (rAngle - tmpItem['index'] + 1)
+					tRho = (tmpNum + tmptfNum) * self.eps / (rAngle - tmpItem['index'] + 1)
 					if tRho >= rho:
 						tmplIndex -= 1
 						tmplAngle = tmpItem['index']
@@ -156,7 +157,7 @@ Noise Rate:	%f
 				while tmprIndex < (listLen-1):
 					tmpItem = ALL.getitem(tmprIndex+1)
 					tmpNum = tmpItem['data']
-					tRho = (tmpNum + tfNum) / (tmpItem['index'] - lAngle + 1)
+					tRho = (tmpNum + tmptfNum) * self.eps / (tmpItem['index'] - lAngle + 1)
 					if tRho >= rho:
 						tmprIndex += 1
 						tmprAngle = tmpItem['index']
@@ -177,7 +178,9 @@ Noise Rate:	%f
 				# print "rho iteration"
 			
 			# 满足 cluster 条件，否则放弃
+			# print "tfNum: %d" % tfNum
 			if tfNum >= N:
+				print "Current tfNum is %d" % tfNum
 				for x in xrange(rIndex, lIndex-1):
 					angle = ALL.getitem(x)['index'] % 360
 					if angle not in labelList.keys():
@@ -214,7 +217,7 @@ Noise Rate:	%f
 					else:
 						x += 1
 					
-					print "0 to left iteration"
+					# print "0 to left iteration"
 			else:
 				cIndex += 1
 
