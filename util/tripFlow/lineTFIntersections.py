@@ -123,7 +123,7 @@ Noise Rate:	%f
 
 		cIndex = sIndex
 		clusteID = 0
-		print "Start from %d" % cIndex
+		# print "Start from %d" % cIndex
 		while(cIndex < listLen):
 			base = ALL.getitem(cIndex)
 			tfNum, lIndex, rIndex = base['data'], cIndex, cIndex
@@ -180,9 +180,10 @@ Noise Rate:	%f
 			# 满足 cluster 条件，否则放弃
 			# print "tfNum: %d" % tfNum
 			if tfNum >= N:
-				print "Current tfNum is %d" % tfNum
-				for x in xrange(rIndex, lIndex-1):
+				print "Current tfNum is %d, lIndex is %d, rIndex is %d, clusterID is %d" % (tfNum, lIndex, rIndex, clusteID)
+				for x in xrange(rIndex, lIndex-1, -1):
 					angle = ALL.getitem(x)['index'] % 360
+					angle = str(angle)
 					if angle not in labelList.keys():
 						labelList[angle] = clusteID + self.dbscanBaseNum
 					ALL.delete(x)
@@ -228,7 +229,7 @@ Noise Rate:	%f
 		# 返回结果计算
 		noiseNum = 0
 		for x in xrange(0, arrayLen):
-			angle = angleArray[x]
+			angle = str(angleArray[x])
 			if angle in labelList.keys():
 				res.append(labelList[angle])
 			else:
