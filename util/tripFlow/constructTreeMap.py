@@ -76,7 +76,10 @@ class ConstructTreeMap(object):
 				lng = float(linelist[0])
 				lat = float(linelist[1])
 				formatGID = getFormatGID([lng, lat])
-				{gid, lngind, latind} = formatGID
+				# {gid, lngind, latind} = formatGID
+				gid = formatGID['gid']
+				lngind = formatGID['lngind']
+				latind = formatGID['latind']
 				# gdirStr = linelist[2]
 
 				linelist[6] = float(linelist[6])
