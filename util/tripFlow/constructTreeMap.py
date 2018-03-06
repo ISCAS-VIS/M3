@@ -127,17 +127,20 @@ class ConstructTreeMap(object):
 		while queue:
 			vertex = queue.pop(0)
 			
-			gid = str(vertex[-4])
-			node = self.deleteNode(gid, vertex[-1])
+			gidStr = vertex[-4]
+			nodeID = vertex[-1]
+
+			print "self.currentData['count']: %d" % self.currentData['count']
+			print "Length of queue: %d" % len(queue)
+
+			node = self.deleteNode(gidStr, nodeID)
 			child = self.BFSOneTreeMap(vertex, parentNRN)
-			self.appendNode(node, gid)
-			
+			self.appendNode(node, gidStr)
+
 			if 'children' in child.keys():
 				nothing = False
 				res['children'].append(child)
 
-				gidStr = vertex[-4]
-				nodeID = vertex[-1]
 				self.deleteNode(gidStr, nodeID)
 
 		# result
