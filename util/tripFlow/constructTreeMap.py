@@ -56,11 +56,22 @@ class ConstructTreeMap(object):
 			}
 
 			gid = str(element[-4])
-			if gid not in self.recDict.keys():
+			# 如果之前的操作已经删除了该记录对应的
+			if not self.ifNodeExist(gid, element[-1]):
 				continue
 
 			self.deleteNode(gid, element[-1])
-			res = self.BFSOneTreeMap(element[:], 0)
+			res = {
+				"root": {
+					"id": self.treeNodesID,
+					"lng": element[0],
+					"lat": element[1],
+					"num": 0
+				},
+				"children": []
+			}
+			childs = self.BFSOneTreeMap(element[:], element[4])
+			res['children'].append(childs)
 			self.treeMap.append(res)
 
 			print "#%d TreeMap Nodes Number: %d" % (x, self.currentData['count'])
@@ -106,20 +117,11 @@ class ConstructTreeMap(object):
 		f.close()
 	
 	def BFSOneTreeMap(self, parentNode, recordNum=0):
-		queue = []
-		parentNRN = parentNode[4]
-
-		res = {
-			"root": {
-				"id": self.treeNodesID,
-				"lng": parentNode[0],
-				"lat": parentNode[1],
-				"num": recordNum
-			},
-			"children": []
-		}
 		self.treeNodesID += 1
 		self.currentData['count'] += 1 
+
+		queue = []
+		parentNRN = parentNode[4]
 		nothing = True
 
 		# 六个交点计算，得出三个 gid，然后匹配方向加入 queue
@@ -127,6 +129,16 @@ class ConstructTreeMap(object):
 		direction = [parentNode[5], parentNode[6]]
 		gids = self.getNextGIDs(point, direction)
 		queue += self.getNextDirections(gids, parentNode)
+
+		res = {
+			"root": {
+				"id": self.treeNodesID,
+				"lng": gids[0][0],
+				"lat": gids[0][1],
+				"num": recordNum
+			},
+			"children": [  ]
+		}
 
 		# BFS Looping Condition
 		while queue:
@@ -141,9 +153,9 @@ class ConstructTreeMap(object):
 			node = self.deleteNode(gidStr, nodeID)
 			child = self.BFSOneTreeMap(vertex, parentNRN)
 			
-			if 'children' in child.keys():
-				nothing = False
-				res['children'].append(child)
+			# if 'children' in child.keys():
+			nothing = False
+			res['children'].append(child)
 
 			# 	self.deleteNode(gidStr, nodeID)
 			# else:
@@ -206,12 +218,19 @@ class ConstructTreeMap(object):
 					jumpPoints[current] = jumpPoints[i][:]
 		
 		# 只取三个交点
-		for i in xrange(0, self.custom_params['jump_length']):
-			lng = jumpPoints[i][0]
-			lat = jumpPoints[i][1]
 
-			ilat = lat
-			ilng = lng
+		# 确定该方向的交点，为最小的交点
+		minLng = jumpPoints[0][0]
+		mingLat = jumpPoints[0][1]
+		if x != 0 and y != 0:
+			for i in xrange(1, self.custom_params['jump_length']):
+				if minLng > jumpPoints[i][0]:
+					minLng = jumpPoints[i][0]
+					minLat = jumpPoints[i][1]
+
+		for i in xrange(0, self.custom_params['jump_length']):
+			ilat = jumpPoints[i][0]
+			ilng = jumpPoints[i][1]
 			if jumpPoints[i][2] == 0:
 				ilat += 0.002 * latDir  # 0.002 为一小点偏量
 			else:
@@ -219,7 +238,7 @@ class ConstructTreeMap(object):
 
 			point = getFormatGID([ilng, ilat])
 			gid = point['gid']
-			res.append([lng, lat, gid])
+			res.append([minLng, minLat, gid])
 		
 		return res
 	
@@ -244,6 +263,9 @@ class ConstructTreeMap(object):
 
 			# 每个网格中的方向遍历
 			for subIndex in xrange(0, recsLen):
+				# 更新经纬度到交点，而非原先网格中点
+				self.recDict[gid][subIndex][0] = gids[index][0]
+				self.recDict[gid][subIndex][1] = gids[index][1]
 				rec = self.recDict[gid][subIndex]
 				validation = self.judgeRecordLegality(rec, parentNode)
 				if validation:
@@ -312,6 +334,26 @@ class ConstructTreeMap(object):
 					del self.recDict[gid][x] 
 				return True
 	
+	def ifNodeExist(self, gid, nodeID):
+		"""
+		根据 gid 以及 node 编号删除对应记录
+			:param self: 
+			:param gid: 
+			:param nodeID: 
+		"""
+		# res = None
+		gid = str(gid)
+		if gid not in self.recDict.keys():
+			return False
+
+		nodesLen = len(self.recDict[gid])
+
+		for x in xrange(0, nodesLen):
+			if self.recDict[gid][x][-1] == nodeID:
+				return True
+		
+		return False
+
 	def appendNode(self, data, gid):
 		if gid in self.recDict.keys():
 			self.recDict[gid].append(data)
