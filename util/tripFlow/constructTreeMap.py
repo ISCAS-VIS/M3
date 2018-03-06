@@ -114,7 +114,7 @@ class ConstructTreeMap(object):
 			"children": []
 		}
 		self.treeNodesID += 1
-		self.currentData += 1 
+		self.currentData['count'] += 1 
 		nothing = True
 
 		# 六个交点计算，得出三个 gid，然后匹配方向加入 queue
@@ -127,8 +127,12 @@ class ConstructTreeMap(object):
 		while queue:
 			vertex = queue.pop(0)
 			
+			gid = str(vertex[-4])
+			node = self.deleteNode(gid, vertex[-1])
 			child = self.BFSOneTreeMap(vertex, parentNRN)
-			if child:
+			self.appendNode(node, gid)
+			
+			if 'children' in child.keys():
 				nothing = False
 				res['children'].append(child)
 
@@ -285,17 +289,26 @@ class ConstructTreeMap(object):
 			:param gid: 
 			:param nodeID: 
 		"""
+		res = None
 		gid = str(gid)
 		nodesLen = len(self.recDict[gid])
 
 		for x in xrange(0, nodesLen):
 			if self.recDict[gid][x][-1] == nodeID:
 				if len(self.recDict[gid]) == 1:
+					res = self.recDict[gid][0][:]
 					self.recDict.pop(gid, None) 
 				else: 
+					res = self.recDict[gid][x][:]
 					del self.recDict[gid][x] 
-				return True
+				return res
 	
+	def appendNode(self, data, gid):
+		if gid in self.recDict.keys():
+			self.recDict[gid].append(data)
+		else:
+			self.recDict[gid] = [data]
+
 	def outputToFile(self, ofile):
 		with open(ofile, 'wb') as f:
 			json.dump({

@@ -20,11 +20,11 @@ from util.tripFlow.constructTreeMap import ConstructTreeMap
 def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width): 
 	dataType = 'angle'
 	custom_params = {
-		'tree_num': 3,
-		'search_angle': 60,
-		'seed_strength': 0.3,
+		'tree_num': tree_num,
+		'search_angle': search_angle,
+		'seed_strength': seed_strength,
 		'max_curvation': 180,
-		'tree_width': 3,
+		'tree_width': tree_width,
 		'jump_length': 3,
 		'LngSPLIT': 0.0064,
 		'LatSPLIT': 0.005
@@ -82,7 +82,7 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width)
+	processTask(x, stdindir, stdoutdir, tree_num, search_angle,  , tree_width)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()
