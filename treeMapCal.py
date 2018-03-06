@@ -82,7 +82,7 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	processTask(x, stdindir, stdoutdir, tree_num, search_angle,  , tree_width)
+	processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()
