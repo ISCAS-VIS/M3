@@ -51,12 +51,14 @@ class ConstructTreeMap(object):
 				'lat': element[1],
 				'direction': element[5:7],
 				'strength': element[4], 
-				'speed': element[3]
+				'speed': element[3],
+				'count': 0
 			}
 
 			res = self.BFSOneTreeMap(element[:], 0)
-			if res:
-				self.treeMap.append(res)
+			self.treeMap.append(res)
+
+			print "#%d TreeMap Nodes Number: %d" % (x, self.currentData['count'])
 		
 		self.outputToFile(ofile)
 
@@ -73,9 +75,9 @@ class ConstructTreeMap(object):
 				linelist = line.split(',')
 
 				# 
-				lng = float(linelist[0])
-				lat = float(linelist[1])
-				formatGID = getFormatGID([lng, lat])
+				linelist[0] = float(linelist[0])
+				linelist[1] = float(linelist[1])
+				formatGID = getFormatGID([linelist[0], linelist[1]])
 				# {gid, lngind, latind} = formatGID
 				gid = formatGID['gid']
 				lngind = formatGID['lngind']
@@ -112,6 +114,7 @@ class ConstructTreeMap(object):
 			"children": []
 		}
 		self.treeNodesID += 1
+		self.currentData += 1 
 		nothing = True
 
 		# 六个交点计算，得出三个 gid，然后匹配方向加入 queue
@@ -131,7 +134,7 @@ class ConstructTreeMap(object):
 
 				gidStr = vertex[-4]
 				nodeID = vertex[-1]
-				self.deleteNode(gid, nodeID)
+				self.deleteNode(gidStr, nodeID)
 
 		# result
 		if nothing:
@@ -173,7 +176,7 @@ class ConstructTreeMap(object):
 				iLat = fromLat + incrementLng * k
 				iLng = incrementLng + fromLng
 				key = '%d,0' % (i)
-				jumpPoints[key] = [iLng, iLat, i, 0]
+				jumpPoints.append([iLng, iLat, i, 0])
 
 		if x != 0 and y != 0:
     		# 根据纬度从小到大排前三
@@ -193,10 +196,13 @@ class ConstructTreeMap(object):
 		for i in xrange(0, self.custom_params['jump_length']):
 			lng = jumpPoints[i][0]
 			lat = jumpPoints[i][1]
+
+			ilat = lat
+			ilng = lng
 			if jumpPoints[i][2] == 0:
-				ilat = lat + 0.002 * latDir  # 0.002 为一小点偏量
+				ilat += 0.002 * latDir  # 0.002 为一小点偏量
 			else:
-				ilng = lng + 0.002 * lngDir
+				ilng += 0.002 * lngDir
 
 			point = getFormatGID([ilng, ilat])
 			gid = point['gid']
@@ -279,6 +285,7 @@ class ConstructTreeMap(object):
 			:param gid: 
 			:param nodeID: 
 		"""
+		gid = str(gid)
 		nodesLen = len(self.recDict[gid])
 
 		for x in xrange(0, nodesLen):
