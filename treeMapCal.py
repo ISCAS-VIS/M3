@@ -72,7 +72,7 @@ def main(argv):
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
-	
+
 	processTask(x, stdindir, stdoutdir)
 
 	# @多进程运行程序 END
@@ -82,5 +82,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
-	logging.basicConfig(filename='logger-tripflowcal.log', level=logging.DEBUG)
+	logging.basicConfig(filename='logger-treemapflowcal.log', level=logging.DEBUG)
 	main(sys.argv[1:])
