@@ -127,8 +127,10 @@ class ConstructTreeMap(object):
 		# 六个交点计算，得出三个 gid，然后匹配方向加入 queue
 		point = [parentNode[0], parentNode[1], parentNode[-4]]
 		direction = [parentNode[5], parentNode[6]]
-		gids = self.getNextGIDs(point, direction)
-		queue += self.getNextDirections(gids, parentNode)
+		tmpStepRes = self.getNextGIDs(point, direction)
+		gids = tmpStepRes['res']
+		originGid = tmpStepRes['originGid']
+		queue += self.getNextDirections(gids, parentNode, originGid)
 
 		res = {
 			"root": {
@@ -221,16 +223,22 @@ class ConstructTreeMap(object):
 
 		# 确定该方向的交点，为最小的交点
 		minLng = jumpPoints[0][0]
-		mingLat = jumpPoints[0][1]
+		minLat = jumpPoints[0][1]
+		originGid = 0
 		if x != 0 and y != 0:
 			for i in xrange(1, self.custom_params['jump_length']):
 				if minLng > jumpPoints[i][0]:
 					minLng = jumpPoints[i][0]
 					minLat = jumpPoints[i][1]
 
+		updateOriginGid = False
 		for i in xrange(0, self.custom_params['jump_length']):
 			ilat = jumpPoints[i][0]
 			ilng = jumpPoints[i][1]
+
+			if ilng == minLng and ilat == minLat:
+				updateOriginGid = True
+
 			if jumpPoints[i][2] == 0:
 				ilat += 0.002 * latDir  # 0.002 为一小点偏量
 			else:
@@ -238,13 +246,19 @@ class ConstructTreeMap(object):
 
 			point = getFormatGID([ilng, ilat])
 			gid = point['gid']
+			if updateOriginGid:
+				updateOriginGid = False
+				originGid = gid
 			res.append([minLng, minLat, gid])
 		
-		return res
+		return {
+			'res': res,
+			'originGid': originGid
+		}
 	
-	def getNextDirections(self, gids, parentNode):
+	def getNextDirections(self, gids, parentNode, originGid):
 		"""
-		获取接下来最接近条件的 N 个方向并返回
+		获取接下来最接近条件的 N 个方向并返回， gids 中的 lng/lat 相同
 			:param self: 
 			:param gids: 
 			:param parentNode: 
@@ -266,6 +280,7 @@ class ConstructTreeMap(object):
 				# 更新经纬度到交点，而非原先网格中点
 				self.recDict[gid][subIndex][0] = gids[index][0]
 				self.recDict[gid][subIndex][1] = gids[index][1]
+				self.recDict[gid][subIndex][-4] = originGid
 				rec = self.recDict[gid][subIndex]
 				validation = self.judgeRecordLegality(rec, parentNode)
 				if validation:
