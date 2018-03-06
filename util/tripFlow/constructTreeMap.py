@@ -55,6 +55,11 @@ class ConstructTreeMap(object):
 				'count': 0
 			}
 
+			gid = str(element[-4])
+			if gid not in self.recDict.keys():
+				continue
+
+			self.deleteNode(gid, element[-1])
 			res = self.BFSOneTreeMap(element[:], 0)
 			self.treeMap.append(res)
 
@@ -127,7 +132,7 @@ class ConstructTreeMap(object):
 		while queue:
 			vertex = queue.pop(0)
 			
-			gidStr = vertex[-4]
+			gidStr = str(vertex[-4])
 			nodeID = vertex[-1]
 
 			print "self.currentData['count']: %d" % self.currentData['count']
@@ -135,13 +140,14 @@ class ConstructTreeMap(object):
 
 			node = self.deleteNode(gidStr, nodeID)
 			child = self.BFSOneTreeMap(vertex, parentNRN)
-			self.appendNode(node, gidStr)
-
+			
 			if 'children' in child.keys():
 				nothing = False
 				res['children'].append(child)
 
-				self.deleteNode(gidStr, nodeID)
+			# 	self.deleteNode(gidStr, nodeID)
+			# else:
+			# 	self.appendNode(node, gidStr)
 
 		# result
 		if nothing:
@@ -292,19 +298,19 @@ class ConstructTreeMap(object):
 			:param gid: 
 			:param nodeID: 
 		"""
-		res = None
+		# res = None
 		gid = str(gid)
 		nodesLen = len(self.recDict[gid])
 
 		for x in xrange(0, nodesLen):
 			if self.recDict[gid][x][-1] == nodeID:
 				if len(self.recDict[gid]) == 1:
-					res = self.recDict[gid][0][:]
+					# res = self.recDict[gid][0][:]
 					self.recDict.pop(gid, None) 
 				else: 
-					res = self.recDict[gid][x][:]
+					# res = self.recDict[gid][x][:]
 					del self.recDict[gid][x] 
-				return res
+				return True
 	
 	def appendNode(self, data, gid):
 		if gid in self.recDict.keys():
