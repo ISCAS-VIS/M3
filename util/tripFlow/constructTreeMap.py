@@ -123,6 +123,7 @@ class ConstructTreeMap(object):
 			
 			child = self.BFSOneTreeMap(vertex, parentNRN)
 			if child:
+				nothing = False
 				res['children'].append(child)
 
 				gidStr = vertex[-4]
@@ -131,9 +132,9 @@ class ConstructTreeMap(object):
 
 		# result
 		if nothing:
-			return None
-		else:
-			return res
+			del res['children']
+		
+		return res
 	
 	def getNextGIDs(self, point, direction):
 		"""
