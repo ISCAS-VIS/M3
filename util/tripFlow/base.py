@@ -56,7 +56,17 @@ def getFormatGID(point, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 			'latind': latind
 		}
 
-def parseFormatGID(id, direction, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
+def getGIDByIndex(id, x, y, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
+	'north': 41.0500,  # 41.050,
+	'south': 39.4570,  # 39.457,
+	'west': 115.4220,  # 115.422,
+	'east': 117.5000,  # 117.500
+}):
+	LNGNUM = int( (locs['east'] - locs['west']) / LngSPLIT + 1 )
+	
+	return id + x + y * LNGNUM
+
+def parseFormatGID(id, direction='n', LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 	'north': 41.0500,  # 41.050,
 	'south': 39.4570,  # 39.457,
 	'west': 115.4220,  # 115.422,
@@ -69,6 +79,7 @@ def parseFormatGID(id, direction, LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 		:param SPLIT=0.05: 
 	"""
 
+	id = int(id)
 	LNGNUM = int((locs['east'] - locs['west']) / LngSPLIT + 1)
 
 	latind = int(id / LNGNUM)
@@ -115,3 +126,18 @@ def getDirection(fPoint, tPoint):
 		return 'n'
 	else:
 		return 's'
+
+def cosVector(x, y):
+	if len(x) != len(y):
+		print 'error input,x and y is not in the same space'
+		return None
+
+	result1=0.0
+	result2=0.0
+	result3=0.0
+	for i in xrange(0, len(x)):
+		result1+=x[i]*y[i]   #sum(X*Y)
+		result2+=x[i]**2     #sum(X*X)
+		result3+=y[i]**2     #sum(Y*Y)
+
+	return result1 / ((result2*result3)**0.5)
