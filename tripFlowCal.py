@@ -5,6 +5,10 @@
 # 
 # python tripFlowCal.py -d /home/joe/Documents/git/fake -p /home/joe/Documents/git/fake -e 0.01 -m 40 [grid]
 # [circle]
+# 
+# line
+# python tripFlowCal.py -d /datahouse/tao.jiang -p /datahouse/tao.jiang -e 2 -m 10
+
 
 import sys
 import time
