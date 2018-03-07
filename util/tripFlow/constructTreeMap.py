@@ -79,7 +79,7 @@ class ConstructTreeMap(object):
 			res['children'].append(childs)
 			self.treeMap.append(res)
 
-			print "#%d TreeMap Nodes Number: %d" % (x, self.currentData['count'])
+			print "#%d TreeMap Nodes Number: %d" % (x, self.currentData['count']+1)
 		
 		self.outputToFile(ofile)
 
