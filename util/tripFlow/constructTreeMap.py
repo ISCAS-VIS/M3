@@ -355,8 +355,7 @@ class ConstructTreeMap(object):
 		"""
 		# res = None
 		gid = str(gid)
-		print "Delete GID %s nodeID %s" % (gid, nodeID)
-
+		# print "Delete GID %s nodeID %s" % (gid, nodeID)
 
 		nodesLen = len(self.recDict[gid])
 
