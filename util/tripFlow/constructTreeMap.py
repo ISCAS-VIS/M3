@@ -33,6 +33,7 @@ class ConstructTreeMap(object):
 		# }
 		self.entries = []  # 起始点集合
 		self.currentData = {}
+		self.keepTreeStructList = []
 		self.recDict = {}  # record 字典，key 值为 gid 字符串
 		self.treeMap = []  # 存储的 treemap 数组
 
@@ -123,9 +124,14 @@ class ConstructTreeMap(object):
 					self.entries.append(linelist[:])
 		f.close()
 	
-	def BFSOneTreeMap(self, parentNode, recordNum=0):
+	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[]):
 		self.treeNodesID += 1
 		self.currentData['count'] += 1 
+
+		for each in treeQueue:
+			id = "%d-%s" % (each[-4], each[-1])
+			if id not in self.keepTreeStructList:
+				self.keepTreeStructList.append(id)
 
 		queue = []
 		parentNRN = parentNode[4]
@@ -138,6 +144,7 @@ class ConstructTreeMap(object):
 		gids = tmpStepRes['res']
 		originGid = tmpStepRes['originGid']
 		queue += self.getNextDirections(gids, parentNode, originGid)
+		queueCopy = queue[:]
 
 		res = {
 			"root": {
@@ -156,11 +163,15 @@ class ConstructTreeMap(object):
 			gidStr = str(vertex[-4])
 			nodeID = vertex[-1]
 
+			treeStructID = "%s-%s" % (gidStr, nodeID)
+			if treeStructID in self.keepTreeStructList:
+				continue
+
 			# print "self.currentData['count']: %d" % self.currentData['count']
 			# print "Length of queue: %d" % len(queue)
 
 			node = self.deleteNode(gidStr, nodeID)
-			child = self.BFSOneTreeMap(vertex, parentNRN)
+			child = self.BFSOneTreeMap(vertex, parentNRN, queueCopy)
 			
 			# if 'children' in child.keys():
 			nothing = False
@@ -346,7 +357,7 @@ class ConstructTreeMap(object):
 		gid = str(gid)
 		print "Delete GID %s nodeID %s" % (gid, nodeID)
 
-		
+
 		nodesLen = len(self.recDict[gid])
 
 		for x in xrange(0, nodesLen):
