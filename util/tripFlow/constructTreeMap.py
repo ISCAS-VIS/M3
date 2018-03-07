@@ -38,8 +38,8 @@ class ConstructTreeMap(object):
 		self.treeMap = []  # 存储的 treemap 数组
 
 	def run(self):
-		# input_filename = 'mcres-%s-%d' % (self.dataType, self.index)
-		input_filename = 'mcres-%d' % (self.index)
+		input_filename = 'mcres-%s-%d' % (self.dataType, self.index)
+		# input_filename = 'mcres-%d' % (self.index)
 		output_filename = 'tmres-%s-%d' % (self.dataType, self.index)
 		ifile = os.path.join(self.INPUT_PATH, input_filename)
 		ofile = os.path.join(self.OUTPUT_PATH, output_filename)
