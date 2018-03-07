@@ -46,6 +46,9 @@ class ConstructTreeMap(object):
 
 		for x in xrange(0, self.custom_params['tree_num']):
 			# 初始化工作
+			if len(self.entries) == 0:
+				break
+
 			element = self.entries.pop()
 			self.currentData = {
 				'lng': element[0],
@@ -90,6 +93,9 @@ class ConstructTreeMap(object):
 			for line in f:
 				line = line.strip('\n')
 				linelist = line.split(',')
+
+				if linelist[2] != 'from':
+					continue
 
 				# 
 				linelist[0] = float(linelist[0])
@@ -281,7 +287,7 @@ class ConstructTreeMap(object):
 				# 更新经纬度到交点，而非原先网格中点
 				self.recDict[gid][subIndex][0] = gids[index][0]
 				self.recDict[gid][subIndex][1] = gids[index][1]
-				self.recDict[gid][subIndex][-4] = originGid
+				# self.recDict[gid][subIndex][-4] = originGid
 				rec = self.recDict[gid][subIndex]
 				validation = self.judgeRecordLegality(rec, parentNode)
 				if validation:
