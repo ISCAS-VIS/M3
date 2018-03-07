@@ -37,7 +37,8 @@ class ConstructTreeMap(object):
 		self.treeMap = []  # 存储的 treemap 数组
 
 	def run(self):
-		input_filename = 'mcres-%s-%d' % (self.dataType, self.index)
+		# input_filename = 'mcres-%s-%d' % (self.dataType, self.index)
+		input_filename = 'mcres-%d' % (self.index)
 		output_filename = 'tmres-%s-%d' % (self.dataType, self.index)
 		ifile = os.path.join(self.INPUT_PATH, input_filename)
 		ofile = os.path.join(self.OUTPUT_PATH, output_filename)
@@ -233,8 +234,8 @@ class ConstructTreeMap(object):
 
 		updateOriginGid = False
 		for i in xrange(0, self.custom_params['jump_length']):
-			ilat = jumpPoints[i][0]
-			ilng = jumpPoints[i][1]
+			ilng = jumpPoints[i][0]
+			ilat = jumpPoints[i][1]
 
 			if ilng == minLng and ilat == minLat:
 				updateOriginGid = True
