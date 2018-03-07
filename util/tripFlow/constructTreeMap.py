@@ -156,8 +156,8 @@ class ConstructTreeMap(object):
 			gidStr = str(vertex[-4])
 			nodeID = vertex[-1]
 
-			print "self.currentData['count']: %d" % self.currentData['count']
-			print "Length of queue: %d" % len(queue)
+			# print "self.currentData['count']: %d" % self.currentData['count']
+			# print "Length of queue: %d" % len(queue)
 
 			node = self.deleteNode(gidStr, nodeID)
 			child = self.BFSOneTreeMap(vertex, parentNRN)
@@ -344,6 +344,9 @@ class ConstructTreeMap(object):
 		"""
 		# res = None
 		gid = str(gid)
+		print "Delete GID %s nodeID %s" % (gid, nodeID)
+
+		
 		nodesLen = len(self.recDict[gid])
 
 		for x in xrange(0, nodesLen):
