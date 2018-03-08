@@ -46,7 +46,7 @@ def mergeLargeRecords(city, baseurl, count):
 
 def usage():
 	# /datahouse/zhtan/datasets/VIS-rawdata-region/
-	print "python -d /datasets -p /datasets -i 3999"
+	print "python -d /datasetsURL -p /datahouse/tao.jiang -i 3999"
 
 
 def main(argv):
@@ -81,14 +81,14 @@ def main(argv):
 	print "Start approach at %s" % STARTTIME
 
 	# @多进程运行程序 START
-	# jobs = []
+	jobs = []
 
-	# for x in xrange(0, jnum):
-	# 	jobs.append(Process(target=processTask, args=(x, city, stdindir, stdoutdir, inum, onum, 87, 300000)))
-	# 	jobs[x].start()
+	for x in xrange(0, jnum):
+		jobs.append(Process(target=processTask, args=(x, city, stdindir, stdoutdir, inum, onum, 87, 300000)))
+		jobs[x].start()
 
-	# for job in jobs:
-	# 	job.join()
+	for job in jobs:
+		job.join()
 
 	# 处理剩余数据进文件
 	# 合并操作
