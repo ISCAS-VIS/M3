@@ -81,7 +81,7 @@ def parseFormatGID(id, direction='n', LngSPLIT=0.0064, LatSPLIT=0.005, locs={
 
 	id = int(id)
 	LNGNUM = int((locs['east'] - locs['west']) / LngSPLIT + 1)
-
+	
 	latind = int(id / LNGNUM)
 	lngind = id - latind * LNGNUM
 	
