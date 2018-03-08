@@ -124,7 +124,7 @@ class ConstructTreeMap(object):
 					self.entries.append(linelist[:])
 		f.close()
 	
-	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentNodeGID):
+	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentNodeGID = 0):
 		self.treeNodesID += 1
 		self.currentData['count'] += 1 
 
@@ -224,25 +224,36 @@ class ConstructTreeMap(object):
 				incrementLng = baseLngCenter + self.custom_params['LngSPLIT'] * (0.5 + i) * lngDir - fromLng
 				iLat = fromLat + incrementLng * k
 				iLng = incrementLng + fromLng
-				key = '%d,0' % (i)
+				# key = '%d,0' % (i)
 				jumpPoints.append([iLng, iLat, i, 0])
 
 		if x != 0 and y != 0:
     		# 根据纬度从小到大排前三
-			for i in xrange(self.custom_params['jump_length'], self.custom_params['jump_length'] * 2):
-				current = 0
-				while (jumpPoints[i][0] > jumpPoints[current][0]):
-					current += 1
-					if current == self.custom_params['jump_length']:
-						break
+			# for i in xrange(self.custom_params['jump_length'], self.custom_params['jump_length'] * 2):
+			# 	current = 0
+			# 	while (jumpPoints[i][0] > jumpPoints[current][0]):
+			# 		current += 1
+			# 		if current == self.custom_params['jump_length']:
+			# 			break
 				
-				if current != self.custom_params['jump_length']:
-					for switch in xrange(self.custom_params['jump_length']-1, current):
-						jumpPoints[switch] = jumpPoints[switch-1][:]
-					jumpPoints[current] = jumpPoints[i][:]
-		
-		# 只取三个交点
+			# 	if current != self.custom_params['jump_length']:
+			# 		for switch in xrange(self.custom_params['jump_length']-1, current):
+			# 			jumpPoints[switch] = jumpPoints[switch-1][:]
+			# 		jumpPoints[current] = jumpPoints[i][:]
+			
+			# 
+			for i in xrange(self.custom_params['jump_length'], self.custom_params['jump_length'] * 2):
+				currentIndex = -1
+				currentMax = jumpPoints[i][0]
+				
+				for jumpIndex in xrange(0, self.custom_params['jump_length']):
+					if jumpPoints[jumpIndex][0] > currentMax:
+						currentIndex = jumpIndex
+						currentMax = jumpPoints[jumpIndex][0]
 
+				if currentIndex != -1:
+					jumpPoints[currentIndex] = jumpPoints[i][:]
+		
 		# 确定该方向的交点，为最小的交点
 		minLng = jumpPoints[0][0]
 		minLat = jumpPoints[0][1]
@@ -253,6 +264,7 @@ class ConstructTreeMap(object):
 					minLng = jumpPoints[i][0]
 					minLat = jumpPoints[i][1]
 
+		# 只取三个交点
 		updateOriginGid = False
 		for i in xrange(0, self.custom_params['jump_length']):
 			ilng = jumpPoints[i][0]
