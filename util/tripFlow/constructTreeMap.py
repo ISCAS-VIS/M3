@@ -247,7 +247,7 @@ class ConstructTreeMap(object):
 				currentMax = jumpPoints[i][0]
 				
 				for jumpIndex in xrange(0, self.custom_params['jump_length']):
-					if jumpPoints[jumpIndex][0] > currentMax:
+					if (jumpPoints[jumpIndex][0] * lngDir) > (currentMax * lngDir):
 						currentIndex = jumpIndex
 						currentMax = jumpPoints[jumpIndex][0]
 
