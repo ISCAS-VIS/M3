@@ -75,7 +75,7 @@ class ConstructTreeMap(object):
 				},
 				"children": []
 			}
-			childs = self.BFSOneTreeMap(element[:], element[4])
+			childs = self.BFSOneTreeMap(element[:], element[4], [], element[-4])
 			res['children'].append(childs)
 			self.treeMap.append(res)
 
@@ -124,7 +124,7 @@ class ConstructTreeMap(object):
 					self.entries.append(linelist[:])
 		f.close()
 	
-	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[]):
+	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentNodeGID):
 		self.treeNodesID += 1
 		self.currentData['count'] += 1 
 
@@ -138,7 +138,7 @@ class ConstructTreeMap(object):
 		nothing = True
 
 		# 六个交点计算，得出三个 gid，然后匹配方向加入 queue
-		point = [parentNode[0], parentNode[1], parentNode[-4]]
+		point = [parentNode[0], parentNode[1], currentNodeGID]
 		direction = [parentNode[5], parentNode[6]]
 		tmpStepRes = self.getNextGIDs(point, direction)
 		gids = tmpStepRes['res']
@@ -171,7 +171,7 @@ class ConstructTreeMap(object):
 			# print "Length of queue: %d" % len(queue)
 
 			node = self.deleteNode(gidStr, nodeID)
-			child = self.BFSOneTreeMap(vertex, parentNRN, queueCopy)
+			child = self.BFSOneTreeMap(vertex, parentNRN, queueCopy, originGid)
 			
 			# if 'children' in child.keys():
 			nothing = False
@@ -198,6 +198,10 @@ class ConstructTreeMap(object):
 		[x, y] = direction
 		fromLat = point[1]
 		fromLng = point[0]
+		fromGID = point[2]
+		parsedObj = parseFormatGID(fromGID)
+		baseLatCenter = parsedObj['lat']
+		baseLngCenter = parsedObj['lng']
 
 		latDir = 1 if y > 0 else -1
 		lngDir = 1 if x > 0 else -1
@@ -208,7 +212,7 @@ class ConstructTreeMap(object):
 		if y != 0:  # 与平行纬度线相交
 			k = x / y
 			for i in xrange(0, self.custom_params['jump_length']):
-				incrementLat = self.custom_params['LatSPLIT'] * (0.5 + i) * latDir
+				incrementLat = baseLatCenter + self.custom_params['LatSPLIT'] * (0.5 + i) * latDir - fromLat
 				iLng = fromLng + incrementLat * k
 				iLat = incrementLat + fromLat
 				# key = '0,%d' % (i)
@@ -217,7 +221,7 @@ class ConstructTreeMap(object):
 		if x != 0:  # 与平行经度线相交
 			k = y / x
 			for i in xrange(0, self.custom_params['jump_length']):
-				incrementLng = self.custom_params['LngSPLIT'] * (0.5 + i) * lngDir
+				incrementLng = baseLngCenter + self.custom_params['LngSPLIT'] * (0.5 + i) * lngDir - fromLng
 				iLat = fromLat + incrementLng * k
 				iLng = incrementLng + fromLng
 				key = '%d,0' % (i)
