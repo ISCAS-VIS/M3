@@ -174,8 +174,8 @@ class ConstructTreeMap(object):
 				"id": self.treeNodesID,
 				"lng": gids[0][0],
 				"lat": gids[0][1],
-				"num": parentNode[-4],
-				"speed": parentNode[4]
+				"num": parentNode[4],
+				"speed": parentNode[3]
 			},
 			"children": [  ]
 		}
