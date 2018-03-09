@@ -47,6 +47,7 @@ class ConstructTreeMap(object):
 		ofile = os.path.join(self.OUTPUT_PATH, output_filename)
 		totalNum = self.iterateFile(ifile)
 		usedNum = 0
+		actualTreeNum = 0
 
 		for x in xrange(0, self.custom_params['tree_num']):
 			# 初始化工作
@@ -67,7 +68,8 @@ class ConstructTreeMap(object):
 			# 如果之前的操作已经删除了该记录对应的
 			if not self.ifNodeExist(gid, element[-1]):
 				continue
-
+			
+			actualTreeNum += 1
 			self.deleteNode(gid, element[-1])
 			res = {
 				"root": {
@@ -86,7 +88,7 @@ class ConstructTreeMap(object):
 			usedNum += self.currentData['count'] + 1
 		
 		print "Edges Uesd Rate: %.4f" % (float(usedNum)/totalNum)
-		print "Tree Average Edges Number: %.4f" % (float(usedNum)/self.custom_params['tree_num'])
+		print "Tree Average Edges Number: %.4f" % (float(usedNum)/actualTreeNum)
 		self.outputToFile(ofile)
 
 	def iterateFile(self, ifile):
