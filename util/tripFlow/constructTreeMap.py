@@ -7,6 +7,7 @@
 
 import os 
 import json
+import numpy as np
 from math import acos, pi
 from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import parseFormatGID
@@ -34,6 +35,7 @@ class ConstructTreeMap(object):
 		self.entries = []  # 起始点集合
 		self.currentData = {}
 		self.keepTreeStructList = []
+		
 		self.recDict = {}  # record 字典，key 值为 gid 字符串
 		self.treeMap = []  # 存储的 treemap 数组
 
@@ -43,7 +45,8 @@ class ConstructTreeMap(object):
 		output_filename = 'tmres-%s-%d' % (self.dataType, self.index)
 		ifile = os.path.join(self.INPUT_PATH, input_filename)
 		ofile = os.path.join(self.OUTPUT_PATH, output_filename)
-		self.iterateFile(ifile)
+		totalNum = self.iterateFile(ifile)
+		usedNum = 0
 
 		for x in xrange(0, self.custom_params['tree_num']):
 			# 初始化工作
@@ -80,7 +83,9 @@ class ConstructTreeMap(object):
 			self.treeMap.append(res)
 
 			print "#%d TreeMap Nodes Number: %d" % (x, self.currentData['count']+1)
+			usedNum += self.currentData + 1
 		
+		print "Edges Uesd Rate: %.4f" % (float(usedNum)/totalNum)
 		self.outputToFile(ofile)
 
 	def iterateFile(self, ifile):
@@ -89,6 +94,8 @@ class ConstructTreeMap(object):
 			:param self: 
 			:param ifile: 
 		"""
+		res = []
+
 		with open(ifile, 'rb') as f:
 			nodeID = 0
 			for line in f:
@@ -116,13 +123,25 @@ class ConstructTreeMap(object):
 
 				linelist.extend([gid, lngind, latind, nodeID])
 				nodeID += 1
-				gidStr = str(gid)
-				if gidStr in self.recDict.keys():
-					self.recDict[gidStr].append(linelist)
-				else:
-					self.recDict[gidStr] = [linelist]
-					self.entries.append(linelist[:])
+				
+				res.append(linelist[:])
 		f.close()
+		
+		# 按照 deviceNum 排序
+		res = res.sort(key=lambda x:x[4], reverse=True)
+		for i in xrange(0, nodeID):
+			currentLine = res[i]
+			gidStr = str(currentLine[-4])
+			if gidStr in self.recDict.keys():
+				self.recDict[gidStr].append(currentLine)
+			else:
+				self.recDict[gidStr] = [currentLine]
+			
+			# 筛选种子
+			if i < self.custom_params['topN']:
+				self.entries.append(currentLine[:])
+
+		return len(res)
 	
 	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentNodeGID = 0):
 		self.treeNodesID += 1
@@ -321,10 +340,10 @@ class ConstructTreeMap(object):
     				# 处理符合条件的方向，进行分叉检查
 					if len(topSearchs) < self.custom_params['tree_num']:
 						topSearchs.append(rec[:])
-						topSearchAngles.append(validation['currentAngle'])
+						topSearchAngles.append(validation['mixAngle'])
 					else:
 						maxAngleIndex = -1
-						maxAngle = validation['currentAngle']
+						maxAngle = validation['mixAngle']
 						for topIndex in xrange(0, self.custom_params['tree_num']):
 							tmpAngle = topSearchAngles[topIndex]
 							if maxAngle < tmpAngle:
@@ -334,7 +353,7 @@ class ConstructTreeMap(object):
 						# 替换掉当前最大偏差的方向
 						if maxAngleIndex != -1:
 							topSearchs[maxAngleIndex] = rec[:]
-							topSearchAngles[maxAngleIndex] = validation['currentAngle']
+							topSearchAngles[maxAngleIndex] = validation['mixAngle']
 		
 		return topSearchs
 
@@ -343,7 +362,7 @@ class ConstructTreeMap(object):
 		currentStrength = rec[4]
 
 		parentDirection = [parentNode[5], parentNode[6]]
-		parentStrength = parentNode[4]
+		# parentStrength = parentNode[4]
 
 		currentAngle = acos(cosVector(parentDirection, currentDirection)) * 180 / pi
 		if currentAngle < -self.custom_params['search_angle'] or currentAngle > self.custom_params['search_angle']:
@@ -354,10 +373,13 @@ class ConstructTreeMap(object):
 		if accumulatedAngle < -self.custom_params['max_curvation'] or accumulatedAngle > self.custom_params['max_curvation']:
 			return False
 
-		if currentStrength < parentStrength * self.custom_params['seed_strength']:
+		if currentStrength < self.currentData['strength'] * self.custom_params['seed_strength']:
 			return False
 		
+		mixAngle = cos(currentAngle) * currentStrength
+
 		return {
+			'mixAngle': mixAngle,
 			'currentAngle': currentAngle,
 			'accumulatedAngle': accumulatedAngle
 		}
