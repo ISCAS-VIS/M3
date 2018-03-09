@@ -17,7 +17,7 @@ import getopt
 from util.tripFlow.constructTreeMap import ConstructTreeMap
 
 	
-def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, topN): 
+def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width): 
 	dataType = 'angle'
 	custom_params = {
 		'tree_num': tree_num,
@@ -27,8 +27,7 @@ def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, t
 		'tree_width': tree_width,
 		'jump_length': 3,
 		'LngSPLIT': 0.0064,
-		'LatSPLIT': 0.005,
-		'topN': topN
+		'LatSPLIT': 0.005
 	}
 
 	PROP = {
@@ -49,8 +48,8 @@ def usage():
 
 def main(argv):
 	try:
-		argsArray = ["help", 'stdindir=', 'stdoutdir', "index=", "tree_num", "search_angle", "seed_strength", "tree_width", "topN"]
-		opts, args = getopt.getopt(argv, "hd:p:x:n:a:s:w:t:", argsArray)
+		argsArray = ["help", 'stdindir=', 'stdoutdir', "index=", "tree_num", "search_angle", "seed_strength", "tree_width"]
+		opts, args = getopt.getopt(argv, "hd:p:x:n:a:s:w:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
@@ -60,7 +59,7 @@ def main(argv):
 	stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
 	x = 9
 	tree_num, search_angle, seed_strength, tree_width = 30, 60, 0.3, 3
-	topN = 100
+	# topN = 100
 
 	for opt, arg in opts:
 		if opt == '-h':
@@ -80,13 +79,13 @@ def main(argv):
 			seed_strength = float(arg)
 		elif opt in ('-w', '--tree_width'):
 			tree_width = int(arg)
-		elif opt in ('-t', '--topN'):
-			topN = int(arg)
+		# elif opt in ('-t', '--topN'):
+		# 	topN = int(arg)
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, topN)
+	processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()

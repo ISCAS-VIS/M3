@@ -8,7 +8,7 @@
 import os 
 import json
 import numpy as np
-from math import acos, pi
+from math import acos, cos, pi
 from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import parseFormatGID
 from util.tripFlow.base import cosVector
@@ -83,9 +83,10 @@ class ConstructTreeMap(object):
 			self.treeMap.append(res)
 
 			print "#%d TreeMap Nodes Number: %d" % (x, self.currentData['count']+1)
-			usedNum += self.currentData + 1
+			usedNum += self.currentData['count'] + 1
 		
 		print "Edges Uesd Rate: %.4f" % (float(usedNum)/totalNum)
+		print "Tree Average Edges Number: %.4f" % (float(usedNum)/self.custom_params['tree_num'])
 		self.outputToFile(ofile)
 
 	def iterateFile(self, ifile):
@@ -128,7 +129,7 @@ class ConstructTreeMap(object):
 		f.close()
 		
 		# 按照 deviceNum 排序
-		res = res.sort(key=lambda x:x[4], reverse=True)
+		res.sort(key=lambda x:x[4], reverse=True)
 		for i in xrange(0, nodeID):
 			currentLine = res[i]
 			gidStr = str(currentLine[-4])
@@ -138,7 +139,7 @@ class ConstructTreeMap(object):
 				self.recDict[gidStr] = [currentLine]
 			
 			# 筛选种子
-			if i < self.custom_params['topN']:
+			if i < self.custom_params['tree_num']:
 				self.entries.append(currentLine[:])
 
 		return len(res)
