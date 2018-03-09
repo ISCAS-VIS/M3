@@ -76,7 +76,8 @@ class ConstructTreeMap(object):
 					"id": self.treeNodesID,
 					"lng": element[0],
 					"lat": element[1],
-					"num": 0
+					"num": 0,
+					"speed": 0
 				},
 				"children": []
 			}
@@ -173,7 +174,8 @@ class ConstructTreeMap(object):
 				"id": self.treeNodesID,
 				"lng": gids[0][0],
 				"lat": gids[0][1],
-				"num": recordNum
+				"num": parentNode[-4],
+				"speed": parentNode[4]
 			},
 			"children": [  ]
 		}
