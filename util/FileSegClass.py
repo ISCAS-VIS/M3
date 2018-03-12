@@ -212,7 +212,7 @@ class FileSegByHour(object):
 		self.currentDatasets['data'] = []
 
 	def updLastTravelRecsOnlyTravel(self):
-		if self.currentDatasets['fromAdmin'] == '':
+		if self.currentDatasets['fromAdmin'] == '' or self.currentDatasets['toLatLng'][0] == 0:
 			return 0
 		#
 		fromLatLng = ','.join(self.currentDatasets['fromLatLng'])
@@ -230,6 +230,7 @@ class FileSegByHour(object):
 
 		# 重置
 		self.currentDatasets['fromLatLng'] = [0, 0]
+		self.currentDatasets['toLatLng'] = [0, 0]
 		self.currentDatasets['fromAdmin'] = ''
 		self.currentDatasets['fromTime'] = ''
 		self.currentDatasets['data'] = []
