@@ -40,11 +40,12 @@ class ConstructTreeMap(object):
 		self.treeMap = []  # 存储的 treemap 数组
 
 	def run(self):
-		input_filename = 'mcres-%s-%d' % (self.dataType, self.index)
+		input_file = 'mcres-%s-%d' % (self.dataType, self.index)
 		# input_filename = 'mcres-%d' % (self.index)
-		output_filename = 'tmres-%s-%d' % (self.dataType, self.index)
-		ifile = os.path.join(self.INPUT_PATH, input_filename)
-		ofile = os.path.join(self.OUTPUT_PATH, output_filename)
+		output_subfix = "%d_%d_%.2f" % (self.custom_params['tree_num'], self.custom_params['search_angle'], self.custom_params['seed_strength'])
+		output_file = 'tmres-%s-%d_%s' % (self.dataType, self.index, output_subfix)
+		ifile = os.path.join(self.INPUT_PATH, input_file)
+		ofile = os.path.join(self.OUTPUT_PATH, output_file)
 		totalNum = self.iterateFile(ifile)
 		usedNum = 0
 		actualTreeNum = 0
