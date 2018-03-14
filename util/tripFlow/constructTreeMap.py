@@ -107,8 +107,9 @@ class ConstructTreeMap(object):
 				self.treeMap[cateName].append(res)
 				self.treeNodesID += 1
 
-				print "#%d TreeMap Nodes Number: %d" % (x, self.currentData[cateName]['count']+1)
-				usedNum += self.currentData[cateName]['count'] + 1
+				currentEdgeCount = self.currentData[cateName]['count'] + 1
+				print "[D-%s]#%d TMNodes Number: %d" % (cateName, x, currentEdgeCount)
+				usedNum += currentEdgeCount
 		
 		print "Edges Uesd Rate: %.4f" % (float(usedNum)/totalNum)
 		print "Tree Average Edges Number: %.4f" % (float(usedNum)/actualTreeNum)
