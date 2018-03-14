@@ -30,7 +30,7 @@ class ExtractGridEdges(object):
 		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))  # 小时文件
 		
 		self.iterateFile(ifile)
-		res = self.outputToFile
+		res = self.outputToFile()
 		return {
 			'count': self.singleDirectionCount,
 			'res': res
