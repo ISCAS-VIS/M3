@@ -24,12 +24,17 @@ class ExtractGridEdges(object):
 		self.index = PROP['index']
 		self.resByDir = {'e': {}, 'n': {}, 'w': {}, 's': {}}  # 分方向结果
 		self.resByCate = {'from': {}, 'to': {}}  # 分进出结果
+		self.singleDirectionCount = 0
     
 	def run(self):
 		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))  # 小时文件
 		
 		self.iterateFile(ifile)
-		return self.outputToFile()
+		res = self.outputToFile
+		return {
+			'count': self.singleDirectionCount,
+			'res': res
+		}
 		
 	def iterateFile(self, file):
 		count = 0
@@ -87,6 +92,8 @@ class ExtractGridEdges(object):
 		print "Total %d records in this file." % (count)
 
 	def updateResByLine(self, fPoint, tPoint, fromGid, toGid, direction, speed):
+		self.singleDirectionCount += 1
+
 		# 处理方向与网格间的相交点
 		fGidIPoint, tGidIPoint = self.getGridIntersection(fPoint, tPoint, fromGid, toGid, direction)
 		fGidIPointStr = "%.6f,%.6f" % (fGidIPoint[0], fGidIPoint[1])
@@ -231,4 +238,7 @@ class ExtractGridEdges(object):
 			json.dump(self.resByCate, f)
 		f.close()
 
-		return memres, self.resByCate
+		return {
+			'resByDir': memres, 
+			'resByCate': self.resByCate
+		}
