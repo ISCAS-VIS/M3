@@ -57,6 +57,12 @@ def main(argv):
 	# 	sys.exit(2)
 
 	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length] = argv
+	x = int(x)
+	tree_num = int(tree_num)
+	search_angle = int(search_angle)
+	seed_strength = float(seed_strength)
+	tree_width = int(tree_width)
+	jump_length = int(jump_length)
 
 	# stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
 	# stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
