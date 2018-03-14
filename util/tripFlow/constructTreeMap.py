@@ -60,8 +60,8 @@ class ConstructTreeMap(object):
 	def run(self):
 		input_file = 'mcres-%s-%d' % (self.dataType, self.index)
 		# input_filename = 'mcres-%d' % (self.index)
-		output_subfix = "%d_%d_%.2f" % (self.custom_params['tree_num'], self.custom_params['search_angle'], self.custom_params['seed_strength'])
-		output_file = 'tmres-%s-%d_%s' % (self.dataType, self.index, output_subfix)
+		output_suffix = "%d_%d_%.2f_%d" % (self.custom_params['tree_num'], self.custom_params['search_angle'], self.custom_params['seed_strength'], self.custom_params['tree_width'])
+		output_file = 'tmres-%s-%d_%s' % (self.dataType, self.index, output_suffix)
 		ifile = os.path.join(self.INPUT_PATH, input_file)
 		ofile = os.path.join(self.OUTPUT_PATH, output_file)
 		totalNum = self.iterateFile(ifile)
