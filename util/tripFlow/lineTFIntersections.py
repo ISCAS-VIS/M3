@@ -22,7 +22,7 @@ class LineTFIntersections(object):
 		self.dataType = 'angle'
 		self.resByAng = PROP['resByAng']
 
-		self.typeNum = 1  # 暂时为1
+		self.typeNum = 2  # 暂时为1
 		self.dbLabel = [[] for x in xrange(0, self.typeNum)]
 		self.dbInput = [[] for x in xrange(0, self.typeNum)]
 		self.subInfo = [[] for x in xrange(0, self.typeNum)]
