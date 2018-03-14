@@ -44,7 +44,7 @@ def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, t
 def usage():
 	# /datahouse/zhtan/datasets/VIS-rawdata-region/
 	# print "python treeMapCal.py -d /dir -p /dir -x 9 -n 30 -a 60 -s 0.3 -w 3 -l 3"
-	print "python treeMapCal.py /dir /dir 9 30 60 0.3 3 3"
+	print "python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 30 60 0.1 1 3"
 
 
 def main(argv):
