@@ -13,7 +13,7 @@
 import sys
 import time
 import logging
-import getopt
+# import getopt
 from util.tripFlow.constructTreeMap import ConstructTreeMap
 
 	
@@ -43,50 +43,53 @@ def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, t
 
 def usage():
 	# /datahouse/zhtan/datasets/VIS-rawdata-region/
-	print "python treeMapCal.py -d /dir -p /dir -x 9 -n 30 -a 60 -s 0.3 -w 3 -l 3"
+	# print "python treeMapCal.py -d /dir -p /dir -x 9 -n 30 -a 60 -s 0.3 -w 3 -l 3"
+	print "python treeMapCal.py /dir /dir 9 30 60 0.3 3 3"
 
 
 def main(argv):
-	try:
-		argsArray = ["help", 'stdindir=', 'stdoutdir', "index=", "tree_num", "search_angle", "seed_strength", "tree_width", "jump_length"]
-		opts, args = getopt.getopt(argv, "hd:p:x:n:a:s:w:l:", argsArray)
-	except getopt.GetoptError as err:
-		print str(err)
-		usage()
-		sys.exit(2)
+	# try:
+	# 	argsArray = ["help", 'stdindir=', 'stdoutdir', "index=", "tree_num", "search_angle", "seed_strength", "tree_width", "jump_length"]
+	# 	opts, args = getopt.getopt(argv, "hd:p:x:n:a:s:w:l:", argsArray)
+	# except getopt.GetoptError as err:
+	# 	print str(err)
+	# 	usage()
+	# 	sys.exit(2)
 
-	stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
-	stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
-	x = 9
-	tree_num, search_angle, seed_strength, tree_width = 30, 60, 0.3, 3
-	# topN = 100
-	jump_length = 3
+	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length] = argv
 
-	for opt, arg in opts:
-		if opt == '-h':
-			usage()
-			sys.exit()
-		elif opt in ("-d", "--stdindir"):
-			stdindir = arg
-		elif opt in ('-p', '--stdoutdir'):
-			stdoutdir = arg
-		elif opt in ('-x', '--index'):
-			x = int(arg)
-		elif opt in ('-n', '--tree_num'):
-			tree_num = int(arg)
-		elif opt in ('-a', '--search_angle'):
-			search_angle = int(arg)
-		elif opt in ('-s', '--seed_strength'):
-			seed_strength = float(arg)
-		elif opt in ('-w', '--tree_width'):
-			tree_width = int(arg)
-		elif opt in ('-l', '--jump_length'):
-			jump_length = int(arg)
+	# stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
+	# stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
+	# x = 9
+	# tree_num, search_angle, seed_strength, tree_width = 30, 60, 0.3, 3
+	# # topN = 100
+	# jump_length = 3
+
+	# for opt, arg in opts:
+	# 	if opt == '-h':
+	# 		usage()
+	# 		sys.exit()
+	# 	elif opt in ("-d", "--stdindir"):
+	# 		stdindir = arg
+	# 	elif opt in ('-p', '--stdoutdir'):
+	# 		stdoutdir = arg
+	# 	elif opt in ('-x', '--index'):
+	# 		x = int(arg)
+	# 	elif opt in ('-n', '--tree_num'):
+	# 		tree_num = int(arg)
+	# 	elif opt in ('-a', '--search_angle'):
+	# 		search_angle = int(arg)
+	# 	elif opt in ('-s', '--seed_strength'):
+	# 		seed_strength = float(arg)
+	# 	elif opt in ('-w', '--tree_width'):
+	# 		tree_width = int(arg)
+	# 	elif opt in ('-l', '--jump_length'):
+	# 		jump_length = int(arg)
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, jump_length)
+	processTask(x, indir, outdir, tree_num, search_angle, seed_strength, tree_width, jump_length)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()

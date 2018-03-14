@@ -27,7 +27,12 @@ def processTask(x, eps, min_samples, stdindir, stdoutdir):
 		'ODIRECTORY': stdoutdir
 	}
 	task = ExtractGridEdges(PROP)
-	resByDir, resByCate = task.run()
+	res = task.run()
+	
+	count = res['count']
+	min_samples = int(count / 6000) if count > 6000 else 1
+
+	resByDir, resByCate = res['res']['resByDir'], res['res']['resByCate']
 	dataType = 'angle'  # 确定是按照方向聚类还是角度聚类 direction, category
 	EPS_INTERVAL = 0.001 if dataType == 'direction' else 0.4
 
