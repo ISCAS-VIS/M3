@@ -32,12 +32,30 @@ class ConstructTreeMap(object):
 		# 	'tree_width': 0,
 		# 	'jump_length': 0
 		# }
-		self.entries = []  # 起始点集合
-		self.currentData = {}
-		self.keepTreeStructList = []
+		self.cateKeys = {0: 'from', 1: 'to'}
+		self.currentCateName = 'from'
+
+		self.entries = {
+			'from': [],
+			'to': []
+		}  # 起始点集合
+		self.currentData = {
+			'from': {},
+			'to': {}
+		} 
+		self.keepTreeStructList = {
+			'from': [],
+			'to': []
+		}
 		
-		self.recDict = {}  # record 字典，key 值为 gid 字符串
-		self.treeMap = []  # 存储的 treemap 数组
+		self.recDict = {
+			'from': {},
+			'to': {}
+		}  # record 字典，key 值为 gid 字符串
+		self.treeMap = {
+			'from': [],
+			'to': []
+		}  # 存储的 treemap 数组
 
 	def run(self):
 		input_file = 'mcres-%s-%d' % (self.dataType, self.index)
@@ -50,44 +68,47 @@ class ConstructTreeMap(object):
 		usedNum = 0
 		actualTreeNum = 0
 
-		for x in xrange(0, self.custom_params['tree_num']):
-			# 初始化工作
-			if len(self.entries) == 0:
-				break
+		for dirKey, cateName in self.cateKeys.iteritems():
+			self.currentCateName = cateName
+			for x in xrange(0, self.custom_params['tree_num']):
+					# 初始化工作
+				if len(self.entries[cateName]) == 0:
+					break
 
-			element = self.entries.pop()
-			self.currentData = {
-				'lng': element[0],
-				'lat': element[1],
-				'direction': element[5:7],
-				'strength': element[4], 
-				'speed': element[3],
-				'count': 0
-			}
+				element = self.entries[cateName].pop()
+				self.currentData[cateName] = {
+					'lng': element[0],
+					'lat': element[1],
+					'direction': element[5:7],
+					'strength': element[4], 
+					'speed': element[3],
+					'count': 0
+				}
 
-			gid = str(element[-4])
-			# 如果之前的操作已经删除了该记录对应的
-			if not self.ifNodeExist(gid, element[-1]):
-				continue
-			
-			actualTreeNum += 1
-			self.deleteNode(gid, element[-1])
-			res = {
-				"root": {
-					"id": self.treeNodesID,
-					"lng": element[0],
-					"lat": element[1],
-					"num": 0,
-					"speed": 0
-				},
-				"children": []
-			}
-			childs = self.BFSOneTreeMap(element[:], element[4], [], element[-4])
-			res['children'].append(childs)
-			self.treeMap.append(res)
+				gid = str(element[-4])
+				# 如果之前的操作已经删除了该记录对应的
+				if not self.ifNodeExist(gid, element[-1]):
+					continue
+				
+				actualTreeNum += 1
+				self.deleteNode(gid, element[-1])
+				res = {
+					"root": {
+						"id": self.treeNodesID,
+						"lng": element[0],
+						"lat": element[1],
+						"num": 0,
+						"speed": 0
+					},
+					"children": []
+				}
+				childs = self.BFSOneTreeMap(element[:], element[4], [], element[-4])
+				res['children'].append(childs)
+				self.treeMap[cateName].append(res)
+				self.treeNodesID += 1
 
-			print "#%d TreeMap Nodes Number: %d" % (x, self.currentData['count']+1)
-			usedNum += self.currentData['count'] + 1
+				print "#%d TreeMap Nodes Number: %d" % (x, self.currentData[cateName]['count']+1)
+				usedNum += self.currentData[cateName]['count'] + 1
 		
 		print "Edges Uesd Rate: %.4f" % (float(usedNum)/totalNum)
 		print "Tree Average Edges Number: %.4f" % (float(usedNum)/actualTreeNum)
@@ -99,7 +120,12 @@ class ConstructTreeMap(object):
 			:param self: 
 			:param ifile: 
 		"""
-		res = []
+		cateKeys = self.cateKeys
+
+		res = {
+			'from': [],
+			'to': []
+		}
 
 		with open(ifile, 'rb') as f:
 			nodeID = 0
@@ -107,8 +133,8 @@ class ConstructTreeMap(object):
 				line = line.strip('\n')
 				linelist = line.split(',')
 
-				if linelist[2] != 'from':
-					continue
+				# if linelist[2] != 'from':
+				# 	continue
 
 				# 
 				linelist[0] = float(linelist[0])
@@ -129,33 +155,38 @@ class ConstructTreeMap(object):
 				linelist.extend([gid, lngind, latind, nodeID])
 				nodeID += 1
 				
-				res.append(linelist[:])
+				res[linelist[2]].append(linelist[:])
 		f.close()
 		
 		# 按照 deviceNum 排序
-		res.sort(key=lambda x:x[4], reverse=True)
-		for i in xrange(0, nodeID):
-			currentLine = res[i]
-			gidStr = str(currentLine[-4])
-			if gidStr in self.recDict.keys():
-				self.recDict[gidStr].append(currentLine)
-			else:
-				self.recDict[gidStr] = [currentLine]
+		for dirKey, cateName in cateKeys.iteritems():
+			res[cateKeys[index]].sort(key=lambda x:x[4], reverse=True)
 			
-			# 筛选种子
-			if i < self.custom_params['tree_num']:
-				self.entries.append(currentLine[:])
+			nodeLen = len(res[cateName])
+			for i in xrange(0, nodeLen):
+				currentLine = res[cateName][i]
+				gidStr = str(currentLine[-4])
+				if gidStr in self.recDict[cateName].keys():
+					self.recDict[cateName][gidStr].append(currentLine)
+				else:
+					self.recDict[cateName][gidStr] = [currentLine]
+				
+				# 筛选种子
+				if i < self.custom_params['tree_num']:
+					self.entries[cateName].append(currentLine[:])
 
 		return len(res)
 	
 	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentNodeGID = 0):
+		cateName = self.currentCateName
+
 		self.treeNodesID += 1
-		self.currentData['count'] += 1 
+		self.currentData[cateName]['count'] += 1 
 
 		for each in treeQueue:
 			id = "%d-%s" % (each[-4], each[-1])
-			if id not in self.keepTreeStructList:
-				self.keepTreeStructList.append(id)
+			if id not in self.keepTreeStructList[cateName]:
+				self.keepTreeStructList[cateName].append(id)
 
 		queue = []
 		parentNRN = parentNode[4]
@@ -189,7 +220,7 @@ class ConstructTreeMap(object):
 			nodeID = vertex[-1]
 
 			treeStructID = "%s-%s" % (gidStr, nodeID)
-			if treeStructID in self.keepTreeStructList:
+			if treeStructID in self.keepTreeStructList[cateName]:
 				continue
 
 			# print "self.currentData['count']: %d" % self.currentData['count']
@@ -198,13 +229,9 @@ class ConstructTreeMap(object):
 			node = self.deleteNode(gidStr, nodeID)
 			child = self.BFSOneTreeMap(vertex, parentNRN, queueCopy, originGid)
 			
-			# if 'children' in child.keys():
 			nothing = False
 			res['children'].append(child)
 
-			# 	self.deleteNode(gidStr, nodeID)
-			# else:
-			# 	self.appendNode(node, gidStr)
 
 		# result
 		if nothing:
@@ -254,19 +281,6 @@ class ConstructTreeMap(object):
 
 		if x != 0 and y != 0:
     		# 根据纬度从小到大排前三
-			# for i in xrange(self.custom_params['jump_length'], self.custom_params['jump_length'] * 2):
-			# 	current = 0
-			# 	while (jumpPoints[i][0] > jumpPoints[current][0]):
-			# 		current += 1
-			# 		if current == self.custom_params['jump_length']:
-			# 			break
-				
-			# 	if current != self.custom_params['jump_length']:
-			# 		for switch in xrange(self.custom_params['jump_length']-1, current):
-			# 			jumpPoints[switch] = jumpPoints[switch-1][:]
-			# 		jumpPoints[current] = jumpPoints[i][:]
-			
-			# 
 			for i in xrange(self.custom_params['jump_length'], self.custom_params['jump_length'] * 2):
 				currentIndex = -1
 				currentMax = jumpPoints[i][0]
@@ -322,6 +336,7 @@ class ConstructTreeMap(object):
 			:param gids: 
 			:param parentNode: 
 		"""
+		cateName = self.currentCateName
 		topSearchs = []
 		topSearchAngles = []
 		res = []
@@ -330,17 +345,17 @@ class ConstructTreeMap(object):
 		# 每个网格遍历
 		for index in xrange(0, gidsLen):
 			gid = str(gids[index][2])
-			if gid not in self.recDict.keys():
+			if gid not in self.recDict[cateName].keys():
 				continue
-			recsLen = len(self.recDict[gid])
+			recsLen = len(self.recDict[cateName][gid])
 
 			# 每个网格中的方向遍历
 			for subIndex in xrange(0, recsLen):
 				# 更新经纬度到交点，而非原先网格中点
-				self.recDict[gid][subIndex][0] = gids[index][0]
-				self.recDict[gid][subIndex][1] = gids[index][1]
+				self.recDict[cateName][gid][subIndex][0] = gids[index][0]
+				self.recDict[cateName][gid][subIndex][1] = gids[index][1]
 				# self.recDict[gid][subIndex][-4] = originGid
-				rec = self.recDict[gid][subIndex]
+				rec = self.recDict[cateName][gid][subIndex]
 				validation = self.judgeRecordLegality(rec, parentNode)
 				if validation:
     				# 处理符合条件的方向，进行分叉检查
@@ -364,6 +379,7 @@ class ConstructTreeMap(object):
 		return topSearchs
 
 	def judgeRecordLegality(self, rec, parentNode):
+		cateName = self.currentCateName
 		currentDirection = rec[5:7]
 		currentStrength = rec[4]
 
@@ -374,12 +390,12 @@ class ConstructTreeMap(object):
 		if currentAngle < -self.custom_params['search_angle'] or currentAngle > self.custom_params['search_angle']:
 			return False
 		
-		initDirection = self.currentData['direction']
+		initDirection = self.currentData[cateName]['direction']
 		accumulatedAngle = acos(cosVector(initDirection, currentDirection)) * 180 / pi
 		if accumulatedAngle < -self.custom_params['max_curvation'] or accumulatedAngle > self.custom_params['max_curvation']:
 			return False
 
-		if currentStrength < self.currentData['strength'] * self.custom_params['seed_strength']:
+		if currentStrength < self.currentData[cateName]['strength'] * self.custom_params['seed_strength']:
 			return False
 		
 		mixAngle = cos(currentAngle) * currentStrength
@@ -397,20 +413,20 @@ class ConstructTreeMap(object):
 			:param gid: 
 			:param nodeID: 
 		"""
-		# res = None
+		cateName = self.currentCateName
 		gid = str(gid)
 		# print "Delete GID %s nodeID %s" % (gid, nodeID)
 
-		nodesLen = len(self.recDict[gid])
+		nodesLen = len(self.recDict[cateName][gid])
 
 		for x in xrange(0, nodesLen):
-			if self.recDict[gid][x][-1] == nodeID:
-				if len(self.recDict[gid]) == 1:
+			if self.recDict[cateName][gid][x][-1] == nodeID:
+				if len(self.recDict[cateName][gid]) == 1:
 					# res = self.recDict[gid][0][:]
-					self.recDict.pop(gid, None) 
+					self.recDict[cateName].pop(gid, None) 
 				else: 
 					# res = self.recDict[gid][x][:]
-					del self.recDict[gid][x] 
+					del self.recDict[cateName][gid][x] 
 				return True
 	
 	def ifNodeExist(self, gid, nodeID):
@@ -420,29 +436,31 @@ class ConstructTreeMap(object):
 			:param gid: 
 			:param nodeID: 
 		"""
-		# res = None
+		cateName = self.currentCateName
 		gid = str(gid)
-		if gid not in self.recDict.keys():
+		if gid not in self.recDict[cateName].keys():
 			return False
 
-		nodesLen = len(self.recDict[gid])
+		nodesLen = len(self.recDict[cateName][gid])
 
 		for x in xrange(0, nodesLen):
-			if self.recDict[gid][x][-1] == nodeID:
+			if self.recDict[cateName][gid][x][-1] == nodeID:
 				return True
 		
 		return False
 
 	def appendNode(self, data, gid):
-		if gid in self.recDict.keys():
-			self.recDict[gid].append(data)
+		cateName = self.currentCateName
+
+		if gid in self.recDict[cateName].keys():
+			self.recDict[cateName][gid].append(data)
 		else:
-			self.recDict[gid] = [data]
+			self.recDict[cateName][gid] = [data]
 
 	def outputToFile(self, ofile):
 		with open(ofile, 'wb') as f:
 			json.dump({
 				'res': self.treeMap,
-				'len': len(self.treeMap)
+				'len': len(self.treeMap['from']) + len(self.treeMap['to'])
 			}, f)
 		f.close()
