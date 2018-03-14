@@ -160,7 +160,7 @@ class ConstructTreeMap(object):
 		
 		# 按照 deviceNum 排序
 		for dirKey, cateName in cateKeys.iteritems():
-			res[cateKeys[index]].sort(key=lambda x:x[4], reverse=True)
+			res[cateName].sort(key=lambda x:x[4], reverse=True)
 			
 			nodeLen = len(res[cateName])
 			for i in xrange(0, nodeLen):
