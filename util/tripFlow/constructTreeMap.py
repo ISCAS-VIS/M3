@@ -244,7 +244,7 @@ class ConstructTreeMap(object):
 				gridDevNumList[cateName].sort(key=lambda x:x[1], reverse=True)
 
 				gridLen = len(gridDevNumList[cateName])
-				treeNum = floor(self.custom_params['tree_num'] * gridLen)
+				treeNum = int(floor(self.custom_params['tree_num'] * gridLen))
 				
 				for i in xrange(0, treeNum):
 					gid = gridDevNumList[cateName][i][0]
