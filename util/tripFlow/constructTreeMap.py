@@ -7,8 +7,8 @@
 
 import os 
 import json
-import numpy as np
-from math import acos, cos, pi
+# import numpy as np
+from math import acos, cos, pi, floor
 from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import parseFormatGID
 from util.tripFlow.base import cosVector
@@ -60,18 +60,19 @@ class ConstructTreeMap(object):
 	def run(self):
 		input_file = 'mcres-%s-%d' % (self.dataType, self.index)
 		# input_filename = 'mcres-%d' % (self.index)
-		output_suffix = "%d_%d_%.2f_%d" % (self.custom_params['tree_num'], self.custom_params['search_angle'], self.custom_params['seed_strength'], self.custom_params['tree_width'])
+		output_suffix = "%.2f_%d_%.2f_%d_%d" % (self.custom_params['tree_num'], self.custom_params['search_angle'], self.custom_params['seed_strength'], self.custom_params['tree_width'], self.custom_params['jump_length'])
 		output_file = 'tmres-%s-%d_%s' % (self.dataType, self.index, output_suffix)
 		ifile = os.path.join(self.INPUT_PATH, input_file)
 		ofile = os.path.join(self.OUTPUT_PATH, output_file)
 		totalNum = self.iterateFile(ifile)
+		roundTreeNum = int(totalNum * self.custom_params['tree_num'])
 		usedNum = 0
 		actualTreeNum = 0
 
 		for dirKey, cateName in self.cateKeys.iteritems():
 			self.currentCateName = cateName
-			for x in xrange(0, self.custom_params['tree_num']):
-					# 初始化工作
+			for x in xrange(0, roundTreeNum):
+				# 初始化工作
 				if len(self.entries[cateName]) == 0:
 					break
 
@@ -164,6 +165,7 @@ class ConstructTreeMap(object):
 			res[cateName].sort(key=lambda x:x[4], reverse=True)
 			
 			nodeLen = len(res[cateName])
+			treeNum = floor(self.custom_params['tree_num'] * nodeLen)
 			for i in xrange(0, nodeLen):
 				currentLine = res[cateName][i]
 				gidStr = str(currentLine[-4])
@@ -173,10 +175,10 @@ class ConstructTreeMap(object):
 					self.recDict[cateName][gidStr] = [currentLine]
 				
 				# 筛选种子
-				if i < self.custom_params['tree_num']:
+				if i < treeNum:
 					self.entries[cateName].append(currentLine[:])
 
-		return len(res)
+		return int(nodeID/2)
 	
 	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentNodeGID = 0):
 		cateName = self.currentCateName
@@ -360,13 +362,13 @@ class ConstructTreeMap(object):
 				validation = self.judgeRecordLegality(rec, parentNode)
 				if validation:
     				# 处理符合条件的方向，进行分叉检查
-					if len(topSearchs) < self.custom_params['tree_num']:
+					if len(topSearchs) < self.custom_params['tree_width']:
 						topSearchs.append(rec[:])
 						topSearchAngles.append(validation['mixAngle'])
 					else:
 						maxAngleIndex = -1
 						maxAngle = validation['mixAngle']
-						for topIndex in xrange(0, self.custom_params['tree_num']):
+						for topIndex in xrange(0, self.custom_params['tree_width']):
 							tmpAngle = topSearchAngles[topIndex]
 							if maxAngle < tmpAngle:
 								maxAngleIndex = topIndex
