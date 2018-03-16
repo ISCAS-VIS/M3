@@ -58,7 +58,7 @@ def main(argv):
 
 	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length] = argv
 	x = int(x)
-	tree_num = int(tree_num)
+	tree_num = float(tree_num)
 	search_angle = int(search_angle)
 	seed_strength = float(seed_strength)
 	tree_width = int(tree_width)
