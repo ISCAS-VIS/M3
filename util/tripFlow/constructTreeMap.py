@@ -30,7 +30,9 @@ class ConstructTreeMap(object):
 		# 	'seed_strength': 0,
 		# 	'max_curvation': 0,
 		# 	'tree_width': 0,
-		# 	'jump_length': 0
+		# 	'jump_length': 0,
+		# 	"seed_unit": 0,
+		# 	"grid_dirnum": 0,
 		# }
 		self.cateKeys = {0: 'from', 1: 'to'}
 		self.currentCateName = 'from'
@@ -60,10 +62,21 @@ class ConstructTreeMap(object):
 	def run(self):
 		input_file = 'mcres-%s-%d' % (self.dataType, self.index)
 		# input_filename = 'mcres-%d' % (self.index)
-		output_suffix = "%.2f_%d_%.2f_%d_%d" % (self.custom_params['tree_num'], self.custom_params['search_angle'], self.custom_params['seed_strength'], self.custom_params['tree_width'], self.custom_params['jump_length'])
+		p1 = self.custom_params['tree_num']
+		p2 = self.custom_params['search_angle']
+		p3 = self.custom_params['seed_strength']
+		p4 = self.custom_params['tree_width']
+		p5 = self.custom_params['jump_length']
+		p6 = self.custom_params['seed_unit']
+		p7 = self.custom_params['grid_dirnum']
+		output_suffix = "%.2f_%d_%.2f_%d_%d_%s_%d" % (p1, p2, p3, p4, p5, p6, p7)
+		
 		output_file = 'tmres-%s-%d_%s' % (self.dataType, self.index, output_suffix)
 		ifile = os.path.join(self.INPUT_PATH, input_file)
 		ofile = os.path.join(self.OUTPUT_PATH, output_file)
+		if os.path.isfile(ifile):
+			return False
+
 		totalNum = self.iterateFile(ifile)
 		roundTreeNum = int(totalNum * self.custom_params['tree_num'])
 		usedNum = 0
@@ -129,14 +142,14 @@ class ConstructTreeMap(object):
 			'to': []
 		}
 
+		seedUnit = self.custom_params['seed_unit']
+		gridDirNum = self.custom_params['grid_dirnum']
+
 		with open(ifile, 'rb') as f:
 			nodeID = 0
 			for line in f:
 				line = line.strip('\n')
 				linelist = line.split(',')
-
-				# if linelist[2] != 'from':
-				# 	continue
 
 				# 
 				linelist[0] = float(linelist[0])
@@ -160,7 +173,7 @@ class ConstructTreeMap(object):
 				res[linelist[2]].append(linelist[:])
 		f.close()
 		
-		# 按照 deviceNum 排序
+		# 分 from/to 方向，按照 deviceNum 排序
 		for dirKey, cateName in cateKeys.iteritems():
 			res[cateName].sort(key=lambda x:x[4], reverse=True)
 			
