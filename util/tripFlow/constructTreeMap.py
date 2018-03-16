@@ -8,6 +8,7 @@
 import os 
 import json
 # import numpy as np
+import copy
 from math import acos, cos, pi, floor
 from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import parseFormatGID
@@ -131,19 +132,18 @@ class ConstructTreeMap(object):
 
 	def iterateFile(self, ifile):
 		"""
-		遍历文件，构建 gid-record 字典
+		遍历文件，构建 gid-record 字典以及种子方向列表
 			:param self: 
 			:param ifile: 
 		"""
 		cateKeys = self.cateKeys
 
-		res = {
-			'from': [],
-			'to': []
-		}
-
 		seedUnit = self.custom_params['seed_unit']
 		gridDirNum = self.custom_params['grid_dirnum']
+
+		# 网格列表以及网格与所属记录的对应字典
+		gridDevNumDict, gridDevNumList = { 'from': {}, 'to': {} }, { 'from': [], 'to': [] }
+		gridRecsDict = { 'from': {}, 'to': {} }
 
 		with open(ifile, 'rb') as f:
 			nodeID = 0
@@ -159,7 +159,7 @@ class ConstructTreeMap(object):
 				gid = formatGID['gid']
 				lngind = formatGID['lngind']
 				latind = formatGID['latind']
-				# gdirStr = linelist[2]
+				gdirStr = linelist[2]
 
 				linelist[6] = float(linelist[6])
 				linelist[5] = float(linelist[5])
@@ -169,16 +169,44 @@ class ConstructTreeMap(object):
 
 				linelist.extend([gid, lngind, latind, nodeID])
 				nodeID += 1
-				
-				res[linelist[2]].append(linelist[:])
+
+				strGID = str(gid)
+				if strGID in gridDevNumDict[gdirStr].keys():
+					gridDevNumDict[gdirStr][strGID] += linelist[4]
+					gridRecsDict[gdirStr][strGID].append(linelist[:])
+				else:
+					gridDevNumDict[gdirStr][strGID] = linelist[4]
+					gridRecsDict[gdirStr][strGID] = [linelist[:]]
+
+				# res[gdirStr].append(linelist[:])
 		f.close()
+
+		# 构建 grid 排序数组
+		for dirKey, cateName in cateKeys.iteritems():
+			for key, val in gridDevNumDict.iteritems():
+				gridDevNumList[cateName].append([key, val])
+
+		# 前 N 方向筛选
+		N = self.custom_params['grid_dirnum']
+		if N == -1:
+			N = 999
+
+		res = {
+			'from': [],
+			'to': []
+		}
+
+		for dirKey, cateName in cateKeys.iteritems():
+			for gid, reclist in gridRecsDict[cateName].iteritems():
+				reclist.sort(key=lambda x:x[4], reverse=True)
+				if len(reclist) >= N:
+					res[cateName] += reclist[0:N]
+				else:
+					res[cateName] += reclist[:]
 		
 		# 分 from/to 方向，按照 deviceNum 排序
 		for dirKey, cateName in cateKeys.iteritems():
-			res[cateName].sort(key=lambda x:x[4], reverse=True)
-			
 			nodeLen = len(res[cateName])
-			treeNum = floor(self.custom_params['tree_num'] * nodeLen)
 			for i in xrange(0, nodeLen):
 				currentLine = res[cateName][i]
 				gidStr = str(currentLine[-4])
@@ -187,12 +215,36 @@ class ConstructTreeMap(object):
 				else:
 					self.recDict[cateName][gidStr] = [currentLine]
 				
-				# 筛选种子
-				if i < treeNum:
-					self.entries[cateName].append(currentLine[:])
-
+		resInAll = copy.deepcopy(res)
+		resByGID = copy.deepcopy(gridRecsDict)
+		self.pickUpSeeds(resInAll, gridDevNumList, resByGID)
+		
 		return int(nodeID/2)
 	
+	def pickUpSeeds(self, resInAll, gridDevNumList, resByGID):
+		cateKeys = self.cateKeys
+
+		# basic 方式筛选种子
+		for dirKey, cateName in cateKeys.iteritems():
+			if self.custom_params['seed_unit'] == 'basic':
+				resInAll[cateName].sort(key=lambda x:x[4], reverse=True)
+				
+				nodeLen = len(resInAll[cateName])
+				treeNum = floor(self.custom_params['tree_num'] * nodeLen)
+				for i in xrange(0, nodeLen):
+					if i < treeNum:
+						self.entries[cateName].append(currentLine[:])
+			elif self.custom_params['seed_unit'] == 'grid':
+				gridDevNumList[cateName].sort(key=lambda x:x[1], reverse=True)
+
+				gridLen = len(gridDevNumList[cateName])
+				treeNum = floor(self.custom_params['tree_num'] * gridLen)
+				
+				for i in xrange(0, treeNum):
+					gid = gridDevNumList[cateName][i][0]
+					self.entries[cateName] += resByGID[cateName][gid][:]
+
+
 	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentNodeGID = 0):
 		cateName = self.currentCateName
 
