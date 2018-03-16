@@ -17,7 +17,7 @@ import logging
 from util.tripFlow.constructTreeMap import ConstructTreeMap
 
 	
-def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, jump_length): 
+def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum): 
 	dataType = 'angle'
 	custom_params = {
 		'tree_num': tree_num,
@@ -26,6 +26,8 @@ def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, t
 		'max_curvation': 90,
 		'tree_width': tree_width,
 		'jump_length': jump_length,
+		"seed_unit": seed_unit,
+		"grid_dirnum": grid_dirnum,
 		'LngSPLIT': 0.0064,
 		'LatSPLIT': 0.005
 	}
@@ -42,9 +44,19 @@ def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, t
 
 
 def usage():
-	# /datahouse/zhtan/datasets/VIS-rawdata-region/
 	# print "python treeMapCal.py -d /dir -p /dir -x 9 -n 30 -a 60 -s 0.3 -w 3 -l 3"
-	print "python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 30 60 0.1 1 3"
+
+	# 'stdindir='
+	# 'stdoutdir'
+	# "index="
+	# "tree_num"
+	# "search_angle"
+	# "seed_strength"
+	# "tree_width"
+	# "jump_length"
+	# "seed_unit"
+	# "grid_dirnum"
+	print "python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 30 60 0.1 1 3 basic -1"
 
 
 def main(argv):
@@ -56,13 +68,14 @@ def main(argv):
 	# 	usage()
 	# 	sys.exit(2)
 
-	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length] = argv
+	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum] = argv
 	x = int(x)
 	tree_num = float(tree_num)
 	search_angle = int(search_angle)
 	seed_strength = float(seed_strength)
 	tree_width = int(tree_width)
 	jump_length = int(jump_length)
+	grid_dirnum = int(grid_dirnum)
 
 	# stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
 	# stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
@@ -95,7 +108,7 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	processTask(x, indir, outdir, tree_num, search_angle, seed_strength, tree_width, jump_length)
+	processTask(x, indir, outdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()
