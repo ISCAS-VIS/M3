@@ -74,7 +74,7 @@ class ConstructTreeMap(object):
 		output_file = 'tmres-%s-%d_%s' % (self.dataType, self.index, output_suffix)
 		ifile = os.path.join(self.INPUT_PATH, input_file)
 		ofile = os.path.join(self.OUTPUT_PATH, output_file)
-		if os.path.isfile(ifile):
+		if not os.path.isfile(ifile):
 			return False
 
 		totalNum = self.iterateFile(ifile)
