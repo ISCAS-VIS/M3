@@ -126,6 +126,10 @@ class ConstructTreeMap(object):
 				print "[D-%s]#%d TMNodes Number: %d" % (cateName, x, currentEdgeCount)
 				usedNum += currentEdgeCount
 		
+		if totalNum == 0 or actualTreeNum == 0:
+			print "Zero Result!"
+			return 0
+
 		print "Edges Uesd Rate: %.4f" % (float(usedNum)/totalNum)
 		print "Tree Average Edges Number: %.4f" % (float(usedNum)/actualTreeNum)
 		self.outputToFile(ofile)
@@ -218,7 +222,7 @@ class ConstructTreeMap(object):
 		resInAll = copy.deepcopy(res)
 		resByGID = copy.deepcopy(gridRecsDict)
 		self.pickUpSeeds(resInAll, gridDevNumList, resByGID)
-		
+
 		return int(nodeID/2)
 	
 	def pickUpSeeds(self, resInAll, gridDevNumList, resByGID):
@@ -232,6 +236,8 @@ class ConstructTreeMap(object):
 				nodeLen = len(resInAll[cateName])
 				treeNum = floor(self.custom_params['tree_num'] * nodeLen)
 				for i in xrange(0, nodeLen):
+					currentLine = resInAll[cateName][i]
+
 					if i < treeNum:
 						self.entries[cateName].append(currentLine[:])
 			elif self.custom_params['seed_unit'] == 'grid':
