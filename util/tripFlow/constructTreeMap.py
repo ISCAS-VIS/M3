@@ -187,7 +187,7 @@ class ConstructTreeMap(object):
 
 		# 构建 grid 排序数组
 		for dirKey, cateName in cateKeys.iteritems():
-			for key, val in gridDevNumDict.iteritems():
+			for key, val in gridDevNumDict[cateName].iteritems():
 				gridDevNumList[cateName].append([key, val])
 
 		# 前 N 方向筛选
