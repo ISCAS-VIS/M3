@@ -123,8 +123,14 @@ class ExtractGridEdges(object):
 		fiDis = sqrt(pow(fX, 2) + pow(fY, 2))
 		tiDis = sqrt(pow(tX, 2) + pow(tY, 2))
 
-		angleLng = (fGidIPoint[0] - fPoint[0]) / fiDis
-		angleLat = (fGidIPoint[1] - fPoint[1]) / fiDis
+		vecY = tPoint[0] - fPoint[0]
+		vecX = tPoint[1] - fPoint[1]
+		vecDis = sqrt(pow(vecY, 2) + pow(vecX, 2))
+
+		# angleLng = (fGidIPoint[0] - fPoint[0]) / fiDis
+		# angleLat = (fGidIPoint[1] - fPoint[1]) / fiDis
+		angleLng = vecY / vecDis
+		angleLat = vecX / vecDis
 		tmpLng = fPoint[0] + angleLng
 		tmpLat = fPoint[1] + angleLat
 		fCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
@@ -132,8 +138,8 @@ class ExtractGridEdges(object):
 		fangle = acos(angleLat) * 180 / pi
 		fromCVecStr = "%s,%d,from,%f,%s,%.1f" % (fCircleIPointStr, fromGid, speed, direction, fangle)
 
-		angleLat = (tGidIPoint[1] - tPoint[1]) / tiDis
-		angleLng = (tGidIPoint[0] - tPoint[0]) / tiDis
+		# angleLat = (tGidIPoint[1] - tPoint[1]) / tiDis
+		# angleLng = (tGidIPoint[0] - tPoint[0]) / tiDis
 		tmpLng = tPoint[0] + angleLng
 		tmpLat = tPoint[1] + angleLat
 		tCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
