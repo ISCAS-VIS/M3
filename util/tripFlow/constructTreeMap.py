@@ -271,6 +271,7 @@ class ConstructTreeMap(object):
 		direction = [parentNode[5], parentNode[6]]
 		tmpStepRes = self.getNextGIDs(point, direction)
 		gids = tmpStepRes['res']
+		intersectionPoint = tmpStepRes['endPoints']
 		# originGid = tmpStepRes['originGid']
 		queue += self.getNextDirections(gids, parentNode)
 		queueCopy = queue[:]
@@ -307,7 +308,17 @@ class ConstructTreeMap(object):
 			subres['children'] = childs
 			res.append(subres)
 
-
+		if len(res) == 0:
+			self.treeNodesID += 1
+			res.append({
+				"root": {
+					"id": self.treeNodesID,
+					"lng": intersectionPoint[0],
+					"lat": intersectionPoint[1],
+					"num": parentNode[4],
+					"speed": parentNode[3]
+				}
+			})
 		# result
 		# if nothing:
 		# 	del res['children']
@@ -369,15 +380,15 @@ class ConstructTreeMap(object):
 				if currentIndex != -1:
 					jumpPoints[currentIndex] = jumpPoints[i][:]
 		
-		# 确定该方向的交点，为最小的交点
-		# minLng = jumpPoints[0][0]
-		# minLat = jumpPoints[0][1]
-		# originGid = 0
-		# if x != 0 and y != 0:
-		# 	for i in xrange(1, self.custom_params['jump_length']):
-		# 		if minLng > jumpPoints[i][0]:
-		# 			minLng = jumpPoints[i][0]
-		# 			minLat = jumpPoints[i][1]
+		# 确定该方向离圆心最小的交点
+		minLng = jumpPoints[0][0]
+		minLat = jumpPoints[0][1]
+		originGid = 0
+		if x != 0 and y != 0:
+			for i in xrange(1, self.custom_params['jump_length']):
+				if minLng * lngDir > jumpPoints[i][0] * lngDir:
+					minLng = jumpPoints[i][0]
+					minLat = jumpPoints[i][1]
 
 		# 只取三个交点
 		updateOriginGid = False
@@ -401,7 +412,8 @@ class ConstructTreeMap(object):
 			res.append([ilng, ilat, gid])
 		
 		return {
-			'res': res
+			'res': res,
+			'endPoints': [minLng, minLat]
 			# 'originGid': originGid
 		}
 	
