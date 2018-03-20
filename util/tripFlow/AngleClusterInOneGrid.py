@@ -24,6 +24,7 @@ class AngleClusterInOneGrid(object):
 		self.eps = PROP['eps']
 		self.min_samples = PROP['min_samples']
 		self.dbscanBaseNum = 0
+		self.noiseNum = 0
 	
 	def run(self):
 		ifilename = 'triprec-smooth-%d.json' % (self.index)
@@ -36,11 +37,13 @@ class AngleClusterInOneGrid(object):
 		# self.constructInput()
 		cres = self.clusterAngles()
 		self.dbLabel = cres['labels']
+		self.noiseNum = cres['noiseNum']
+		self.outputToFile()
 
 	def constructInput(self, edgesData):
 		cate = 'from'
 
-		for key, itemlist in edgesData[cate]:
+		for key, itemlist in edgesData[cate].items():
 			subLen = len(itemlist)
 			for x in xrange(0, subLen):
 				angle = int(float(itemlist[x][6]))
@@ -259,6 +262,10 @@ class AngleClusterInOneGrid(object):
 				'fromAngle': fromAngle,
 				'toAngle': toAngle
 			})
+
+		print "Total numbers: %d" % (self.dbscanBaseNum)
+		print "Total noise number: %d" % (self.noiseNum)
+		print len(ores)
 
 		# 结果存入 JSON 文件
 		ofilename = 'acres-%d' % (self.index)
