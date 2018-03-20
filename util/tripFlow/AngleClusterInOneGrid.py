@@ -46,7 +46,8 @@ class AngleClusterInOneGrid(object):
 		for key, itemlist in edgesData[cate].items():
 			subLen = len(itemlist)
 			for x in xrange(0, subLen):
-				angle = int(float(itemlist[x][6]))
+				linelist = itemlist[x].split(',')
+				angle = int(float(linelist[6]))
 				self.angleList.append([angle, 1])
 
 	def clusterAngles(self):
