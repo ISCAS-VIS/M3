@@ -62,7 +62,7 @@ class LineTFIntersections(object):
 					gLng = gidInfo['lng']
 					
 					tmpLngLat.append(linelist[0] + ',' + linelist[1])
-					tmpAngle.append(angle)
+					tmpAngle.append([angle, 1])
 					subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 					tmpSubInfo.append("%d,%.6f,%.6f,%s" % (gid, gLng, gLat, subprops))
 
@@ -99,8 +99,10 @@ Noise Rate:	%f
 		rho = arrayLen * self.eps / 360  # 每度至少拥有的 trip 数量
 
 		for x in xrange(0, arrayLen):
-			angleList[angleArray[x]] += 1
-			angleList[angleArray[x] + 360] += 1
+			[angle, weight] = angleArray[x]
+			
+			angleList[angle] += weight
+			angleList[angle + 360] += weight
 		
 		initLinkList = []
 		for x in xrange(0, 720):
@@ -133,7 +135,7 @@ Noise Rate:	%f
 				break
 
 			# 左右循环直至没有新元素加入则停止，并做好标记和删除工作
-			cRho = tfNum * self.eps / (rAngle - lAngle + 1)
+			cRho = tfNum / (rAngle - lAngle + 1)
 			endFlag = True
 			# 密度符合条件的情况下则一直向两边遍历
 			while (cRho >= rho):
@@ -144,7 +146,7 @@ Noise Rate:	%f
 				while tmplIndex > 0:
 					tmpItem = ALL.getitem(tmplIndex-1)
 					tmpNum = tmpItem['data']
-					tRho = (tmpNum + tmptfNum) * self.eps / (rAngle - tmpItem['index'] + 1)
+					tRho = (tmpNum + tmptfNum) / (rAngle - tmpItem['index'] + 1)
 					if tRho >= rho:
 						tmplIndex -= 1
 						tmplAngle = tmpItem['index']
@@ -157,7 +159,7 @@ Noise Rate:	%f
 				while tmprIndex < (listLen-1):
 					tmpItem = ALL.getitem(tmprIndex+1)
 					tmpNum = tmpItem['data']
-					tRho = (tmpNum + tmptfNum) * self.eps / (tmpItem['index'] - lAngle + 1)
+					tRho = (tmpNum + tmptfNum) / (tmpItem['index'] - lAngle + 1)
 					if tRho >= rho:
 						tmprIndex += 1
 						tmprAngle = tmpItem['index']
