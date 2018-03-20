@@ -5,7 +5,7 @@
 # [hour, id, time, lat, lng, from_lat, from_lng, from_time, to_lat, to_Lng, to_time]
 # 
 # Output Data Format
-# [lng, lat, gid, from/to, speed, direction]
+# [lng, lat, gid, from/to, speed, direction, angle]
 
 import os
 import json
