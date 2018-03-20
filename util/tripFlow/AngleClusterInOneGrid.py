@@ -204,6 +204,7 @@ class AngleClusterInOneGrid(object):
 		totalLen = len(self.dbLabel)
 		
 		# 初始化
+		id = 0
 		currentID = -1
 		fromAngle = -1
 		toAngle = -1
@@ -271,5 +272,5 @@ class AngleClusterInOneGrid(object):
 		ofilename = 'acres-%d' % (self.index)
 		ofile = os.path.join(self.OUTPUT_PATH, ofilename)
 		with open(ofile, 'wb') as f:
-			f.write('\n'.join(ores))
+			json.dump(ores, f)
 		f.close()
