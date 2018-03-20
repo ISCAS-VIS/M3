@@ -255,8 +255,7 @@ class ConstructTreeMap(object):
 		cateName = self.currentCateName
 
 		self.treeNodesID += 1
-		self.currentData[cateName]['count'] += 1 
-
+		
 		for each in treeQueue:
 			id = "%d-%s" % (each[-4], each[-1])
 			if id not in self.keepTreeStructList[cateName]:
@@ -290,6 +289,7 @@ class ConstructTreeMap(object):
 				continue
 			
 			self.treeNodesID += 1
+			self.currentData[cateName]['count'] += 1 
 			subres = {
 				"root": {
 					"id": self.treeNodesID,
@@ -310,6 +310,7 @@ class ConstructTreeMap(object):
 
 		if len(res) == 0:
 			self.treeNodesID += 1
+			self.currentData[cateName]['count'] += 1 
 			res.append({
 				"root": {
 					"id": self.treeNodesID,
