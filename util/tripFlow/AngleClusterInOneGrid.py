@@ -95,7 +95,7 @@ class AngleClusterInOneGrid(object):
 				break
 
 			# 左右循环直至没有新元素加入则停止，并做好标记和删除工作
-			cRho = tfNum * self.eps / (rAngle - lAngle + 1)
+			cRho = tfNum / (rAngle - lAngle + 1)
 			endFlag = True
 			# 密度符合条件的情况下则一直向两边遍历
 			while (cRho >= rho):
@@ -106,7 +106,7 @@ class AngleClusterInOneGrid(object):
 				while tmplIndex > 0:
 					tmpItem = ALL.getitem(tmplIndex-1)
 					tmpNum = tmpItem['data']
-					tRho = (tmpNum + tmptfNum) * self.eps / (rAngle - tmpItem['index'] + 1)
+					tRho = (tmpNum + tmptfNum) / (rAngle - tmpItem['index'] + 1)
 					if tRho >= rho:
 						tmplIndex -= 1
 						tmplAngle = tmpItem['index']
@@ -119,7 +119,7 @@ class AngleClusterInOneGrid(object):
 				while tmprIndex < (listLen-1):
 					tmpItem = ALL.getitem(tmprIndex+1)
 					tmpNum = tmpItem['data']
-					tRho = (tmpNum + tmptfNum) * self.eps / (tmpItem['index'] - lAngle + 1)
+					tRho = (tmpNum + tmptfNum) / (tmpItem['index'] - lAngle + 1)
 					if tRho >= rho:
 						tmprIndex += 1
 						tmprAngle = tmpItem['index']
