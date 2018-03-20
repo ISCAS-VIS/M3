@@ -210,6 +210,8 @@ class AngleClusterInOneGrid(object):
 		
 		# 初始化
 		id = 0
+		while self.dbLabel[id] == -1:
+			id += 1
 		currentID = -1
 		fromAngle = -1
 		toAngle = -1
