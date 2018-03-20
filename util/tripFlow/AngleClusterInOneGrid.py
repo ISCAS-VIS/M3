@@ -56,6 +56,7 @@ class AngleClusterInOneGrid(object):
 
 	def clusterAngles(self):
 		angleList = [0 for x in xrange(0, 720)]
+		aresList = [-1 for x in xrange(0, 360)]
 		labelList = {}
 		res = []
 		angleArray = self.angleList
@@ -142,6 +143,7 @@ class AngleClusterInOneGrid(object):
 			if tfNum >= N:
 				for x in xrange(rIndex, lIndex-1, -1):
 					angle = ALL.getitem(x)['index'] % 360
+					aresList[angle] = clusteID
 					angle = str(angle)
 					if angle not in labelList.keys():
 						labelList[angle] = clusteID + self.dbscanBaseNum
@@ -199,7 +201,7 @@ class AngleClusterInOneGrid(object):
 		self.dbscanBaseNum += clusteID
 
 		return {
-			'labels': res, 
+			'labels': aresList, 
 			'noiseNum': noiseNum
 		}
     
