@@ -216,7 +216,7 @@ class AngleClusterInOneGrid(object):
 			id += 1
 		currentID = -1
 		fromAngle = -1
-		toAngle = -1
+		toAngle = 0
 		currentNum  = 0
 
 		while id < totalLen:
@@ -225,7 +225,8 @@ class AngleClusterInOneGrid(object):
 			# 每一次对噪声后的类别开端第一个元素进行初始化
 			if currentID == -1 and CID != -1:
 				currentID = CID
-				fromAngle = self.angleList[id][0]
+				fromAngle = id
+				toAngle = id
 			
 			rate = float(currentNum)/totalLen
 			singleItem = {
@@ -247,8 +248,8 @@ class AngleClusterInOneGrid(object):
 
 				currentID = CID
 				currentNum = 1
-				fromAngle = self.angleList[id][0]
-				toAngle = self.angleList[id][0]
+				fromAngle = id
+				toAngle = id
 			elif CID == -1:
 				if currentNum != 0:
 					ores.append(singleItem)
