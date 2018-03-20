@@ -240,9 +240,9 @@ class AngleClusterInOneGrid(object):
 			}
 
 			# 根据当前聚类编号进行行为判断
-			if CID == currentID:
+			if CID == currentID and CID != -1:
 				currentNum += 1
-				toAngle = self.angleList[id][0]
+				toAngle = id
 			elif CID != -1:
 				ores.append(singleItem)
 
