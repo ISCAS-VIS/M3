@@ -5,7 +5,7 @@
 # [hour, id, time, lat, lng, from_lat, from_lng, from_time, to_lat, to_Lng, to_time]
 # 
 # Output Data Format
-# [lng, lat, gid, from/to, speed, direction, angle]
+# [lng, lat, gid, from/to, speed, direction, angle, strength]
 
 import os
 import json
@@ -13,7 +13,9 @@ from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import getRealDistance
 from util.tripFlow.base import getDirection
 from util.tripFlow.base import parseFormatGID
+from util.tripFlow.base import getGIDByIndex
 from math import sqrt, pow, acos, pi
+import math
 
 
 class ExtractGridEdges(object):
@@ -22,6 +24,7 @@ class ExtractGridEdges(object):
 		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-tf')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-rec')
 		self.index = PROP['index']
+		self.delta = PROP['delta'] * PROP['delta'] * 2
 		self.resByDir = {'e': {}, 'n': {}, 'w': {}, 's': {}}  # 分方向结果
 		self.resByCate = {'from': {}, 'to': {}}  # 分进出结果
 		self.singleDirectionCount = 0
@@ -116,6 +119,7 @@ class ExtractGridEdges(object):
 			self.resByDir[direction][toGid] = [toVecStr]
 		# END
 
+		# 处理二：分出入的旅途元数据（归一化向量）存储
 		fX = fPoint[1] - fGidIPoint[1]
 		fY = fPoint[0] - fGidIPoint[0]
 		tX = tPoint[1] - tGidIPoint[1]
@@ -123,40 +127,67 @@ class ExtractGridEdges(object):
 		fiDis = sqrt(pow(fX, 2) + pow(fY, 2))
 		tiDis = sqrt(pow(tX, 2) + pow(tY, 2))
 
+		# 计算边方向及其绝对距离
 		vecY = tPoint[0] - fPoint[0]
 		vecX = tPoint[1] - fPoint[1]
 		vecDis = sqrt(pow(vecY, 2) + pow(vecX, 2))
 
-		# angleLng = (fGidIPoint[0] - fPoint[0]) / fiDis
-		# angleLat = (fGidIPoint[1] - fPoint[1]) / fiDis
 		angleLng = vecY / vecDis
 		angleLat = vecX / vecDis
 		tmpLng = fPoint[0] + angleLng
 		tmpLat = fPoint[1] + angleLat
 		fCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
-		# print tmpLat
 		fangle = acos(angleLat) * 180 / pi
-		fromCVecStr = "%s,%d,from,%f,%s,%.1f" % (fCircleIPointStr, fromGid, speed, direction, fangle)
+		fromCVecStr = "%s,%d,from,%f,%s,%.1f,1" % (fCircleIPointStr, fromGid, speed, direction, fangle)
 
-		# angleLat = (tGidIPoint[1] - tPoint[1]) / tiDis
-		# angleLng = (tGidIPoint[0] - tPoint[0]) / tiDis
-		tmpLng = tPoint[0] + angleLng
-		tmpLat = tPoint[1] + angleLat
-		tCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
-		# print tmpLat
-		tangle = acos(angleLat) * 180 / pi
-		toCVecStr = "%s,%d,to,%f,%s,%.1f" % (tCircleIPointStr, toGid, speed, direction, tangle)
-
-		# 处理二：分出入的旅途元数据（归一化向量）存储
 		if fromGid in self.resByCate['from'].keys():
 			self.resByCate['from'][fromGid].append(fromCVecStr)
 		else:
 			self.resByCate['from'][fromGid] = [fromCVecStr]
 
+		# KDE 处理 from 相邻24个小格方向问题
+		for x in xrange(-2, 3):
+			for y in xrange(-2, 3):
+				if x == 0 and y == 0:
+					continue
+
+				newGID = getGIDByIndex(fromGid, x, y)
+				newStrength = pow(math.e, -(x*x+y*y)/self.delta)
+				fromCVecStr = "%s,%d,from,%f,%s,%.1f,%f" % (fCircleIPointStr, newGID, speed, direction, fangle, newStrength)
+
+				if newGID in self.resByCate['from'].keys():
+					self.resByCate['from'][newGID].append(fromCVecStr)
+				else:
+					self.resByCate['from'][newGID] = [fromCVecStr]
+		# KDE END
+
+		tmpLng = tPoint[0] + angleLng
+		tmpLat = tPoint[1] + angleLat
+		tCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
+		tangle = acos(angleLat) * 180 / pi
+		toCVecStr = "%s,%d,to,%f,%s,%.1f,1" % (tCircleIPointStr, toGid, speed, direction, tangle)
+
 		if toGid in self.resByCate['to'].keys():
 			self.resByCate['to'][toGid].append(toCVecStr)
 		else:
 			self.resByCate['to'][toGid] = [toCVecStr]
+
+		# KDE 处理 to 相邻24个小格方向问题
+		for x in xrange(-2, 3):
+			for y in xrange(-2, 3):
+				if x == 0 and y == 0:
+					continue
+
+				newGID = getGIDByIndex(toGid, x, y)
+				newStrength = pow(math.e, -(x*x+y*y)/self.delta)
+				toCVecStr = "%s,%d,to,%f,%s,%.1f,%f" % (tCircleIPointStr, newGID, speed, direction, tangle, newStrength)
+
+				if newGID in self.resByCate['to'].keys():
+					self.resByCate['to'][newGID].append(toCVecStr)
+				else:
+					self.resByCate['to'][newGID] = [toCVecStr]
+		# KDE END
+		# END
 
 		return 0
 

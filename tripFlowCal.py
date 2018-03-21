@@ -20,9 +20,10 @@ from util.tripFlow.mergeClusterEdges import MergeClusterEdges
 from util.tripFlow.lineTFIntersections import LineTFIntersections
 
 			
-def processTask(x, eps, min_samples, stdindir, stdoutdir): 
+def processTask(x, eps, min_samples, delta, stdindir, stdoutdir): 
 	PROP = {
 		'index': x, 
+		'delta': delta,
 		'IDIRECTORY': stdindir, 
 		'ODIRECTORY': stdoutdir
 	}
@@ -98,8 +99,8 @@ def usage():
 
 def main(argv):
 	try:
-		argsArray = ["help", 'stdindir=', 'stdoutdir', "eps", "min_samples", "index="]
-		opts, args = getopt.getopt(argv, "hd:p:e:m:x:", argsArray)
+		argsArray = ["help", 'stdindir=', 'stdoutdir', "eps", "min_samples", "index=", "delta"]
+		opts, args = getopt.getopt(argv, "hd:p:e:m:x:t:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
@@ -108,6 +109,7 @@ def main(argv):
 	stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
 	stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
 	eps, min_samples = 0.01, 10
+	delta = 1
 	x = 9
 
 	for opt, arg in opts:
@@ -124,6 +126,8 @@ def main(argv):
 			min_samples = int(arg)
 		elif opt in ('-x', '--index'):
 			x = int(arg)
+		elif opt in ('-t' '--delta'):
+			delta = float(arg)			
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
@@ -137,7 +141,7 @@ def main(argv):
 	# ===	Cluster Opts	===
 	# ''' % (stdindir, stdoutdir, eps, min_samples)
 
-	processTask(x, eps, min_samples, stdindir, stdoutdir)
+	processTask(x, eps, min_samples, delta, stdindir, stdoutdir)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()

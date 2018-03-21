@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # Input Data Format
-# [lng, lat, gid, from/to, speed, direction]
+# [lng, lat, gid, from/to, speed, direction, angle, strength]
 # 
 # Output data format
 # 分方向分 Grid 聚集的结果
