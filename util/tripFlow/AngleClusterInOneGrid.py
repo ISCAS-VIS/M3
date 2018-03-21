@@ -8,7 +8,7 @@
 import os 
 import json
 # import copy
-from math import sin, cos
+from math import sin, cos, radians
 from util.tripFlow.LinkList import LinkList
 
 
@@ -229,11 +229,13 @@ class AngleClusterInOneGrid(object):
 				toAngle = id
 			
 			rate = float(currentNum)/totalLen
+			fRadians = radians(fromAngle)
+			tRadians = radians(toAngle)
 			singleItem = {
-				'x1': sin(fromAngle),
-				'y1': cos(fromAngle),
-				'x2': sin(toAngle),
-				'y2': cos(toAngle),
+				'x1': sin(fRadians),
+				'y1': cos(fRadians),
+				'x2': sin(tRadians),
+				'y2': cos(tRadians),
 				'rate': rate,
 				'fromAngle': fromAngle,
 				'toAngle': toAngle
@@ -264,11 +266,13 @@ class AngleClusterInOneGrid(object):
 		# 清零操作
 		if currentNum != 0:
 			rate = float(currentNum)/totalLen
+			fRadians = radians(fromAngle)
+			tRadians = radians(toAngle)
 			ores.append({
-				'x1': sin(fromAngle),
-				'y1': cos(fromAngle),
-				'x2': sin(toAngle),
-				'y2': cos(toAngle),
+				'x1': sin(fRadians),
+				'y1': cos(fRadians),
+				'x2': sin(tRadians),
+				'y2': cos(tRadians),
 				'rate': rate,
 				'fromAngle': fromAngle,
 				'toAngle': toAngle
