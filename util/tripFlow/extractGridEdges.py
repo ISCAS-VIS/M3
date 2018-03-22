@@ -138,7 +138,7 @@ class ExtractGridEdges(object):
 		tmpLat = fPoint[1] + angleLat
 		fCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
 		fangle = acos(angleLat) * 180 / pi
-		if angleLng < 0 and fangle != 0:
+		if angleLng < 0 and fangle > 0.1:
 			fangle = 360 - fangle
 
 		fromCVecStr = "%s,%d,from,%f,%s,%.1f,1" % (fCircleIPointStr, fromGid, speed, direction, fangle)
@@ -149,19 +149,19 @@ class ExtractGridEdges(object):
 			self.resByCate['from'][fromGid] = [fromCVecStr]
 
 		# KDE 处理 from 相邻24个小格方向问题
-		for x in xrange(-2, 3):
-			for y in xrange(-2, 3):
-				if x == 0 and y == 0:
-					continue
+		# for x in xrange(-2, 3):
+		# 	for y in xrange(-2, 3):
+		# 		if x == 0 and y == 0:
+		# 			continue
 
-				newGID = getGIDByIndex(fromGid, x, y)
-				newStrength = pow(math.e, -(x*x+y*y)/self.delta)
-				fromCVecStr = "%s,%d,from,%f,%s,%.1f,%f" % (fCircleIPointStr, newGID, speed, direction, fangle, newStrength)
+		# 		newGID = getGIDByIndex(fromGid, x, y)
+		# 		newStrength = pow(math.e, -(x*x+y*y)/self.delta)
+		# 		fromCVecStr = "%s,%d,from,%f,%s,%.1f,%f" % (fCircleIPointStr, newGID, speed, direction, fangle, newStrength)
 
-				if newGID in self.resByCate['from'].keys():
-					self.resByCate['from'][newGID].append(fromCVecStr)
-				else:
-					self.resByCate['from'][newGID] = [fromCVecStr]
+		# 		if newGID in self.resByCate['from'].keys():
+		# 			self.resByCate['from'][newGID].append(fromCVecStr)
+		# 		else:
+		# 			self.resByCate['from'][newGID] = [fromCVecStr]
 		# KDE END
 
 		tmpLng = tPoint[0] + angleLng
@@ -176,19 +176,19 @@ class ExtractGridEdges(object):
 			self.resByCate['to'][toGid] = [toCVecStr]
 
 		# KDE 处理 to 相邻24个小格方向问题
-		for x in xrange(-2, 3):
-			for y in xrange(-2, 3):
-				if x == 0 and y == 0:
-					continue
+		# for x in xrange(-2, 3):
+		# 	for y in xrange(-2, 3):
+		# 		if x == 0 and y == 0:
+		# 			continue
 
-				newGID = getGIDByIndex(toGid, x, y)
-				newStrength = pow(math.e, -(x*x+y*y)/self.delta)
-				toCVecStr = "%s,%d,to,%f,%s,%.1f,%f" % (tCircleIPointStr, newGID, speed, direction, tangle, newStrength)
+		# 		newGID = getGIDByIndex(toGid, x, y)
+		# 		newStrength = pow(math.e, -(x*x+y*y)/self.delta)
+		# 		toCVecStr = "%s,%d,to,%f,%s,%.1f,%f" % (tCircleIPointStr, newGID, speed, direction, tangle, newStrength)
 
-				if newGID in self.resByCate['to'].keys():
-					self.resByCate['to'][newGID].append(toCVecStr)
-				else:
-					self.resByCate['to'][newGID] = [toCVecStr]
+		# 		if newGID in self.resByCate['to'].keys():
+		# 			self.resByCate['to'][newGID].append(toCVecStr)
+		# 		else:
+		# 			self.resByCate['to'][newGID] = [toCVecStr]
 		# KDE END
 		# END
 
