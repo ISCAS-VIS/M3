@@ -20,7 +20,7 @@ from util.tripFlow.mergeClusterEdges import MergeClusterEdges
 from util.tripFlow.lineTFIntersections import LineTFIntersections
 
 			
-def processTask(x, eps, min_samples, K, delta, stdindir, stdoutdir): 
+def processTask(x, eps, K, delta, stdindir, stdoutdir): 
 	PROP = {
 		'index': x, 
 		'delta': delta,
@@ -94,7 +94,7 @@ min_samples	= %d
 
 def usage():
 	# /datahouse/zhtan/datasets/VIS-rawdata-region/
-	print "python tripFlowCal.py -d /datasets -p /datasets -e 0.01 -m 10 -x 18"
+	print "python tripFlowCal.py -d /datasets -p /datasets -e 2 -x 18 -k 24000"
 
 
 def main(argv):
@@ -108,7 +108,8 @@ def main(argv):
 
 	stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
 	stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
-	eps, min_samples = 0.01, 10
+	eps = 0.01
+	# min_samples = 10
 	delta = 1
 	x = 9
 	K = 24000
@@ -123,8 +124,8 @@ def main(argv):
 			stdoutdir = arg
 		elif opt in ("-e", "--eps"):
 			eps = float(arg)
-		elif opt in ('-m', '--min_samples'):
-			min_samples = int(arg)
+		# elif opt in ('-m', '--min_samples'):
+		# 	min_samples = int(arg)
 		elif opt in ('-x', '--index'):
 			x = int(arg)
 		elif opt in ('-t' '--delta'):
@@ -144,7 +145,7 @@ def main(argv):
 	# ===	Cluster Opts	===
 	# ''' % (stdindir, stdoutdir, eps, min_samples)
 
-	processTask(x, eps, min_samples, K, delta, stdindir, stdoutdir)
+	processTask(x, eps, K, delta, stdindir, stdoutdir)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()

@@ -33,8 +33,9 @@ python segDayDataForTripFlow.py
 # -d 输入文件夹
 # -p 输出文件夹
 # -e 密度数
-# -m 最小聚类个数
-python tripFlowCal.py -d /tripflow/spaceInterval/ -p /tripflow/spaceInterval/ -e 2 -m 10
+# -x 时段编号
+# -k 总边数除以该值得到 min_samples
+python tripFlowCal.py -d /tripflow/spaceInterval/ -p /tripflow/spaceInterval/ -e 2 -x 9 -k 24000
 ```
 
 ### 在线调用部分
@@ -46,13 +47,19 @@ python tripFlowCal.py -d /tripflow/spaceInterval/ -p /tripflow/spaceInterval/ -e
 # 输入文件夹
 # 输出文件夹
 # 处理的小时 ID
-# treeMap 个数
+# treeMap 比例
 # search_angle
 # seed_strength
 # tree_width
 # jump_length
-python /datahouse/tripflow/200 /datahouse/tripflow/200 treeMapCal.py 9 30 60 0.1 1 3
+# seed_unit
+# grid_dirnum
+python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 0.01 60 0.1 1 3 basic -1
+```
 
+```
+# 在线生成 angleCluster 脚本
+python angleClusterCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 0.01 100
 ```
 
 ## 联系
