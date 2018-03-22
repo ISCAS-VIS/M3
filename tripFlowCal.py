@@ -20,7 +20,7 @@ from util.tripFlow.mergeClusterEdges import MergeClusterEdges
 from util.tripFlow.lineTFIntersections import LineTFIntersections
 
 			
-def processTask(x, eps, min_samples, delta, stdindir, stdoutdir): 
+def processTask(x, eps, min_samples, K, delta, stdindir, stdoutdir): 
 	PROP = {
 		'index': x, 
 		'delta': delta,
@@ -31,7 +31,7 @@ def processTask(x, eps, min_samples, delta, stdindir, stdoutdir):
 	res = task.run()
 	
 	count = res['count']
-	min_samples = int(count / 20000) if count > 20000 else 1
+	min_samples = int(count / K) if count > K else 1
 
 	resByDir = res['res']['resByDir']
 	resByCate = res['res']['resByCate']
@@ -99,8 +99,8 @@ def usage():
 
 def main(argv):
 	try:
-		argsArray = ["help", 'stdindir=', 'stdoutdir', "eps", "min_samples", "index=", "delta"]
-		opts, args = getopt.getopt(argv, "hd:p:e:m:x:t:", argsArray)
+		argsArray = ["help", 'stdindir=', 'stdoutdir', "eps", "min_samples", "index=", "delta", "kval"]
+		opts, args = getopt.getopt(argv, "hd:p:e:m:x:t:k:", argsArray)
 	except getopt.GetoptError as err:
 		print str(err)
 		usage()
@@ -111,6 +111,7 @@ def main(argv):
 	eps, min_samples = 0.01, 10
 	delta = 1
 	x = 9
+	K = 24000
 
 	for opt, arg in opts:
 		if opt == '-h':
@@ -127,7 +128,9 @@ def main(argv):
 		elif opt in ('-x', '--index'):
 			x = int(arg)
 		elif opt in ('-t' '--delta'):
-			delta = float(arg)			
+			delta = float(arg)
+		elif opt in ('-k' '--kval'):
+			K = int(arg)				
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
@@ -141,7 +144,7 @@ def main(argv):
 	# ===	Cluster Opts	===
 	# ''' % (stdindir, stdoutdir, eps, min_samples)
 
-	processTask(x, eps, min_samples, delta, stdindir, stdoutdir)
+	processTask(x, eps, min_samples, K, delta, stdindir, stdoutdir)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()
