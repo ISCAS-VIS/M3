@@ -138,6 +138,8 @@ class ExtractGridEdges(object):
 		tmpLat = fPoint[1] + angleLat
 		fCircleIPointStr = "%.6f,%.6f" % (tmpLng, tmpLat)
 		fangle = acos(angleLat) * 180 / pi
+		if angleLng < 0:
+			fangle = 360 - fangle
 		fromCVecStr = "%s,%d,from,%f,%s,%.1f,1" % (fCircleIPointStr, fromGid, speed, direction, fangle)
 
 		if fromGid in self.resByCate['from'].keys():
