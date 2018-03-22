@@ -31,7 +31,7 @@ def processTask(x, eps, min_samples, delta, stdindir, stdoutdir):
 	res = task.run()
 	
 	count = res['count']
-	min_samples = int(count / 6000) if count > 6000 else 1
+	min_samples = int(count / 3000) if count > 3000 else 1
 
 	resByDir = res['res']['resByDir']
 	resByCate = res['res']['resByCate']

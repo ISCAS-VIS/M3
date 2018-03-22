@@ -78,12 +78,12 @@ class LineTFIntersections(object):
 			
 			noiseRate = float(noiseNum) / totalNum
 			print '''
-===	DBScan Info	===
+===	Angle Cluster Info	===
 Number of dbscan clusters in all:	%d
 Grid ID number: %d
 Records(total):	%d
 Noise Rate:	%f
-===	DBScan Info	===
+===	Angle Cluster Info	===
 ''' % (self.dbscanBaseNum, accumulator, totalNum, noiseRate)
 
 		return noiseRate
