@@ -8,7 +8,7 @@
 import os 
 import json
 # import copy
-from math import sin, cos, radians
+from math import sin, cos, radians, floor
 from util.tripFlow.LinkList import LinkList
 
 
@@ -20,6 +20,7 @@ class AngleClusterInOneGrid(object):
 		self.index = PROP['index']
 		self.dbLabel = []
 		self.angleList = []
+		self.angleCount = [0 for x in xrange(0, 24)]
 
 		self.eps = PROP['eps']
 		self.min_samples = PROP['min_samples']
@@ -34,10 +35,9 @@ class AngleClusterInOneGrid(object):
 			self.constructInput(edgesData)
 		f.close()
 
-		# self.constructInput()
-		cres = self.clusterAngles()
-		self.dbLabel = cres['labels']
-		self.noiseNum = cres['noiseNum']
+		# cres = self.clusterAngles()
+		# self.dbLabel = cres['labels']
+		# self.noiseNum = cres['noiseNum']
 		self.outputToFile()
 
 	def constructInput(self, edgesData):
@@ -49,7 +49,9 @@ class AngleClusterInOneGrid(object):
 			for x in xrange(0, subLen):
 				linelist = itemlist[x].split(',')
 				angle = int(float(linelist[6]))
-				self.angleList.append([angle, 1])
+				# self.angleList.append([angle, 1])
+				aid = int(floor(angle/15))
+				self.angleCount[aid] += 1
 				count += 1
 		
 		print "Total angle number: %d" % (count)
@@ -207,84 +209,84 @@ class AngleClusterInOneGrid(object):
     
 	def outputToFile(self):
 		# 从前向后遍历，得到每个类别的起止方向，并计算对应流量所占百分比
-		ores = []
-		totalLen = len(self.dbLabel)
+		# ores = []
+		# totalLen = len(self.dbLabel)
 		
-		# 初始化
-		id = 0
-		while self.dbLabel[id] == -1:
-			id += 1
-		currentID = -1
-		fromAngle = -1
-		toAngle = 0
-		currentNum  = 0
+		# # 初始化
+		# id = 0
+		# while self.dbLabel[id] == -1:
+		# 	id += 1
+		# currentID = -1
+		# fromAngle = -1
+		# toAngle = 0
+		# currentNum  = 0
 
-		while id < totalLen:
-			CID = self.dbLabel[id]
+		# while id < totalLen:
+		# 	CID = self.dbLabel[id]
 
-			# 每一次对噪声后的类别开端第一个元素进行初始化
-			if currentID == -1 and CID != -1:
-				currentID = CID
-				fromAngle = id
-				toAngle = id
+		# 	# 每一次对噪声后的类别开端第一个元素进行初始化
+		# 	if currentID == -1 and CID != -1:
+		# 		currentID = CID
+		# 		fromAngle = id
+		# 		toAngle = id
 			
-			rate = float(currentNum)/totalLen
-			fRadians = radians(fromAngle)
-			tRadians = radians(toAngle)
-			singleItem = {
-				'x1': sin(fRadians),
-				'y1': cos(fRadians),
-				'x2': sin(tRadians),
-				'y2': cos(tRadians),
-				'rate': rate,
-				'fromAngle': fromAngle,
-				'toAngle': toAngle
-			}
+		# 	rate = float(currentNum)/totalLen
+		# 	fRadians = radians(fromAngle)
+		# 	tRadians = radians(toAngle)
+		# 	singleItem = {
+		# 		'x1': sin(fRadians),
+		# 		'y1': cos(fRadians),
+		# 		'x2': sin(tRadians),
+		# 		'y2': cos(tRadians),
+		# 		'rate': rate,
+		# 		'fromAngle': fromAngle,
+		# 		'toAngle': toAngle
+		# 	}
 
-			# 根据当前聚类编号进行行为判断
-			if CID == currentID and CID != -1:
-				currentNum += 1
-				toAngle = id
-			elif CID != -1:
-				ores.append(singleItem)
+		# 	# 根据当前聚类编号进行行为判断
+		# 	if CID == currentID and CID != -1:
+		# 		currentNum += 1
+		# 		toAngle = id
+		# 	elif CID != -1:
+		# 		ores.append(singleItem)
 
-				currentID = CID
-				currentNum = 1
-				fromAngle = id
-				toAngle = id
-			elif CID == -1:
-				if currentNum != 0:
-					ores.append(singleItem)
+		# 		currentID = CID
+		# 		currentNum = 1
+		# 		fromAngle = id
+		# 		toAngle = id
+		# 	elif CID == -1:
+		# 		if currentNum != 0:
+		# 			ores.append(singleItem)
 
-					currentID = -1
-					currentNum = 0
-					fromAngle = -1
-					toAngle = -1
+		# 			currentID = -1
+		# 			currentNum = 0
+		# 			fromAngle = -1
+		# 			toAngle = -1
 			
-			id += 1
+		# 	id += 1
 
-		# 清零操作
-		if currentNum != 0:
-			rate = float(currentNum)/totalLen
-			fRadians = radians(fromAngle)
-			tRadians = radians(toAngle)
-			ores.append({
-				'x1': sin(fRadians),
-				'y1': cos(fRadians),
-				'x2': sin(tRadians),
-				'y2': cos(tRadians),
-				'rate': rate,
-				'fromAngle': fromAngle,
-				'toAngle': toAngle
-			})
+		# # 清零操作
+		# if currentNum != 0:
+		# 	rate = float(currentNum)/totalLen
+		# 	fRadians = radians(fromAngle)
+		# 	tRadians = radians(toAngle)
+		# 	ores.append({
+		# 		'x1': sin(fRadians),
+		# 		'y1': cos(fRadians),
+		# 		'x2': sin(tRadians),
+		# 		'y2': cos(tRadians),
+		# 		'rate': rate,
+		# 		'fromAngle': fromAngle,
+		# 		'toAngle': toAngle
+		# 	})
 
-		print "Total numbers: %d" % (self.dbscanBaseNum)
-		print "Total noise number: %d" % (self.noiseNum)
-		print len(ores)
+		# print "Total numbers: %d" % (self.dbscanBaseNum)
+		# print "Total noise number: %d" % (self.noiseNum)
+		# print len(ores)
 
 		# 结果存入 JSON 文件
 		ofilename = 'acres-%d' % (self.index)
 		ofile = os.path.join(self.OUTPUT_PATH, ofilename)
 		with open(ofile, 'wb') as f:
-			json.dump(ores, f)
+			json.dump(self.angleCount, f)
 		f.close()
