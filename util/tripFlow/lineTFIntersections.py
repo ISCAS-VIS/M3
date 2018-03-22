@@ -97,7 +97,7 @@ Noise Rate:	%f
 
 		N = self.min_samples
 		rho = arrayLen * self.eps / 360  # 每度至少拥有的 trip 数量
-		print "Current rho: %f" % (rho)
+		# print "Current rho: %f" % (rho)
 
 		for x in xrange(0, arrayLen):
 			[angle, weight] = angleArray[x]
@@ -181,7 +181,7 @@ Noise Rate:	%f
 				# print "rho iteration"
 			
 			# 满足 cluster 条件，否则放弃
-			print "tfNum: %d" % tfNum
+			# print "tfNum: %d" % tfNum
 			if tfNum >= N:
 				# print "Current tfNum is %d, lIndex is %d, rIndex is %d, clusterID is %d" % (tfNum, lIndex, rIndex, clusteID)
 				for x in xrange(rIndex, lIndex-1, -1):
@@ -234,7 +234,7 @@ Noise Rate:	%f
 		# 返回结果计算
 		noiseNum = 0
 		for x in xrange(0, arrayLen):
-			angle = str(angleArray[x])
+			angle = str(angleArray[x][0])
 			if angle in labelList.keys():
 				res.append(labelList[angle])
 			else:
