@@ -17,7 +17,7 @@ import logging
 from util.tripFlow.constructTreeMap import ConstructTreeMap
 
 	
-def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum): 
+def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta): 
 	dataType = 'angle'
 	custom_params = {
 		'tree_num': tree_num,
@@ -29,7 +29,8 @@ def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, t
 		"seed_unit": seed_unit,
 		"grid_dirnum": grid_dirnum,
 		'LngSPLIT': 0.0064,
-		'LatSPLIT': 0.005
+		'LatSPLIT': 0.005,
+		'delta': delta
 	}
 
 	PROP = {
@@ -56,7 +57,8 @@ def usage():
 	# "jump_length"
 	# "seed_unit"
 	# "grid_dirnum"
-	print "python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 0.03 60 0.1 1 3 basic -1"
+	# "delta"
+	print "python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 0.03 60 0.1 1 3 basic -1 1"
 
 
 def main(argv):
@@ -68,7 +70,7 @@ def main(argv):
 	# 	usage()
 	# 	sys.exit(2)
 
-	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum] = argv
+	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta] = argv
 	x = int(x)
 	tree_num = float(tree_num)
 	search_angle = int(search_angle)
@@ -76,6 +78,7 @@ def main(argv):
 	tree_width = int(tree_width)
 	jump_length = int(jump_length)
 	grid_dirnum = int(grid_dirnum)
+	delta = float(delta)
 
 	# stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
 	# stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
@@ -108,7 +111,7 @@ def main(argv):
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	processTask(x, indir, outdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum)
+	processTask(x, indir, outdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()
