@@ -95,9 +95,9 @@ Noise Rate:	%f
 		labelList = {}
 		res = []
 		arrayLen = len(angleArray)
+		totalStrength = 0
 
 		N = self.min_samples
-		rho = arrayLen * self.eps / 360  # 每度至少拥有的 trip 数量
 		# print "Current rho: %f" % (rho)
 
 		for x in xrange(0, arrayLen):
@@ -105,6 +105,10 @@ Noise Rate:	%f
 			
 			angleList[angle] += weight
 			angleList[angle + 360] += weight
+
+			totalStrength += weight
+
+		rho = totalStrength * self.eps / 360  # 每度至少拥有的 trip 数量
 		
 		initLinkList = []
 		for x in xrange(0, 720):
