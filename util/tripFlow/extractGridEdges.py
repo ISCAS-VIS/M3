@@ -13,9 +13,9 @@ from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import getRealDistance
 from util.tripFlow.base import getDirection
 from util.tripFlow.base import parseFormatGID
-# from util.tripFlow.base import getGIDByIndex
+from util.tripFlow.base import getGIDByIndex
 from math import sqrt, pow, acos, pi
-# import math
+import math
 
 
 class ExtractGridEdges(object):
