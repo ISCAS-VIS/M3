@@ -41,6 +41,7 @@ class ExtractGridEdges(object):
 		}
 		
 	def iterateFile(self, file):
+		print "Delta for current running %f" % self.delta
 		count = 0
 		with open(file, 'rb') as f:
 			firstLine = True
