@@ -21,11 +21,13 @@ from util.tripFlow.lineTFIntersections import LineTFIntersections
 
 			
 def processTask(x, eps, K, delta, stdindir, stdoutdir): 
+	subfix = ".2f" % (delta)
 	PROP = {
 		'index': x, 
 		'delta': delta,
 		'IDIRECTORY': stdindir, 
-		'ODIRECTORY': stdoutdir
+		'ODIRECTORY': stdoutdir,
+		'subfix': subfix
 	}
 	task = ExtractGridEdges(PROP)
 	res = task.run()
@@ -55,7 +57,8 @@ def processTask(x, eps, K, delta, stdindir, stdoutdir):
 			'resByAng': resByCate,
 			'dataType': dataType,
 			'eps': eps,
-			'min_samples': min_samples
+			'min_samples': min_samples,
+			'subfix': subfix
 		}
 		print '''
 ===	Cluster Parameters	===
@@ -86,7 +89,8 @@ min_samples	= %d
 		'index': x, 
 		'IDIRECTORY': stdindir, 
 		'ODIRECTORY': stdoutdir,
-		'dataType': dataType
+		'dataType': dataType,
+		'subfix': subfix
 	}
 	mergeTask = MergeClusterEdges(mergePROP)
 	mergeTask.run()
@@ -110,7 +114,7 @@ def main(argv):
 	stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
 	eps = 0.01
 	# min_samples = 10
-	delta = -1
+	delta = -1.0
 	x = 9
 	K = 24000
 

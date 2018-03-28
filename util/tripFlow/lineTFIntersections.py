@@ -19,6 +19,7 @@ class LineTFIntersections(object):
 		# self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-tf')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-res')
 		self.index = PROP['index']
+		self.subfix = PROP['subfix']
 		self.dataType = 'angle'
 		self.resByAng = PROP['resByAng']
 
@@ -265,7 +266,7 @@ Noise Rate:	%f
 				onerecStr = "%s,%s,%s" % (label, lngLatStr, subInfoStr)
 				ores.append(onerecStr)
 
-		ofilename = 'tfres-%s-%d' % (self.dataType, self.index)
+		ofilename = 'tfres-%s-%d-%s' % (self.dataType, self.index, self.subfix)
 		ofile = os.path.join(self.OUTPUT_PATH, ofilename)
 		with open(ofile, 'wb') as f:
 			f.write('\n'.join(ores))

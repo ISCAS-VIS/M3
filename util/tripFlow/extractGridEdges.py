@@ -24,10 +24,11 @@ class ExtractGridEdges(object):
 		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-tf')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-rec')
 		self.index = PROP['index']
-		self.delta = PROP['delta'] * PROP['delta'] * 2 if PROP['delta'] > 0 else -1
+		self.delta = PROP['delta'] * PROP['delta'] * 2 if PROP['delta'] > 0 else -1.0
 		self.resByDir = {'e': {}, 'n': {}, 'w': {}, 's': {}}  # 分方向结果
 		self.resByCate = {'from': {}, 'to': {}}  # 分进出结果
 		self.singleDirectionCount = 0
+		self.subfix = PROP['subfix']
     
 	def run(self):
 		ifile = os.path.join(self.INPUT_PATH, 'traveldata-%d' % (self.index))  # 小时文件
@@ -269,13 +270,13 @@ class ExtractGridEdges(object):
 		
 		print "Total %d gids and %d records in four directions" % (gidNum, recNum)
 
-		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-direction-%d' % (self.index))
+		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-direction-%d-%s' % (self.index, self.subfix))
 		with open(ofile, 'wb') as f:
 			f.write('\n'.join(ores))
 		f.close()
 
 		# smooth - Category and angle
-		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-smooth-%d.json' % (self.index))
+		ofile = os.path.join(self.OUTPUT_PATH, 'triprec-smooth-%d-%s.json' % (self.index, self.subfix))
 		with open(ofile, 'wb') as f:
 			json.dump(self.resByCate, f)
 		f.close()

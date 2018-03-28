@@ -62,7 +62,7 @@ class ConstructTreeMap(object):
 
 	def run(self):
 		delta = "%.2f" % self.custom_params['delta']  # 暂未使用
-		input_file = 'mcres-%s-%d' % (self.dataType, self.index)
+		input_file = 'mcres-%s-%d-%s' % (self.dataType, self.index, delta)
 		# input_filename = 'mcres-%d' % (self.index)
 		p1 = self.custom_params['tree_num']
 		p2 = self.custom_params['search_angle']
