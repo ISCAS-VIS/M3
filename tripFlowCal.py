@@ -110,7 +110,7 @@ def main(argv):
 	stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
 	eps = 0.01
 	# min_samples = 10
-	delta = 1
+	delta = -1
 	x = 9
 	K = 24000
 

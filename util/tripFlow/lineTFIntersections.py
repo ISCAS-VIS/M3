@@ -60,9 +60,10 @@ class LineTFIntersections(object):
 					gidInfo = parseFormatGID(gid, 'e')
 					gLat = gidInfo['lat']
 					gLng = gidInfo['lng']
+					strength = float(linelist[7])
 					
 					tmpLngLat.append(linelist[0] + ',' + linelist[1])
-					tmpAngle.append([angle, 1])
+					tmpAngle.append([angle, strength])
 					subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 					tmpSubInfo.append("%d,%.6f,%.6f,%s" % (gid, gLng, gLat, subprops))
 
