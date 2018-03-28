@@ -21,7 +21,7 @@ from util.tripFlow.lineTFIntersections import LineTFIntersections
 
 			
 def processTask(x, eps, K, delta, stdindir, stdoutdir): 
-	subfix = ".2f" % (delta)
+	subfix = "%.2f" % (delta)
 	PROP = {
 		'index': x, 
 		'delta': delta,
