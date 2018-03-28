@@ -61,7 +61,7 @@ class ConstructTreeMap(object):
 		}  # 存储的 treemap 数组
 
 	def run(self):
-		delta = "%.2f" % self.custom_params['delta']  # 暂未使用
+		delta = "%.2f" % self.custom_params['delta'] 
 		input_file = 'mcres-%s-%d-%s' % (self.dataType, self.index, delta)
 		# input_filename = 'mcres-%d' % (self.index)
 		p1 = self.custom_params['tree_num']
