@@ -13,9 +13,9 @@ from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import getRealDistance
 from util.tripFlow.base import getDirection
 from util.tripFlow.base import parseFormatGID
-from util.tripFlow.base import getGIDByIndex
+# from util.tripFlow.base import getGIDByIndex
 from math import sqrt, pow, acos, pi
-import math
+# import math
 
 
 class ExtractGridEdges(object):
@@ -24,7 +24,7 @@ class ExtractGridEdges(object):
 		self.INPUT_PATH = os.path.join(PROP['IDIRECTORY'], 'bj-byhour-tf')
 		self.OUTPUT_PATH = os.path.join(PROP['ODIRECTORY'], 'bj-byhour-rec')
 		self.index = PROP['index']
-		self.delta = PROP['delta'] * PROP['delta'] * 2
+		self.delta = PROP['delta'] * PROP['delta'] * 2 if PROP['delta'] > 0 else -1
 		self.resByDir = {'e': {}, 'n': {}, 'w': {}, 's': {}}  # 分方向结果
 		self.resByCate = {'from': {}, 'to': {}}  # 分进出结果
 		self.singleDirectionCount = 0
@@ -149,19 +149,20 @@ class ExtractGridEdges(object):
 			self.resByCate['from'][fromGid] = [fromCVecStr]
 
 		# KDE 处理 from 相邻24个小格方向问题
-		# for x in xrange(-2, 3):
-		# 	for y in xrange(-2, 3):
-		# 		if x == 0 and y == 0:
-		# 			continue
+		if self.delta > 0:
+			for x in xrange(-2, 3):
+				for y in xrange(-2, 3):
+					if x == 0 and y == 0:
+						continue
 
-		# 		newGID = getGIDByIndex(fromGid, x, y)
-		# 		newStrength = pow(math.e, -(x*x+y*y)/self.delta)
-		# 		fromCVecStr = "%s,%d,from,%f,%s,%.1f,%f" % (fCircleIPointStr, newGID, speed, direction, fangle, newStrength)
+					newGID = getGIDByIndex(fromGid, x, y)
+					newStrength = pow(math.e, -(x*x+y*y)/self.delta)
+					fromCVecStr = "%s,%d,from,%f,%s,%.1f,%f" % (fCircleIPointStr, newGID, speed, direction, fangle, newStrength)
 
-		# 		if newGID in self.resByCate['from'].keys():
-		# 			self.resByCate['from'][newGID].append(fromCVecStr)
-		# 		else:
-		# 			self.resByCate['from'][newGID] = [fromCVecStr]
+					if newGID in self.resByCate['from'].keys():
+						self.resByCate['from'][newGID].append(fromCVecStr)
+					else:
+						self.resByCate['from'][newGID] = [fromCVecStr]
 		# KDE END
 
 		tmpLng = tPoint[0] + angleLng
@@ -176,19 +177,20 @@ class ExtractGridEdges(object):
 			self.resByCate['to'][toGid] = [toCVecStr]
 
 		# KDE 处理 to 相邻24个小格方向问题
-		# for x in xrange(-2, 3):
-		# 	for y in xrange(-2, 3):
-		# 		if x == 0 and y == 0:
-		# 			continue
+		if self.delta > 0:
+			for x in xrange(-2, 3):
+				for y in xrange(-2, 3):
+					if x == 0 and y == 0:
+						continue
 
-		# 		newGID = getGIDByIndex(toGid, x, y)
-		# 		newStrength = pow(math.e, -(x*x+y*y)/self.delta)
-		# 		toCVecStr = "%s,%d,to,%f,%s,%.1f,%f" % (tCircleIPointStr, newGID, speed, direction, tangle, newStrength)
+					newGID = getGIDByIndex(toGid, x, y)
+					newStrength = pow(math.e, -(x*x+y*y)/self.delta)
+					toCVecStr = "%s,%d,to,%f,%s,%.1f,%f" % (tCircleIPointStr, newGID, speed, direction, tangle, newStrength)
 
-		# 		if newGID in self.resByCate['to'].keys():
-		# 			self.resByCate['to'][newGID].append(toCVecStr)
-		# 		else:
-		# 			self.resByCate['to'][newGID] = [toCVecStr]
+					if newGID in self.resByCate['to'].keys():
+						self.resByCate['to'][newGID].append(toCVecStr)
+					else:
+						self.resByCate['to'][newGID] = [toCVecStr]
 		# KDE END
 		# END
 
