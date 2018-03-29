@@ -97,6 +97,8 @@ Noise Rate:	%f
 		res = []
 		arrayLen = len(angleArray)
 		totalStrength = 0
+		print "DEBUG: arrayLen"
+		print arrayLen
 
 		N = self.min_samples
 		# print "Current rho: %f" % (rho)
