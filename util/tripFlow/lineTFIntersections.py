@@ -67,17 +67,18 @@ class LineTFIntersections(object):
 					tmpAngle.append([angle, strength])
 					subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 					tmpSubInfo.append("%d,%.6f,%.6f,%s" % (gid, gLng, gLat, subprops))
-				
-				if len(tmpAngle) == 0:
-					continue
-
-				self.dbInput[x] += tmpLngLat
-				self.subInfo[x] += tmpSubInfo
 
 				# DBScan result
 				dbres = self.lineCLusterCalculation(tmpAngle)
+
+				if not dbres:
+					continue
+
 				noiseNum += dbres['noiseNum']
 				self.dbLabel[x] += dbres['labels']
+
+				self.dbInput[x] += tmpLngLat
+				self.subInfo[x] += tmpSubInfo
 
 				accumulator += 1
 			
@@ -124,7 +125,10 @@ Noise Rate:	%f
 					'data': angleList[x]
 				})
 		
-		print initLinkList
+		# print initLinkList
+		if len(initLinkList) == 0:
+			return False
+
 		ALL = LinkList()
 		ALL.initlist(initLinkList)
 		listLen = ALL.getlength()
