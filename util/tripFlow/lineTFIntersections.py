@@ -67,6 +67,9 @@ class LineTFIntersections(object):
 					tmpAngle.append([angle, strength])
 					subprops = "%s,%s,%s" % (gdirStr, speed, direction)
 					tmpSubInfo.append("%d,%.6f,%.6f,%s" % (gid, gLng, gLat, subprops))
+				
+				if len(tmpAngle) == 0:
+					continue
 
 				self.dbInput[x] += tmpLngLat
 				self.subInfo[x] += tmpSubInfo
@@ -97,8 +100,8 @@ Noise Rate:	%f
 		res = []
 		arrayLen = len(angleArray)
 		totalStrength = 0
-		print "DEBUG: arrayLen"
-		print arrayLen
+		# print "DEBUG: arrayLen"
+		# print arrayLen
 
 		N = self.min_samples
 		# print "Current rho: %f" % (rho)
@@ -121,6 +124,7 @@ Noise Rate:	%f
 					'data': angleList[x]
 				})
 		
+		print initLinkList
 		ALL = LinkList()
 		ALL.initlist(initLinkList)
 		listLen = ALL.getlength()
