@@ -291,14 +291,14 @@ class ConstructTreeMap(object):
 			if treeStructID in self.keepTreeStructList[cateName]:
 				continue
 			
-			self.treeNodesID += 1
-			self.currentData[cateName]['count'] += 1 
-
 			# 距离判断 START
 			dis = currentDis + getRealDistance(parentNode[0], parentNode[1], vertex[0], vertex[1])
 			if dis > self.custom_params['max_distance'] * 1000:
 				continue
 			# 距离判断 END
+
+			self.treeNodesID += 1
+			self.currentData[cateName]['count'] += 1 
 
 			subres = {
 				"root": {
