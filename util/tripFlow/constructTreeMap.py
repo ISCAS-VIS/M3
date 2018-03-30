@@ -254,7 +254,7 @@ class ConstructTreeMap(object):
 					self.entries[cateName] += resByGID[cateName][gid][:]
 
 
-	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[]):
+	def BFSOneTreeMap(self, parentNode, recordNum=0, treeQueue=[], currentDis=0):
 		cateName = self.currentCateName
 
 		self.treeNodesID += 1
@@ -295,7 +295,7 @@ class ConstructTreeMap(object):
 			self.currentData[cateName]['count'] += 1 
 
 			# 距离判断 START
-			dis = getRealDistance(parentNode[0], parentNode[1], vertex[0], vertex[1])
+			dis = currentDis + getRealDistance(parentNode[0], parentNode[1], vertex[0], vertex[1])
 			if dis > self.custom_params['max_distance'] * 1000:
 				continue
 			# 距离判断 END
@@ -306,13 +306,14 @@ class ConstructTreeMap(object):
 					"lng": vertex[0],
 					"lat": vertex[1],
 					"num": parentNode[4],
-					"speed": parentNode[3]
+					"speed": parentNode[3],
+					"dis": dis
 				},
 				"children": [  ]
 			}
 
 			node = self.deleteNode(gidStr, nodeID)
-			childs = self.BFSOneTreeMap(vertex, vertex[4], queueCopy)
+			childs = self.BFSOneTreeMap(vertex, vertex[4], queueCopy, dis)
 			
 			# nothing = False
 			subres['children'] = childs
@@ -327,7 +328,8 @@ class ConstructTreeMap(object):
 					"lng": intersectionPoint[0],
 					"lat": intersectionPoint[1],
 					"num": parentNode[4],
-					"speed": parentNode[3]
+					"speed": parentNode[3],
+					"dis": currentDis + getRealDistance(parentNode[0], parentNode[1], intersectionPoint[0], intersectionPoint[1])
 				}
 			})
 		# result
