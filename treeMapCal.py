@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# tripFlow 计算
+# treeMap 计算
 # 
 # python treeMapCal.py -d /home/joe/Documents/git/fake -p /home/joe/Documents/git/fake -e 0.01 -m 40 [grid]
 # [circle]
@@ -13,11 +13,10 @@
 import sys
 import time
 import logging
-# import getopt
 from util.tripFlow.constructTreeMap import ConstructTreeMap
 
 	
-def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta): 
+def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta, max_distance): 
 	dataType = 'angle'
 	custom_params = {
 		'tree_num': tree_num,
@@ -28,6 +27,7 @@ def processTask(x, stdindir, stdoutdir, tree_num, search_angle, seed_strength, t
 		'jump_length': jump_length,
 		"seed_unit": seed_unit,
 		"grid_dirnum": grid_dirnum,
+		'max_distance': max_distance,
 		'LngSPLIT': 0.0064,
 		'LatSPLIT': 0.005,
 		'delta': delta
@@ -58,19 +58,12 @@ def usage():
 	# "seed_unit"
 	# "grid_dirnum"
 	# "delta"
-	print "python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 0.03 60 0.1 1 3 basic -1 1"
+	print "python treeMapCal.py /datahouse/tripflow/200 /datahouse/tripflow/200 9 0.03 60 0.1 1 3 basic -1 1 9999"
 
 
 def main(argv):
-	# try:
-	# 	argsArray = ["help", 'stdindir=', 'stdoutdir', "index=", "tree_num", "search_angle", "seed_strength", "tree_width", "jump_length"]
-	# 	opts, args = getopt.getopt(argv, "hd:p:x:n:a:s:w:l:", argsArray)
-	# except getopt.GetoptError as err:
-	# 	print str(err)
-	# 	usage()
-	# 	sys.exit(2)
 
-	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta] = argv
+	[indir, outdir, x, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta, max_distance] = argv
 	x = int(x)
 	tree_num = float(tree_num)
 	search_angle = int(search_angle)
@@ -79,39 +72,12 @@ def main(argv):
 	jump_length = int(jump_length)
 	grid_dirnum = int(grid_dirnum)
 	delta = float(delta)
-
-	# stdindir = '/home/tao.jiang/datasets/JingJinJi/records'
-	# stdoutdir = '/home/tao.jiang/datasets/JingJinJi/records'
-	# x = 9
-	# tree_num, search_angle, seed_strength, tree_width = 30, 60, 0.3, 3
-	# # topN = 100
-	# jump_length = 3
-
-	# for opt, arg in opts:
-	# 	if opt == '-h':
-	# 		usage()
-	# 		sys.exit()
-	# 	elif opt in ("-d", "--stdindir"):
-	# 		stdindir = arg
-	# 	elif opt in ('-p', '--stdoutdir'):
-	# 		stdoutdir = arg
-	# 	elif opt in ('-x', '--index'):
-	# 		x = int(arg)
-	# 	elif opt in ('-n', '--tree_num'):
-	# 		tree_num = int(arg)
-	# 	elif opt in ('-a', '--search_angle'):
-	# 		search_angle = int(arg)
-	# 	elif opt in ('-s', '--seed_strength'):
-	# 		seed_strength = float(arg)
-	# 	elif opt in ('-w', '--tree_width'):
-	# 		tree_width = int(arg)
-	# 	elif opt in ('-l', '--jump_length'):
-	# 		jump_length = int(arg)
+	max_distance = float(max_distance)
 
 	STARTTIME = time.time()
 	print "Start approach at %s" % STARTTIME
 
-	processTask(x, indir, outdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta)
+	processTask(x, indir, outdir, tree_num, search_angle, seed_strength, tree_width, jump_length, seed_unit, grid_dirnum, delta, max_distance)
 
 	# @多进程运行程序 END
 	ENDTIME = time.time()
