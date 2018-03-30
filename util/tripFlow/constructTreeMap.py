@@ -13,6 +13,7 @@ from math import acos, cos, pi, floor
 from util.tripFlow.base import getFormatGID
 from util.tripFlow.base import parseFormatGID
 from util.tripFlow.base import cosVector
+from util.tripFlow.base import getRealDistance
 
 
 class ConstructTreeMap(object):
@@ -292,6 +293,13 @@ class ConstructTreeMap(object):
 			
 			self.treeNodesID += 1
 			self.currentData[cateName]['count'] += 1 
+
+			# 距离判断 START
+			dis = getRealDistance(parentNode[0], parentNode[1], vertex[0], vertex[1])
+			if dis > self.custom_params['max_distance'] * 1000:
+				continue
+			# 距离判断 END
+
 			subres = {
 				"root": {
 					"id": self.treeNodesID,
